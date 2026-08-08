@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ArrowLeft, ArrowRight, AtSign, Check, Eye, EyeOff, Lock, Mail, ShieldCheck, User } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { isSupabaseConfigured, supabase } from '../lib/supabase'
 
 const DISCOVERY_OPTIONS = ['Google', 'Instagram', 'X (Twitter)', 'Tik Tok', 'Grupo de Whatsapp', 'Outros']
 
@@ -20,7 +20,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
   if (!isOpen) return null
 
-  const configuredSupabase = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_URL !== 'https://placeholder.supabase.co'
+  const configuredSupabase = isSupabaseConfigured
 
   const resetMessages = () => {
     setError(null)
@@ -39,6 +39,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
       return
     }
     try {
+      if (!configuredSupabase) throw new Error('O Supabase não está configurado neste ambiente.')
       if (configuredSupabase) {
         const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(identifier, { redirectTo: window.location.origin })
         if (recoveryError) throw recoveryError
@@ -66,6 +67,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
     setLoading(true)
     try {
+      if (!configuredSupabase) throw new Error('O Supabase não está configurado neste ambiente.')
       if (mode === 'login') {
         if (configuredSupabase && !identifier.includes('@')) throw new Error('Para este acesso, informe o e-mail cadastrado.')
         let authenticatedUser
@@ -73,12 +75,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           const { data, error: loginError } = await supabase.auth.signInWithPassword({ email: identifier, password })
           if (loginError) throw loginError
           authenticatedUser = data.user
-        } else {
-          authenticatedUser = {
-            id: 'local-user',
-            email: identifier.includes('@') ? identifier : `${identifier || 'visitante'}@local.mapasafico`,
-            user_metadata: { name: identifier.split('@')[0] || 'Visitante' }
-          }
         }
         onLoginSuccess(authenticatedUser, rememberConnected)
       } else {
@@ -90,9 +86,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             options: { data: { name: username, username, discoverySource } }
           })
           if (registerError) throw registerError
+          if (!data.session) throw new Error('O cadastro foi criado, mas a confirmação de e-mail está ativa no Supabase. Desative “Confirm email” para permitir acesso imediato.')
           registeredUser = data.user
-        } else {
-          registeredUser = { id: 'local-new-user', email, user_metadata: { name: username, username, discoverySource } }
         }
         onLoginSuccess(registeredUser, true)
       }

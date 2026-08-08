@@ -524,7 +524,7 @@ export const INITIAL_STAND_GEOMETRIES: StandGeometry[] = [
     id: "stand-skeelo",
     mapVersionId: "v1-bienal-sp-2026",
     exhibitorId: "skeelo",
-    standCode: "A61",
+    standCode: "B30",
     type: "polygon",
     polygon: [
       { x: 1900 / 7955, y: 4550 / 6436 },

@@ -26,6 +26,7 @@ import { RoutePlanner } from './components/route/RoutePlanner'
 import { ScheduleView } from './components/schedule/ScheduleView'
 import { AccessibilityPanel } from './components/accessibility/AccessibilityPanel'
 import AuthModal from './components/AuthModal'
+import { isSupabaseConfigured, supabase } from './lib/supabase'
 
 export default function App() {
   const activeTabMode = useExhibitorStore(s => s.activeTabMode)
@@ -33,20 +34,28 @@ export default function App() {
   const selectedExhibitorId = useExhibitorStore(s => s.selectedExhibitorId)
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
   const exhibitors = useExhibitorStore(s => s.exhibitors)
+  const loadExhibitors = useExhibitorStore(s => s.loadExhibitors)
 
   const selectedStandId = useMapStore(s => s.selectedStandId)
   const setSelectedStandId = useMapStore(s => s.setSelectedStandId)
   const reducedMotion = useMapStore(s => s.reducedMotion)
   const mapTheme = useMapStore(s => s.mapTheme)
+  const routeOriginGateId = useMapStore(s => s.routeOriginGateId)
+  const setRouteOriginGateId = useMapStore(s => s.setRouteOriginGateId)
+  const userPosition = useMapStore(s => s.userPosition)
+  const setUserPosition = useMapStore(s => s.setUserPosition)
 
   const geometries = useAdminMapStore(s => s.geometries)
 
   const user = useUserStore(s => s.user)
   const setUser = useUserStore(s => s.setUser)
+  const loadUserData = useUserStore(s => s.loadUserData)
+  const clearUserData = useUserStore(s => s.clearUserData)
 
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false)
   const [isMobileMapSettingsOpen, setIsMobileMapSettingsOpen] = useState(false)
+  const [remoteUserReady, setRemoteUserReady] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = mapTheme
@@ -54,6 +63,48 @@ export default function App() {
   }, [mapTheme])
 
   useEffect(() => {
+    void loadExhibitors()
+  }, [loadExhibitors])
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+    let active = true
+    const hydrateSession = async authUser => {
+      if (!active) return
+      if (!authUser) {
+        setUser(null)
+        clearUserData()
+        setRemoteUserReady(false)
+        return
+      }
+      setUser(authUser)
+      await loadUserData(authUser.id)
+      const { data, error } = await supabase.from('user_route_settings').select('origin_id, user_position').eq('user_id', authUser.id).maybeSingle()
+      if (!active) return
+      if (error) console.error('[Supabase] carregar origem da rota:', error)
+      if (data?.origin_id) setRouteOriginGateId(data.origin_id)
+      if (data?.user_position) setUserPosition(data.user_position)
+      setRemoteUserReady(true)
+    }
+    void supabase.auth.getSession().then(({ data }) => hydrateSession(data.session?.user || null))
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => { void hydrateSession(session?.user || null) })
+    return () => { active = false; listener.subscription.unsubscribe() }
+  }, [clearUserData, loadUserData, setRouteOriginGateId, setUser, setUserPosition])
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user || !remoteUserReady) return
+    const timer = window.setTimeout(() => {
+      void supabase.from('user_route_settings').upsert({
+        user_id: user.id,
+        origin_id: routeOriginGateId,
+        user_position: userPosition
+      }).then(({ error }) => { if (error) console.error('[Supabase] salvar origem da rota:', error) })
+    }, 250)
+    return () => window.clearTimeout(timer)
+  }, [remoteUserReady, routeOriginGateId, user, userPosition])
+
+  useEffect(() => {
+    if (isSupabaseConfigured) return
     const rememberedUser = window.localStorage.getItem('mapasafico-remembered-user')
     if (!rememberedUser || user) return
     try {
@@ -83,8 +134,10 @@ export default function App() {
     else window.localStorage.removeItem('mapasafico-remembered-user')
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     window.localStorage.removeItem('mapasafico-remembered-user')
+    if (isSupabaseConfigured) await supabase.auth.signOut()
+    clearUserData()
     setUser(null)
   }
 

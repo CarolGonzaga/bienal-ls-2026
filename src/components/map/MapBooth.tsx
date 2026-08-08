@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { Heart, Bookmark } from 'lucide-react'
+import { Heart, Bookmark, CheckCircle2 } from 'lucide-react'
 import type { Exhibitor } from '../../types/index.ts'
 import type { MapFeature } from '../../data/map/map-layout.ts'
 import type { GraphicsQuality } from '../../stores/useMapStore.ts'
@@ -95,9 +95,9 @@ export const MapBooth = memo<MapBoothProps>(({ feature, exhibitor, selected, fav
       data-booth-label={isBooth ? label : undefined}
       data-service-label={!isBooth ? label : undefined}
     >{isMainEntrance ? 'ENTRADA · HALL 1' : label}</text>}
-    {exhibitor && quality !== 'eco' && (favorite || inRoute) && zoom >= 1.1 && <g className="map-feature-status" transform={`translate(${x + width - 9},${y + 2})`} aria-hidden="true">
+    {exhibitor && quality !== 'eco' && (favorite || visited || inRoute) && zoom >= 1.1 && <g className="map-feature-status" transform={`translate(${x + width - 9},${y + 2})`} aria-hidden="true">
       <circle cx="5" cy="5" r="5" fill="#fff" stroke={stroke} strokeWidth="1" />
-      {inRoute ? <Bookmark x="2" y="2" width="6" height="6" color="#b45309" fill="#b45309" /> : <Heart x="2" y="2" width="6" height="6" color="#e11d48" fill="#e11d48" />}
+      {inRoute ? <Bookmark x="2" y="2" width="6" height="6" color="#b45309" fill="#b45309" /> : visited ? <CheckCircle2 x="2" y="2" width="6" height="6" color="#0f766e" /> : <Heart x="2" y="2" width="6" height="6" color="#e11d48" fill="#e11d48" />}
     </g>}
   </g>
 })

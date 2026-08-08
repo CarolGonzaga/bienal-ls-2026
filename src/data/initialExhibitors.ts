@@ -289,7 +289,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     name: "Skeelo",
     description: "",
     reasonToVisit: "",
-    standCode: "AREA",
+    standCode: "B30",
     active: true,
     relevanceLevel: "titulos_pontuais",
     categories: ["E-books", "Audiobooks", "Aplicativo"]
