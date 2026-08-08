@@ -165,16 +165,17 @@ export const BienalMap: React.FC = () => {
   }
 
   const dark = mapTheme === 'dark'
+  const effectiveGraphicsQuality = compactViewport && graphicsQuality === 'auto' ? 'high' : graphicsQuality
   const user = userPosition ? { x: (userPosition.worldX / 40 + .5) * MAP_WIDTH, y: (.5 - userPosition.worldZ / 33.25) * MAP_HEIGHT } : null
   const mapItems = features.filter(feature => !['wall', 'external-area', 'street'].includes(feature.type))
   const buildingItems = features.filter(feature => feature.type === 'wall' || feature.type === 'external-area')
 
-  const showMapDetails = graphicsQuality !== 'eco' || transform.zoom >= 2
+  const showMapDetails = effectiveGraphicsQuality !== 'eco' || transform.zoom >= 2
 
-  return <div ref={containerRef} data-testid="bienal-map" data-map-quality={graphicsQuality} data-reduced-motion={reducedMotion} className={`map-quality-${graphicsQuality} absolute inset-0 min-h-[520px] overflow-hidden select-none ${dark ? 'bg-slate-950' : 'bg-slate-100'}`}>
+  return <div ref={containerRef} data-testid="bienal-map" data-map-quality={effectiveGraphicsQuality} data-reduced-motion={reducedMotion} className={`map-quality-${effectiveGraphicsQuality} absolute inset-0 min-h-[520px] overflow-hidden select-none ${dark ? 'bg-slate-950' : 'bg-slate-100'}`}>
     <div data-testid="map-zoom-surface" className="absolute inset-0 flex items-center justify-center overflow-hidden p-2 sm:p-4" style={{ touchAction: 'none' }} {...handlers}>
-      <div className="h-full w-full" style={{ transform: `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.zoom})`, transformOrigin: 'center center' }}>
-        <svg ref={svgRef} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" className={`block h-full w-full ${isChoosingRouteOrigin || isChoosingUserPosition ? 'cursor-crosshair' : ''}`} role="img" aria-labelledby="bienal-map-title bienal-map-description" onClick={handleMapChoice}>
+      <div className="map-vector-transform h-full w-full" style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`, transformOrigin: 'center center' }}>
+        <svg ref={svgRef} viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" className={`map-vector-canvas block h-full w-full ${isChoosingRouteOrigin || isChoosingUserPosition ? 'cursor-crosshair' : ''}`} role="img" aria-labelledby="bienal-map-title bienal-map-description" onClick={handleMapChoice}>
           <title id="bienal-map-title">Mapa indoor da Bienal do Livro</title>
           <desc id="bienal-map-description">Mapa vetorial com pavilhões, ruas, estandes, portões, serviços e rota acessível pelos corredores.</desc>
           <g id="background-layer"><rect width={MAP_WIDTH} height={MAP_HEIGHT} fill={dark ? '#0f172a' : '#f1f5f9'} /></g>
@@ -193,7 +194,7 @@ export const BienalMap: React.FC = () => {
           {showMapDetails && <g id="annotation-layer" className="pointer-events-none">{MAP_ANNOTATIONS.map(annotation => <text key={annotation.id} x={annotation.position.x} y={annotation.position.y} textAnchor="middle" dominantBaseline="middle" fontSize={annotation.fontSize || 7} fontWeight="900" letterSpacing=".25" fill={dark ? '#cbd5e1' : '#475569'}>{annotation.label}</text>)}</g>}
           <g id="booth-and-service-layer">{mapItems.map(feature => {
             const exhibitor = feature.exhibitorId ? exhibitors.find(item => item.id === feature.exhibitorId) : undefined
-            return <MapBooth key={feature.id} feature={feature} exhibitor={exhibitor} selected={selectedStandId === feature.id} favorite={Boolean(exhibitor && favorites.includes(exhibitor.id))} visited={Boolean(exhibitor && visits[exhibitor.id])} inRoute={Boolean(exhibitor && routeStops.some(stop => stop.exhibitorId === exhibitor.id))} isometric={false} zoom={transform.zoom} dark={dark} quality={graphicsQuality} compact={compactViewport} onSelect={() => selectFeature(feature)}/>
+            return <MapBooth key={feature.id} feature={feature} exhibitor={exhibitor} selected={selectedStandId === feature.id} favorite={Boolean(exhibitor && favorites.includes(exhibitor.id))} visited={Boolean(exhibitor && visits[exhibitor.id])} inRoute={Boolean(exhibitor && routeStops.some(stop => stop.exhibitorId === exhibitor.id))} isometric={false} zoom={transform.zoom} dark={dark} quality={effectiveGraphicsQuality} compact={compactViewport} onSelect={() => selectFeature(feature)}/>
           })}</g>
           <MapRoute segments={routeSegments} compact={compactViewport}/>
           <g id="marker-layer">{user && <g data-testid="user-position-marker" transform={`translate(${user.x} ${user.y})`}>{!reducedMotion && <circle className="user-ping" r="14" fill="#d43276"/>}<circle r="9" fill="#d43276" stroke="#fff" strokeWidth="1.5" vectorEffect="non-scaling-stroke"/><circle r="2.5" fill="#fff"/><text y="-13" textAnchor="middle" fontSize="8" fontWeight="900" fill="#b94185">VOCÊ ESTÁ AQUI</text></g>}</g>

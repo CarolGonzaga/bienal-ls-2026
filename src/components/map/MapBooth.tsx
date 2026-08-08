@@ -54,8 +54,8 @@ export const MapBooth = memo<MapBoothProps>(({ feature, exhibitor, selected, fav
   const labelHalo = isDiscreetAccess ? 'transparent' : isBooth && exhibitor ? darker(fill) : dark ? '#475569' : '#f8fafc'
   const compactOutlineWidth = selected ? 1.3 : exhibitor ? .8 : quality === 'eco' ? .28 : .45
   const desktopOutlineWidth = selected ? 1.8 : exhibitor ? 1.05 : quality === 'eco' ? .45 : .65
-  const outlineWidth = isDiscreetAccess ? 0 : compact ? compactOutlineWidth * .4 : desktopOutlineWidth
-  const labelHaloWidth = compact ? .3 : .65
+  const outlineWidth = isDiscreetAccess ? 0 : compact ? compactOutlineWidth * .85 : desktopOutlineWidth
+  const labelHaloWidth = compact ? .5 : .65
   const accessibleName = exhibitor ? `Estande ${feature.boothCode} — ${exhibitor.name}${selected ? ' — selecionado' : ''}` : `${feature.label || feature.boothCode || feature.type}${selected ? ' — selecionado' : ''}`
 
   return <g

@@ -1017,6 +1017,22 @@ html[data-theme='dark'] body {
   filter: none;
 }
 
+.map-vector-canvas {
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+.map-vector-transform {
+  backface-visibility: visible;
+  transform-style: flat;
+}
+
+@media (max-width: 1023px) {
+  [data-map-quality="high"] [data-map-face="top"] {
+    filter: none;
+  }
+}
+
 .reduce-motion *,
 .reduce-motion *::before,
 .reduce-motion *::after {
