@@ -82,8 +82,13 @@ export default function App() {
       const { data, error } = await supabase.from('user_route_settings').select('origin_id, user_position').eq('user_id', authUser.id).maybeSingle()
       if (!active) return
       if (error) console.error('[Supabase] carregar origem da rota:', error)
-      if (data?.origin_id) setRouteOriginGateId(data.origin_id)
-      if (data?.user_position) setUserPosition(data.user_position)
+      if (data?.origin_id === 'CUSTOM' && data?.user_position) {
+        setUserPosition(data.user_position)
+        setRouteOriginGateId('CUSTOM')
+      } else {
+        setUserPosition(null)
+        setRouteOriginGateId('HALL1')
+      }
       setRemoteUserReady(true)
     }
     void supabase.auth.getSession().then(({ data }) => hydrateSession(data.session?.user || null))

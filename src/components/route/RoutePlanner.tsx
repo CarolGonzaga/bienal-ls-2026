@@ -4,7 +4,6 @@ import { useUserStore } from '../../stores/useUserStore'
 import { useExhibitorStore } from '../../stores/useExhibitorStore'
 import { useMapStore } from '../../stores/useMapStore'
 import { useAdminMapStore } from '../../stores/useAdminMapStore'
-import { buildMapLayout } from '../../data/map/map-layout.ts'
 import { CUSTOM_ROUTE_ORIGIN_ID } from '../../data/map/map-routing-graph.ts'
 import { ROUTE_SEGMENT_COLORS } from '../../services/mapRoutingService.ts'
 
@@ -18,21 +17,30 @@ export const RoutePlanner: React.FC = () => {
   const routeOriginGateId = useMapStore(s => s.routeOriginGateId)
   const setRouteOriginGateId = useMapStore(s => s.setRouteOriginGateId)
   const userPosition = useMapStore(s => s.userPosition)
+  const setUserPosition = useMapStore(s => s.setUserPosition)
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
   const setActiveTabMode = useExhibitorStore(s => s.setActiveTabMode)
   const geometries = useAdminMapStore(s => s.geometries)
-  const layout = useMemo(() => buildMapLayout(geometries), [geometries])
-  const boothOrigins = layout.filter(feature => feature.exhibitorId && feature.boothCode)
   const orderedStops = useMemo(() => [...routeStops].sort((a, b) => a.order - b.order), [routeStops])
-  const selectedOrigin = boothOrigins.find(feature => `access-${feature.id}` === routeOriginGateId)
-  const originLabel = routeOriginGateId === CUSTOM_ROUTE_ORIGIN_ID ? 'Personalizado' : routeOriginGateId === 'HALL1' ? 'Entrada Hall 1' : selectedOrigin?.boothCode || 'Ponto selecionado'
+  const originLabel = routeOriginGateId === CUSTOM_ROUTE_ORIGIN_ID && userPosition ? 'Personalizado' : 'Entrada Hall 1'
 
   const showRouteOnMap = () => {
     setActiveTabMode('map')
   }
 
-  const choosePointOnMap = () => setActiveTabMode('map')
-  const useRegisteredPosition = () => setRouteOriginGateId(CUSTOM_ROUTE_ORIGIN_ID)
+  const handleClearRoute = () => {
+    clearRoute()
+    setUserPosition(null)
+    setRouteOriginGateId('HALL1')
+  }
+
+  const handleOriginChange = (originId: string) => {
+    if (originId === CUSTOM_ROUTE_ORIGIN_ID && userPosition) setRouteOriginGateId(CUSTOM_ROUTE_ORIGIN_ID)
+    else {
+      setUserPosition(null)
+      setRouteOriginGateId('HALL1')
+    }
+  }
 
   const handleFocusStand = (exhibitorId: string) => {
     setSelectedExhibitorId(exhibitorId)
@@ -49,10 +57,10 @@ export const RoutePlanner: React.FC = () => {
             <Navigation className="h-5 w-5 text-[#d43276]" />
             <h2 className="route-title text-xl font-bold leading-tight sm:text-2xl">Minha Rota Personalizada</h2>
           </div>
-          <p className="route-muted mt-1 text-xs sm:text-sm">A entrada principal do Hall 1 é a origem padrão. Você também pode partir de um estande.</p>
+          <p className="route-muted mt-1 text-xs sm:text-sm">Todas as rotas começam na Entrada Hall 1 ou no ponto personalizado marcado pelo ícone de pessoa.</p>
         </div>
         {routeStops.length > 0 && (
-          <button onClick={clearRoute} className="route-clear-button flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors">
+          <button onClick={handleClearRoute} className="route-clear-button flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors">
             <Trash2 className="w-3.5 h-3.5" />
             <span>Limpar rota</span>
           </button>
@@ -66,21 +74,13 @@ export const RoutePlanner: React.FC = () => {
             <select
               aria-label="Origem da rota"
               value={routeOriginGateId}
-              onChange={event => setRouteOriginGateId(event.target.value)}
+              onChange={event => handleOriginChange(event.target.value)}
               className="route-origin-select w-full min-w-0 max-w-full rounded-xl border px-4 py-3 text-sm font-semibold outline-none"
             >
               <optgroup label="Entrada principal"><option value="HALL1">Hall 1 · Entrada principal</option></optgroup>
               {userPosition && <optgroup label="Local definido no mapa"><option value={CUSTOM_ROUTE_ORIGIN_ID}>Personalizado</option></optgroup>}
-              <optgroup label="Partir de um estande">{boothOrigins.map(feature => {
-                const exhibitor = exhibitors.find(item => item.id === feature.exhibitorId)
-                return <option key={feature.id} value={`access-${feature.id}`}>{feature.boothCode} — {exhibitor?.name}</option>
-              })}</optgroup>
             </select>
           </label>
-          <div className="hidden">
-            <button type="button" onClick={choosePointOnMap} className="route-secondary-button min-h-11 rounded-xl border px-2 py-2 text-[11px] font-bold sm:px-3 sm:text-xs">Selecionar ponto no mapa</button>
-            <button type="button" onClick={useRegisteredPosition} className="route-soft-button min-h-11 rounded-xl border px-2 py-2 text-[11px] font-bold sm:px-3 sm:text-xs">{userPosition ? 'Usar minha posição' : 'Definir minha posição'}</button>
-          </div>
         </div>
         <button onClick={showRouteOnMap} disabled={routeStops.length === 0} className="route-primary-button min-h-12 w-full min-w-0 rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed">
           Traçar no mapa

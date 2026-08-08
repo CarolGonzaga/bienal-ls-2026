@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { boothAccessPoint, buildMapLayout } from '../../data/map/map-layout.ts'
 import { INITIAL_STAND_GEOMETRIES } from '../../data/initialStands.ts'
-import { buildRoutingGraph, MAIN_CROSS_AISLES } from '../../data/map/map-routing-graph.ts'
+import { buildRoutingGraph, CUSTOM_ROUTE_ORIGIN_ID, MAIN_CROSS_AISLES, withCustomRouteOrigin } from '../../data/map/map-routing-graph.ts'
 import { buildRouteSegments, findRoute, parseMapRouteParams } from '../../services/mapRoutingService.ts'
 import { validateGraph, validateRouteObstacles } from '../../services/mapLayoutValidationService.ts'
 
@@ -105,6 +105,23 @@ test('origem ou destino inexistente retorna nulo', () => {
 test('rota bloqueada retorna nulo', () => {
   const blocked = { ...graph, edges: graph.edges.map(edge => ({ ...edge, blocked: true })) }
   assert.equal(findRoute(blocked, 'P8', `access-${destination.id}`), null)
+})
+
+test('origem personalizada atualiza o início e preserva a ordem dos destinos', () => {
+  const first = features.find(feature => feature.boothCode === 'G36' && feature.exhibitorId)!
+  const second = features.find(feature => feature.boothCode === 'K33' && feature.exhibitorId)!
+  const stops = [
+    { exhibitorId: first.exhibitorId!, standCode: first.boothCode!, visited: false, order: 1 },
+    { exhibitorId: second.exhibitorId!, standCode: second.boothCode!, visited: false, order: 2 }
+  ]
+  const customPoint = { x: 644, y: 700 }
+  const customGraph = withCustomRouteOrigin(graph, customPoint)
+  const segments = buildRouteSegments(customGraph, features, CUSTOM_ROUTE_ORIGIN_ID, stops)
+  assert.equal(segments.length, 2)
+  assert.equal(segments[0].fromId, CUSTOM_ROUTE_ORIGIN_ID)
+  assert.equal(segments[0].points[0].x, customPoint.x)
+  assert.equal(segments[0].points[0].y, customPoint.y)
+  assert.deepEqual(segments.map(segment => segment.destinationExhibitorId), [first.exhibitorId, second.exhibitorId])
 })
 
 test('arestas caminháveis não atravessam estandes ou áreas fechadas', () => {

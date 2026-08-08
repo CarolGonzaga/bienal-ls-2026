@@ -76,6 +76,11 @@ export const BienalMap: React.FC = () => {
   const routePoints = useMemo(() => routeSegments.flatMap(segment => segment.points), [routeSegments])
 
   useEffect(() => {
+    const customOriginIsValid = routeOriginGateId === CUSTOM_ROUTE_ORIGIN_ID && Boolean(userPosition)
+    if (routeOriginGateId !== 'HALL1' && !customOriginIsValid) setRouteOriginGateId('HALL1')
+  }, [routeOriginGateId, setRouteOriginGateId, userPosition])
+
+  useEffect(() => {
     const controls = (window as any).__mapControls
     if (!controls) return
     controls.focusRoute = () => {
@@ -93,7 +98,7 @@ export const BienalMap: React.FC = () => {
 
   useEffect(() => {
     const { origin, destination: destinationCode } = parseMapRouteParams(window.location.search)
-    if (origin && graph.nodes.some(node => node.id === origin)) setRouteOriginGateId(origin)
+    if (origin === 'HALL1') setRouteOriginGateId('HALL1')
     if (!destinationCode) return
     const feature = features.find(item => item.boothCode?.toUpperCase() === destinationCode && item.exhibitorId)
     if (!feature?.exhibitorId || !feature.boothCode) return
@@ -123,6 +128,7 @@ export const BienalMap: React.FC = () => {
         ? { x: feature.geometry.x + feature.geometry.width / 2, y: feature.geometry.y + feature.geometry.height / 2 }
         : { x: feature.geometry.points.reduce((sum, item) => sum + item.x, 0) / feature.geometry.points.length, y: feature.geometry.points.reduce((sum, item) => sum + item.y, 0) / feature.geometry.points.length })
       setUserPosition(toWorldCoordinates(point.x / MAP_WIDTH, point.y / MAP_HEIGHT))
+      setRouteOriginGateId(CUSTOM_ROUTE_ORIGIN_ID)
       setIsChoosingUserPosition(false)
       return
     }
@@ -152,7 +158,8 @@ export const BienalMap: React.FC = () => {
       setUserPosition(toWorldCoordinates(nearest.x / MAP_WIDTH, nearest.y / MAP_HEIGHT))
       setIsChoosingUserPosition(false)
     } else {
-      setRouteOriginGateId(nearest.id)
+      setUserPosition(toWorldCoordinates(nearest.x / MAP_WIDTH, nearest.y / MAP_HEIGHT))
+      setRouteOriginGateId(CUSTOM_ROUTE_ORIGIN_ID)
       setIsChoosingRouteOrigin(false)
     }
   }
