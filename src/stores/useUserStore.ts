@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { User, Visit, RouteStop } from '../types'
 import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
 
@@ -7,6 +8,7 @@ interface UserState {
   favorites: string[]
   visits: Record<string, Visit>
   routeStops: RouteStop[]
+  hasPendingSync: boolean
   setUser: (user: User | null) => void
   toggleFavorite: (exhibitorId: string) => void
   isFavorite: (exhibitorId: string) => boolean
@@ -18,6 +20,7 @@ interface UserState {
   isInRoute: (exhibitorId: string) => boolean
   clearRoute: () => void
   loadUserData: (userId: string) => Promise<void>
+  syncUserData: (userId: string) => Promise<void>
   clearUserData: () => void
 }
 
@@ -36,11 +39,12 @@ const syncRoute = async (userId: string, stops: RouteStop[]) => {
   reportSyncError('sincronizar rota', error)
 }
 
-export const useUserStore = create<UserState>((set, get) => ({
+export const useUserStore = create<UserState>()(persist((set, get) => ({
   user: null,
   favorites: [],
   visits: {},
   routeStops: [],
+  hasPendingSync: false,
 
   setUser: user => set({ user }),
 
@@ -48,7 +52,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     const current = get().favorites
     const userId = get().user?.id
     const removing = current.includes(exhibitorId)
-    set({ favorites: removing ? current.filter(id => id !== exhibitorId) : [...current, exhibitorId] })
+    set({ favorites: removing ? current.filter(id => id !== exhibitorId) : [...current, exhibitorId], hasPendingSync: !navigator.onLine })
     if (!isSupabaseConfigured || !userId) return
     const request = removing
       ? supabase.from('user_favorites').delete().eq('user_id', userId).eq('exhibitor_id', exhibitorId)
@@ -67,7 +71,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       id: `${userId || 'local'}-${exhibitorId}`,
       userId: userId || 'local-user', exhibitorId, visitedAt: new Date().toISOString(), notes
     }
-    set({ visits: current })
+    set({ visits: current, hasPendingSync: !navigator.onLine })
     if (!isSupabaseConfigured || !userId) return
     const request = removing
       ? supabase.from('user_visits').delete().eq('user_id', userId).eq('exhibitor_id', exhibitorId)
@@ -81,7 +85,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     const stops = get().routeStops
     if (stops.some(stop => stop.exhibitorId === exhibitorId)) return
     const next = [...stops, { exhibitorId, standCode, visited: false, order: stops.length + 1 }]
-    set({ routeStops: next })
+    set({ routeStops: next, hasPendingSync: !navigator.onLine })
     const userId = get().user?.id
     if (isSupabaseConfigured && userId) void syncRoute(userId, next)
   },
@@ -89,7 +93,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   removeFromRoute: exhibitorId => {
     const next = get().routeStops.filter(stop => stop.exhibitorId !== exhibitorId)
       .sort((a, b) => a.order - b.order).map((stop, index) => ({ ...stop, order: index + 1 }))
-    set({ routeStops: next })
+    set({ routeStops: next, hasPendingSync: !navigator.onLine })
     const userId = get().user?.id
     if (isSupabaseConfigured && userId) void syncRoute(userId, next)
   },
@@ -101,7 +105,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     if (currentIndex < 0 || targetIndex < 0 || targetIndex >= ordered.length) return
     ;[ordered[currentIndex], ordered[targetIndex]] = [ordered[targetIndex], ordered[currentIndex]]
     const next = ordered.map((stop, index) => ({ ...stop, order: index + 1 }))
-    set({ routeStops: next })
+    set({ routeStops: next, hasPendingSync: !navigator.onLine })
     const userId = get().user?.id
     if (isSupabaseConfigured && userId) void syncRoute(userId, next)
   },
@@ -109,13 +113,17 @@ export const useUserStore = create<UserState>((set, get) => ({
   isInRoute: exhibitorId => get().routeStops.some(stop => stop.exhibitorId === exhibitorId),
 
   clearRoute: () => {
-    set({ routeStops: [] })
+    set({ routeStops: [], hasPendingSync: !navigator.onLine })
     const userId = get().user?.id
     if (isSupabaseConfigured && userId) void syncRoute(userId, [])
   },
 
   loadUserData: async userId => {
     if (!isSupabaseConfigured) return
+    if (get().hasPendingSync) {
+      await get().syncUserData(userId)
+      return
+    }
     const [favoritesResult, visitsResult, routeResult] = await Promise.all([
       supabase.from('user_favorites').select('exhibitor_id').eq('user_id', userId),
       supabase.from('user_visits').select('exhibitor_id, visited_at, notes').eq('user_id', userId),
@@ -137,5 +145,31 @@ export const useUserStore = create<UserState>((set, get) => ({
     })
   },
 
-  clearUserData: () => set({ favorites: [], visits: {}, routeStops: [] })
+  syncUserData: async userId => {
+    if (!isSupabaseConfigured) return
+    const { favorites, visits, routeStops } = get()
+    const [favoritesDelete, visitsDelete] = await Promise.all([
+      supabase.from('user_favorites').delete().eq('user_id', userId),
+      supabase.from('user_visits').delete().eq('user_id', userId)
+    ])
+    if (favoritesDelete.error || visitsDelete.error) {
+      reportSyncError('preparar sincronizaÃ§Ã£o offline', favoritesDelete.error || visitsDelete.error)
+      return
+    }
+    const requests: PromiseLike<{ error: unknown }>[] = []
+    if (favorites.length) requests.push(supabase.from('user_favorites').insert(favorites.map(exhibitorId => ({ user_id: userId, exhibitor_id: exhibitorId }))))
+    const visitRows = Object.values(visits).map(visit => ({
+      user_id: userId, exhibitor_id: visit.exhibitorId, visited_at: visit.visitedAt, notes: visit.notes || null
+    }))
+    if (visitRows.length) requests.push(supabase.from('user_visits').insert(visitRows))
+    const results = await Promise.all(requests)
+    results.forEach(result => reportSyncError('sincronizar dados offline', result.error))
+    await syncRoute(userId, routeStops)
+    set({ hasPendingSync: false })
+  },
+
+  clearUserData: () => set({ favorites: [], visits: {}, routeStops: [], hasPendingSync: false })
+}), {
+  name: 'mapasafico-offline-user-data',
+  partialize: state => ({ favorites: state.favorites, visits: state.visits, routeStops: state.routeStops, hasPendingSync: state.hasPendingSync })
 }))

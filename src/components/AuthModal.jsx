@@ -4,7 +4,7 @@ import { isSupabaseConfigured, supabase } from '../lib/supabase'
 
 const DISCOVERY_OPTIONS = ['Google', 'Instagram', 'X (Twitter)', 'Tik Tok', 'Grupo de Whatsapp', 'Outros']
 
-export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
+export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = false }) {
   const [mode, setMode] = useState('login')
   const [identifier, setIdentifier] = useState('')
   const [username, setUsername] = useState('')
@@ -91,7 +91,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         }
         onLoginSuccess(registeredUser, true)
       }
-      onClose()
+      onClose?.()
     } catch (submitError) {
       setError(submitError.message || 'Não foi possível concluir a autenticação.')
     } finally {
@@ -104,9 +104,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   return (
     <section className="auth-page flex min-h-full w-full items-start justify-center overflow-y-auto px-4 py-8 sm:items-center sm:py-12">
       <div className="auth-card w-full max-w-lg rounded-[2rem] border p-5 sm:p-8">
-        <button type="button" onClick={onClose} className="auth-back-button mb-5 flex items-center gap-2 text-xs font-bold">
+        {!isGate && <button type="button" onClick={onClose} className="auth-back-button mb-5 flex items-center gap-2 text-xs font-bold">
           <ArrowLeft className="h-4 w-4" />Voltar ao site
-        </button>
+        </button>}
 
         <div className="mb-6 flex items-center gap-3">
           <div className="relative h-12 w-12 overflow-hidden"><img src="/logo-icon.png" alt="" className="absolute left-1/2 top-1/2 h-16 w-16 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain" /></div>

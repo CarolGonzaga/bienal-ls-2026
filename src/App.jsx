@@ -50,12 +50,15 @@ export default function App() {
   const user = useUserStore(s => s.user)
   const setUser = useUserStore(s => s.setUser)
   const loadUserData = useUserStore(s => s.loadUserData)
+  const syncUserData = useUserStore(s => s.syncUserData)
   const clearUserData = useUserStore(s => s.clearUserData)
 
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false)
   const [isMobileMapSettingsOpen, setIsMobileMapSettingsOpen] = useState(false)
   const [remoteUserReady, setRemoteUserReady] = useState(false)
+  const [authInitializing, setAuthInitializing] = useState(isSupabaseConfigured)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = mapTheme
@@ -72,12 +75,25 @@ export default function App() {
     const hydrateSession = async authUser => {
       if (!active) return
       if (!authUser) {
+        const cachedUser = window.localStorage.getItem('mapasafico-offline-user')
+        if (!navigator.onLine && cachedUser) {
+          try {
+            setUser(JSON.parse(cachedUser))
+            setRemoteUserReady(true)
+            setAuthInitializing(false)
+            return
+          } catch {
+            window.localStorage.removeItem('mapasafico-offline-user')
+          }
+        }
         setUser(null)
         clearUserData()
         setRemoteUserReady(false)
+        setAuthInitializing(false)
         return
       }
       setUser(authUser)
+      window.localStorage.setItem('mapasafico-offline-user', JSON.stringify(authUser))
       await loadUserData(authUser.id)
       const { data, error } = await supabase.from('user_route_settings').select('origin_id, user_position').eq('user_id', authUser.id).maybeSingle()
       if (!active) return
@@ -90,11 +106,25 @@ export default function App() {
         setRouteOriginGateId('HALL1')
       }
       setRemoteUserReady(true)
+      setAuthInitializing(false)
     }
     void supabase.auth.getSession().then(({ data }) => hydrateSession(data.session?.user || null))
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => { void hydrateSession(session?.user || null) })
     return () => { active = false; listener.subscription.unsubscribe() }
   }, [clearUserData, loadUserData, setRouteOriginGateId, setUser, setUserPosition])
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user) return
+    const synchronize = () => {
+      void syncUserData(user.id)
+      void loadExhibitors()
+      void supabase.from('user_route_settings').upsert({
+        user_id: user.id, origin_id: routeOriginGateId, user_position: userPosition
+      })
+    }
+    window.addEventListener('online', synchronize)
+    return () => window.removeEventListener('online', synchronize)
+  }, [loadExhibitors, routeOriginGateId, syncUserData, user, userPosition])
 
   useEffect(() => {
     if (!isSupabaseConfigured || !user || !remoteUserReady) return
@@ -135,15 +165,25 @@ export default function App() {
 
   const handleLoginSuccess = (userData, rememberConnected = false) => {
     setUser(userData)
+    window.localStorage.setItem('mapasafico-offline-user', JSON.stringify(userData))
     if (rememberConnected) window.localStorage.setItem('mapasafico-remembered-user', JSON.stringify(userData))
     else window.localStorage.removeItem('mapasafico-remembered-user')
   }
 
   const handleLogout = async () => {
     window.localStorage.removeItem('mapasafico-remembered-user')
+    window.localStorage.removeItem('mapasafico-offline-user')
     if (isSupabaseConfigured) await supabase.auth.signOut()
     clearUserData()
     setUser(null)
+  }
+
+  if (authInitializing) {
+    return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src="/logo-icon.png" alt="Mapa SÃ¡fico" className="h-20 w-20 object-contain"/><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
+  }
+
+  if (!user) {
+    return <div className={`brand-shell site-theme theme-${mapTheme} min-h-[100dvh]`}><AuthModal isOpen isGate onLoginSuccess={handleLoginSuccess} /></div>
   }
 
   return (
@@ -214,31 +254,22 @@ export default function App() {
               <Eye className="w-4 h-4" />
             </button>
 
-            {user ? (
-              <div className="site-user-chip flex items-center gap-2 rounded-2xl border px-3 py-1.5">
+            <div className="relative flex items-center gap-2">
+              <button onClick={() => setIsProfileOpen(open => !open)} aria-expanded={isProfileOpen} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Perfil">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
                   {(user.user_metadata?.name || user.email)[0].toUpperCase()}
                 </div>
-                <span className="hidden sm:inline text-xs font-semibold text-slate-200 max-w-[100px] truncate">
-                  {user.user_metadata?.name || user.email}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  title="Sair"
-                  className="p-1 rounded-lg text-slate-400 hover:text-rose-400 transition-colors"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => { handleCloseDrawer(); setIsAuthOpen(true) }}
-                className="flex items-center gap-1.5 rounded-xl bg-[#d43276] px-3.5 py-2 text-xs font-semibold text-white shadow-md shadow-[#d43276]/25 transition-all hover:bg-[#cf005e]"
-              >
-                <User className="w-3.5 h-3.5 text-white" />
-                <span>Entrar</span>
+                <span className="hidden text-xs font-semibold sm:inline">Perfil</span>
               </button>
-            )}
+              <button onClick={handleLogout} title="Sair da conta" className="site-header-action flex items-center gap-1.5 rounded-xl border p-2.5 text-xs font-bold transition-colors sm:px-3">
+                <LogOut className="h-4 w-4"/><span className="hidden sm:inline">Sair</span>
+              </button>
+              {isProfileOpen && <div className="site-user-chip absolute right-0 top-[calc(100%+0.6rem)] z-50 w-64 rounded-2xl border p-4 shadow-xl">
+                <div className="mb-1 text-xs font-black uppercase tracking-wide text-[#d43276]">Meu perfil</div>
+                <div className="truncate text-sm font-bold">{user.user_metadata?.name || user.user_metadata?.username || 'UsuÃ¡ria'}</div>
+                <div className="mt-1 truncate text-xs opacity-70">{user.email}</div>
+              </div>}
+            </div>
           </div>
         </div>
 

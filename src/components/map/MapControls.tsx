@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Crosshair,
   RotateCcw,
@@ -26,6 +26,64 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
   const clearRoute = useUserStore(s => s.clearRoute)
   const dragStartRef = useRef<{ x: number; y: number } | null>(null)
   const [personDragOffset, setPersonDragOffset] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const movePerson = (clientX: number, clientY: number) => {
+      const start = dragStartRef.current
+      if (!start) return
+      setPersonDragOffset({ x: clientX - start.x, y: clientY - start.y })
+    }
+    const finishPerson = (clientX: number, clientY: number) => {
+      const start = dragStartRef.current
+      if (!start) return
+      const dragged = Math.hypot(clientX - start.x, clientY - start.y) >= 8
+      if (dragged) (window as any).__mapControls?.setCustomOriginAtClientPoint?.(clientX, clientY)
+      dragStartRef.current = null
+      setPersonDragOffset({ x: 0, y: 0 })
+    }
+    const onPointerMove = (event: PointerEvent) => {
+      if (!dragStartRef.current) return
+      event.preventDefault()
+      movePerson(event.clientX, event.clientY)
+    }
+    const onPointerUp = (event: PointerEvent) => finishPerson(event.clientX, event.clientY)
+    const onPointerCancel = () => { dragStartRef.current = null; setPersonDragOffset({ x: 0, y: 0 }) }
+    const onTouchMove = (event: TouchEvent) => {
+      if (!dragStartRef.current || !event.touches[0]) return
+      event.preventDefault()
+      movePerson(event.touches[0].clientX, event.touches[0].clientY)
+    }
+    const onTouchEnd = (event: TouchEvent) => {
+      const touch = event.changedTouches[0]
+      if (touch) finishPerson(touch.clientX, touch.clientY)
+    }
+    const onMouseMove = (event: MouseEvent) => movePerson(event.clientX, event.clientY)
+    const onMouseUp = (event: MouseEvent) => finishPerson(event.clientX, event.clientY)
+
+    document.addEventListener('pointermove', onPointerMove, { passive: false })
+    document.addEventListener('pointerup', onPointerUp)
+    document.addEventListener('pointercancel', onPointerCancel)
+    document.addEventListener('touchmove', onTouchMove, { passive: false })
+    document.addEventListener('touchend', onTouchEnd)
+    document.addEventListener('touchcancel', onPointerCancel)
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+    return () => {
+      document.removeEventListener('pointermove', onPointerMove)
+      document.removeEventListener('pointerup', onPointerUp)
+      document.removeEventListener('pointercancel', onPointerCancel)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onTouchEnd)
+      document.removeEventListener('touchcancel', onPointerCancel)
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
+
+  const beginPersonDrag = (clientX: number, clientY: number) => {
+    dragStartRef.current = { x: clientX, y: clientY }
+    setPersonDragOffset({ x: 0, y: 0 })
+  }
 
   const handleResetView = () => (window as any).__mapControls?.resetView?.()
   const handleZoom = (direction: 'in' | 'out') => direction === 'in'
@@ -55,21 +113,21 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
         title="Arraste para definir o ponto de partida"
         onPointerDown={event => {
           event.preventDefault()
-          event.currentTarget.setPointerCapture(event.pointerId)
-          dragStartRef.current = { x: event.clientX, y: event.clientY }
+          event.stopPropagation()
+          beginPersonDrag(event.clientX, event.clientY)
         }}
-        onPointerMove={event => {
-          if (!dragStartRef.current) return
-          setPersonDragOffset({ x: event.clientX - dragStartRef.current.x, y: event.clientY - dragStartRef.current.y })
+        onTouchStart={event => {
+          if ('PointerEvent' in window || !event.touches[0]) return
+          event.preventDefault()
+          event.stopPropagation()
+          beginPersonDrag(event.touches[0].clientX, event.touches[0].clientY)
         }}
-        onPointerUp={event => {
-          if (!dragStartRef.current) return
-          const dragged = Math.hypot(event.clientX - dragStartRef.current.x, event.clientY - dragStartRef.current.y) >= 8
-          if (dragged) (window as any).__mapControls?.setCustomOriginAtClientPoint?.(event.clientX, event.clientY)
-          dragStartRef.current = null
-          setPersonDragOffset({ x: 0, y: 0 })
+        onMouseDown={event => {
+          if ('PointerEvent' in window) return
+          event.preventDefault()
+          event.stopPropagation()
+          beginPersonDrag(event.clientX, event.clientY)
         }}
-        onPointerCancel={() => { dragStartRef.current = null; setPersonDragOffset({ x: 0, y: 0 }) }}
         style={{ transform: `translate(${personDragOffset.x}px, ${personDragOffset.y}px)`, touchAction: 'none' }}
         className={`flex h-9 w-9 cursor-grab items-center justify-center rounded-lg border border-slate-200 bg-white shadow-md transition active:cursor-grabbing ${routeOriginGateId === CUSTOM_ROUTE_ORIGIN_ID ? 'text-[#0f8f83] ring-2 ring-[#0f8f83]/25' : 'text-amber-500'}`}
       ><UserRound className="h-[18px] w-[18px]" strokeWidth={2.4}/></button>
@@ -98,10 +156,9 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
         <button
           aria-label="Arraste para definir o ponto de partida"
           title="Arraste para definir o ponto de partida"
-          onPointerDown={event => { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); dragStartRef.current = { x: event.clientX, y: event.clientY } }}
-          onPointerMove={event => { if (dragStartRef.current) setPersonDragOffset({ x: event.clientX - dragStartRef.current.x, y: event.clientY - dragStartRef.current.y }) }}
-          onPointerUp={event => { if (!dragStartRef.current) return; const dragged = Math.hypot(event.clientX - dragStartRef.current.x, event.clientY - dragStartRef.current.y) >= 8; if (dragged) (window as any).__mapControls?.setCustomOriginAtClientPoint?.(event.clientX, event.clientY); dragStartRef.current = null; setPersonDragOffset({ x: 0, y: 0 }) }}
-          onPointerCancel={() => { dragStartRef.current = null; setPersonDragOffset({ x: 0, y: 0 }) }}
+          onPointerDown={event => { event.preventDefault(); event.stopPropagation(); beginPersonDrag(event.clientX, event.clientY) }}
+          onTouchStart={event => { if ('PointerEvent' in window || !event.touches[0]) return; event.preventDefault(); event.stopPropagation(); beginPersonDrag(event.touches[0].clientX, event.touches[0].clientY) }}
+          onMouseDown={event => { if ('PointerEvent' in window) return; event.preventDefault(); event.stopPropagation(); beginPersonDrag(event.clientX, event.clientY) }}
           style={{ transform: `translate(${personDragOffset.x}px, ${personDragOffset.y}px)`, touchAction: 'none' }}
           className={`map-control-button cursor-grab active:cursor-grabbing ${routeOriginGateId === CUSTOM_ROUTE_ORIGIN_ID ? 'is-active' : ''}`}
         ><UserRound className="h-4 w-4"/></button>
