@@ -1,0 +1,1967 @@
+{
+  "source": "MAPA.png",
+  "detectedCandidates": 211,
+  "matchedBooths": 164,
+  "matches": [
+    {
+      "code": "A30",
+      "bounds": {
+        "x": 873,
+        "y": 850,
+        "width": 127,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 25.846
+    },
+    {
+      "code": "A40",
+      "bounds": {
+        "x": 774,
+        "y": 851,
+        "width": 72,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 25.512
+    },
+    {
+      "code": "A41",
+      "bounds": {
+        "x": 818,
+        "y": 911,
+        "width": 28,
+        "height": 41,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 26.251
+    },
+    {
+      "code": "A47",
+      "bounds": {
+        "x": 776,
+        "y": 912,
+        "width": 21,
+        "height": 46,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 24.523
+    },
+    {
+      "code": "A50",
+      "bounds": {
+        "x": 730,
+        "y": 851,
+        "width": 44,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 24.268
+    },
+    {
+      "code": "A55",
+      "bounds": {
+        "x": 742,
+        "y": 912,
+        "width": 34,
+        "height": 46,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 24.183
+    },
+    {
+      "code": "A58",
+      "bounds": {
+        "x": 656,
+        "y": 851,
+        "width": 74,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.516
+    },
+    {
+      "code": "A60",
+      "bounds": {
+        "x": 576,
+        "y": 851,
+        "width": 56,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.605
+    },
+    {
+      "code": "A61",
+      "bounds": {
+        "x": 480,
+        "y": 912,
+        "width": 138,
+        "height": 46,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.453
+    },
+    {
+      "code": "A66",
+      "bounds": {
+        "x": 554,
+        "y": 870,
+        "width": 22,
+        "height": 15,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.491
+    },
+    {
+      "code": "A68",
+      "bounds": {
+        "x": 510,
+        "y": 851,
+        "width": 44,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.529
+    },
+    {
+      "code": "A79",
+      "bounds": {
+        "x": 380,
+        "y": 912,
+        "width": 28,
+        "height": 44,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.462
+    },
+    {
+      "code": "A80",
+      "bounds": {
+        "x": 387,
+        "y": 850,
+        "width": 36,
+        "height": 20,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.755
+    },
+    {
+      "code": "A81",
+      "bounds": {
+        "x": 329,
+        "y": 912,
+        "width": 31,
+        "height": 46,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.013
+    },
+    {
+      "code": "A85",
+      "bounds": {
+        "x": 306,
+        "y": 912,
+        "width": 23,
+        "height": 46,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.261
+    },
+    {
+      "code": "A86",
+      "bounds": {
+        "x": 313,
+        "y": 851,
+        "width": 30,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.538
+    },
+    {
+      "code": "A88",
+      "bounds": {
+        "x": 258,
+        "y": 851,
+        "width": 55,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.493
+    },
+    {
+      "code": "A89",
+      "bounds": {
+        "x": 262,
+        "y": 912,
+        "width": 28,
+        "height": 45,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.18
+    },
+    {
+      "code": "B20",
+      "bounds": {
+        "x": 1736,
+        "y": 760,
+        "width": 16,
+        "height": 20,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 34.565
+    },
+    {
+      "code": "B30",
+      "bounds": {
+        "x": 1704,
+        "y": 816,
+        "width": 14,
+        "height": 18,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 41.724
+    },
+    {
+      "code": "B38",
+      "bounds": {
+        "x": 1690,
+        "y": 816,
+        "width": 14,
+        "height": 18,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 45.381
+    },
+    {
+      "code": "B40",
+      "bounds": {
+        "x": 1674,
+        "y": 760,
+        "width": 44,
+        "height": 38,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 54.025
+    },
+    {
+      "code": "B58",
+      "bounds": {
+        "x": 1674,
+        "y": 816,
+        "width": 16,
+        "height": 18,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 86.917
+    },
+    {
+      "code": "B60",
+      "bounds": {
+        "x": 1026,
+        "y": 780,
+        "width": 106,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 40.862
+    },
+    {
+      "code": "B66",
+      "bounds": {
+        "x": 928,
+        "y": 780,
+        "width": 72,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 35.523
+    },
+    {
+      "code": "B68",
+      "bounds": {
+        "x": 874,
+        "y": 780,
+        "width": 54,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 30.996
+    },
+    {
+      "code": "B70",
+      "bounds": {
+        "x": 658,
+        "y": 780,
+        "width": 190,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.43
+    },
+    {
+      "code": "B76",
+      "bounds": {
+        "x": 584,
+        "y": 780,
+        "width": 48,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.59
+    },
+    {
+      "code": "B78",
+      "bounds": {
+        "x": 412,
+        "y": 780,
+        "width": 73,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 6.658
+    },
+    {
+      "code": "B79",
+      "bounds": {
+        "x": 512,
+        "y": 780,
+        "width": 72,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 14.631
+    },
+    {
+      "code": "B80",
+      "bounds": {
+        "x": 368,
+        "y": 780,
+        "width": 44,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.734
+    },
+    {
+      "code": "B88",
+      "bounds": {
+        "x": 258,
+        "y": 780,
+        "width": 110,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.554
+    },
+    {
+      "code": "B90",
+      "bounds": {
+        "x": 118,
+        "y": 780,
+        "width": 15,
+        "height": 18,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.55
+    },
+    {
+      "code": "C10",
+      "bounds": {
+        "x": 1301,
+        "y": 728,
+        "width": 194,
+        "height": 12,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.428
+    },
+    {
+      "code": "C20",
+      "bounds": {
+        "x": 1162,
+        "y": 710,
+        "width": 54,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 19.357
+    },
+    {
+      "code": "C28",
+      "bounds": {
+        "x": 1063,
+        "y": 710,
+        "width": 69,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 14.882
+    },
+    {
+      "code": "C30",
+      "bounds": {
+        "x": 1027,
+        "y": 710,
+        "width": 36,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 19.578
+    },
+    {
+      "code": "C40",
+      "bounds": {
+        "x": 658,
+        "y": 710,
+        "width": 116,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 36.24
+    },
+    {
+      "code": "C58",
+      "bounds": {
+        "x": 872,
+        "y": 710,
+        "width": 129,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 26.885
+    },
+    {
+      "code": "C60",
+      "bounds": {
+        "x": 774,
+        "y": 710,
+        "width": 73,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 29.627
+    },
+    {
+      "code": "C70",
+      "bounds": {
+        "x": 511,
+        "y": 710,
+        "width": 121,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 45.602
+    },
+    {
+      "code": "C72",
+      "bounds": {
+        "x": 466,
+        "y": 710,
+        "width": 18,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 49.264
+    },
+    {
+      "code": "C76",
+      "bounds": {
+        "x": 432,
+        "y": 710,
+        "width": 34,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 47.649
+    },
+    {
+      "code": "C77",
+      "bounds": {
+        "x": 386,
+        "y": 728,
+        "width": 46,
+        "height": 19,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 50.143
+    },
+    {
+      "code": "C78",
+      "bounds": {
+        "x": 386,
+        "y": 710,
+        "width": 46,
+        "height": 18,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.299
+    },
+    {
+      "code": "C80",
+      "bounds": {
+        "x": 372,
+        "y": 710,
+        "width": 14,
+        "height": 18,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.336
+    },
+    {
+      "code": "C82",
+      "bounds": {
+        "x": 350,
+        "y": 710,
+        "width": 22,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.421
+    },
+    {
+      "code": "C88",
+      "bounds": {
+        "x": 258,
+        "y": 710,
+        "width": 92,
+        "height": 37,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.168
+    },
+    {
+      "code": "D02",
+      "bounds": {
+        "x": 1656,
+        "y": 640,
+        "width": 37,
+        "height": 88,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 11.358
+    },
+    {
+      "code": "D10",
+      "bounds": {
+        "x": 1634,
+        "y": 640,
+        "width": 22,
+        "height": 88,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 14.002
+    },
+    {
+      "code": "D20",
+      "bounds": {
+        "x": 1572,
+        "y": 640,
+        "width": 50,
+        "height": 88,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.655
+    },
+    {
+      "code": "D28",
+      "bounds": {
+        "x": 1162,
+        "y": 640,
+        "width": 91,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.116
+    },
+    {
+      "code": "D30",
+      "bounds": {
+        "x": 1100,
+        "y": 640,
+        "width": 32,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 13.927
+    },
+    {
+      "code": "D40",
+      "bounds": {
+        "x": 1026,
+        "y": 640,
+        "width": 74,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 8.93
+    },
+    {
+      "code": "D58",
+      "bounds": {
+        "x": 658,
+        "y": 640,
+        "width": 164,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.402
+    },
+    {
+      "code": "D60",
+      "bounds": {
+        "x": 511,
+        "y": 640,
+        "width": 121,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.738
+    },
+    {
+      "code": "D70",
+      "bounds": {
+        "x": 302,
+        "y": 640,
+        "width": 184,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.05
+    },
+    {
+      "code": "D88",
+      "bounds": {
+        "x": 260,
+        "y": 640,
+        "width": 42,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.816
+    },
+    {
+      "code": "E02",
+      "bounds": {
+        "x": 1275,
+        "y": 571,
+        "width": 11,
+        "height": 29,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 28.192
+    },
+    {
+      "code": "E10",
+      "bounds": {
+        "x": 1275,
+        "y": 571,
+        "width": 11,
+        "height": 29,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.439
+    },
+    {
+      "code": "E18",
+      "bounds": {
+        "x": 1275,
+        "y": 571,
+        "width": 11,
+        "height": 29,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.439
+    },
+    {
+      "code": "E20",
+      "bounds": {
+        "x": 1275,
+        "y": 571,
+        "width": 11,
+        "height": 29,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.728
+    },
+    {
+      "code": "E30",
+      "bounds": {
+        "x": 1228,
+        "y": 572,
+        "width": 25,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.1
+    },
+    {
+      "code": "E40",
+      "bounds": {
+        "x": 1026,
+        "y": 572,
+        "width": 106,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.572
+    },
+    {
+      "code": "E58",
+      "bounds": {
+        "x": 661,
+        "y": 572,
+        "width": 183,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.629
+    },
+    {
+      "code": "E60",
+      "bounds": {
+        "x": 511,
+        "y": 572,
+        "width": 121,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.741
+    },
+    {
+      "code": "E70",
+      "bounds": {
+        "x": 375,
+        "y": 572,
+        "width": 110,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 6.108
+    },
+    {
+      "code": "E76",
+      "bounds": {
+        "x": 375,
+        "y": 572,
+        "width": 110,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.603
+    },
+    {
+      "code": "E80",
+      "bounds": {
+        "x": 360,
+        "y": 572,
+        "width": 15,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.43
+    },
+    {
+      "code": "E82",
+      "bounds": {
+        "x": 325,
+        "y": 572,
+        "width": 35,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.91
+    },
+    {
+      "code": "E88",
+      "bounds": {
+        "x": 259,
+        "y": 572,
+        "width": 66,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.1
+    },
+    {
+      "code": "F02",
+      "bounds": {
+        "x": 1275,
+        "y": 571,
+        "width": 11,
+        "height": 29,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 28.115
+    },
+    {
+      "code": "F10",
+      "bounds": {
+        "x": 1275,
+        "y": 542,
+        "width": 11,
+        "height": 28,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.894
+    },
+    {
+      "code": "F14",
+      "bounds": {
+        "x": 1275,
+        "y": 510,
+        "width": 11,
+        "height": 32,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 23.672
+    },
+    {
+      "code": "F18",
+      "bounds": {
+        "x": 1275,
+        "y": 510,
+        "width": 11,
+        "height": 32,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 22.548
+    },
+    {
+      "code": "F20",
+      "bounds": {
+        "x": 1275,
+        "y": 510,
+        "width": 11,
+        "height": 32,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 16.512
+    },
+    {
+      "code": "F28",
+      "bounds": {
+        "x": 1275,
+        "y": 510,
+        "width": 11,
+        "height": 32,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 11.938
+    },
+    {
+      "code": "F30",
+      "bounds": {
+        "x": 1216,
+        "y": 506,
+        "width": 36,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.068
+    },
+    {
+      "code": "F40",
+      "bounds": {
+        "x": 1026,
+        "y": 506,
+        "width": 58,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.752
+    },
+    {
+      "code": "F58",
+      "bounds": {
+        "x": 658,
+        "y": 506,
+        "width": 146,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.446
+    },
+    {
+      "code": "F60",
+      "bounds": {
+        "x": 512,
+        "y": 506,
+        "width": 120,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.765
+    },
+    {
+      "code": "F70",
+      "bounds": {
+        "x": 412,
+        "y": 506,
+        "width": 74,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.784
+    },
+    {
+      "code": "F76",
+      "bounds": {
+        "x": 372,
+        "y": 506,
+        "width": 40,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.634
+    },
+    {
+      "code": "F80",
+      "bounds": {
+        "x": 346,
+        "y": 506,
+        "width": 26,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.018
+    },
+    {
+      "code": "F82",
+      "bounds": {
+        "x": 314,
+        "y": 506,
+        "width": 32,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.743
+    },
+    {
+      "code": "F88",
+      "bounds": {
+        "x": 260,
+        "y": 506,
+        "width": 54,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.776
+    },
+    {
+      "code": "G02",
+      "bounds": {
+        "x": 1275,
+        "y": 542,
+        "width": 11,
+        "height": 28,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 28.178
+    },
+    {
+      "code": "G03",
+      "bounds": {
+        "x": 1275,
+        "y": 542,
+        "width": 11,
+        "height": 28,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 28.178
+    },
+    {
+      "code": "G10",
+      "bounds": {
+        "x": 1275,
+        "y": 510,
+        "width": 11,
+        "height": 32,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.225
+    },
+    {
+      "code": "G14",
+      "bounds": {
+        "x": 1275,
+        "y": 542,
+        "width": 11,
+        "height": 28,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 24.48
+    },
+    {
+      "code": "G18",
+      "bounds": {
+        "x": 1275,
+        "y": 510,
+        "width": 11,
+        "height": 32,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 22.548
+    },
+    {
+      "code": "G20",
+      "bounds": {
+        "x": 1096,
+        "y": 437,
+        "width": 36,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.76
+    },
+    {
+      "code": "G26",
+      "bounds": {
+        "x": 1066,
+        "y": 437,
+        "width": 30,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 29.297
+    },
+    {
+      "code": "G28",
+      "bounds": {
+        "x": 1026,
+        "y": 437,
+        "width": 40,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 26.754
+    },
+    {
+      "code": "G30",
+      "bounds": {
+        "x": 946,
+        "y": 437,
+        "width": 56,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 25.858
+    },
+    {
+      "code": "G36",
+      "bounds": {
+        "x": 917,
+        "y": 437,
+        "width": 29,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 23.566
+    },
+    {
+      "code": "G38",
+      "bounds": {
+        "x": 874,
+        "y": 437,
+        "width": 43,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 25.698
+    },
+    {
+      "code": "G40",
+      "bounds": {
+        "x": 756,
+        "y": 437,
+        "width": 91,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 18.986
+    },
+    {
+      "code": "G50",
+      "bounds": {
+        "x": 694,
+        "y": 437,
+        "width": 17,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.081
+    },
+    {
+      "code": "G52",
+      "bounds": {
+        "x": 711,
+        "y": 437,
+        "width": 45,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 23.1
+    },
+    {
+      "code": "G58",
+      "bounds": {
+        "x": 657,
+        "y": 437,
+        "width": 37,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.844
+    },
+    {
+      "code": "G60",
+      "bounds": {
+        "x": 558,
+        "y": 437,
+        "width": 74,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.868
+    },
+    {
+      "code": "G68",
+      "bounds": {
+        "x": 512,
+        "y": 437,
+        "width": 46,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.919
+    },
+    {
+      "code": "G70",
+      "bounds": {
+        "x": 412,
+        "y": 437,
+        "width": 73,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.378
+    },
+    {
+      "code": "G76",
+      "bounds": {
+        "x": 376,
+        "y": 437,
+        "width": 36,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.343
+    },
+    {
+      "code": "G80",
+      "bounds": {
+        "x": 354,
+        "y": 437,
+        "width": 22,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.662
+    },
+    {
+      "code": "G82",
+      "bounds": {
+        "x": 339,
+        "y": 437,
+        "width": 15,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.379
+    },
+    {
+      "code": "G84",
+      "bounds": {
+        "x": 302,
+        "y": 437,
+        "width": 37,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 2.953
+    },
+    {
+      "code": "G88",
+      "bounds": {
+        "x": 260,
+        "y": 437,
+        "width": 42,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.917
+    },
+    {
+      "code": "H30",
+      "bounds": {
+        "x": 1122,
+        "y": 393,
+        "width": 8,
+        "height": 13,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 19.405
+    },
+    {
+      "code": "H34",
+      "bounds": {
+        "x": 1122,
+        "y": 364,
+        "width": 8,
+        "height": 14,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.697
+    },
+    {
+      "code": "H38",
+      "bounds": {
+        "x": 1092,
+        "y": 393,
+        "width": 8,
+        "height": 13,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.903
+    },
+    {
+      "code": "H40",
+      "bounds": {
+        "x": 1092,
+        "y": 364,
+        "width": 8,
+        "height": 14,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 9.961
+    },
+    {
+      "code": "H48",
+      "bounds": {
+        "x": 1056,
+        "y": 393,
+        "width": 8,
+        "height": 13,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.274
+    },
+    {
+      "code": "H50",
+      "bounds": {
+        "x": 972,
+        "y": 370,
+        "width": 28,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.442
+    },
+    {
+      "code": "H58",
+      "bounds": {
+        "x": 658,
+        "y": 370,
+        "width": 72,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.732
+    },
+    {
+      "code": "H60",
+      "bounds": {
+        "x": 511,
+        "y": 370,
+        "width": 121,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.862
+    },
+    {
+      "code": "H70",
+      "bounds": {
+        "x": 428,
+        "y": 370,
+        "width": 57,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.15
+    },
+    {
+      "code": "H76",
+      "bounds": {
+        "x": 397,
+        "y": 370,
+        "width": 31,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.964
+    },
+    {
+      "code": "H78",
+      "bounds": {
+        "x": 382,
+        "y": 370,
+        "width": 15,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.051
+    },
+    {
+      "code": "H80",
+      "bounds": {
+        "x": 345,
+        "y": 370,
+        "width": 37,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.617
+    },
+    {
+      "code": "H86",
+      "bounds": {
+        "x": 308,
+        "y": 370,
+        "width": 37,
+        "height": 36,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.919
+    },
+    {
+      "code": "IF05",
+      "bounds": {
+        "x": 119,
+        "y": 633,
+        "width": 112,
+        "height": 99
+      },
+      "cost": 0
+    },
+    {
+      "code": "IF06",
+      "bounds": {
+        "x": 119,
+        "y": 438,
+        "width": 111,
+        "height": 162
+      },
+      "cost": 0
+    },
+    {
+      "code": "IF07",
+      "bounds": {
+        "x": 120,
+        "y": 310,
+        "width": 170,
+        "height": 96
+      },
+      "cost": 0
+    },
+    {
+      "code": "J20",
+      "bounds": {
+        "x": 1122,
+        "y": 334,
+        "width": 8,
+        "height": 14,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 31.688
+    },
+    {
+      "code": "J26",
+      "bounds": {
+        "x": 1104,
+        "y": 301,
+        "width": 28,
+        "height": 17,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 27.249
+    },
+    {
+      "code": "J28",
+      "bounds": {
+        "x": 1092,
+        "y": 334,
+        "width": 8,
+        "height": 14,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 29.87
+    },
+    {
+      "code": "J30",
+      "bounds": {
+        "x": 1084,
+        "y": 301,
+        "width": 20,
+        "height": 17,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 19.503
+    },
+    {
+      "code": "J32",
+      "bounds": {
+        "x": 1042,
+        "y": 301,
+        "width": 42,
+        "height": 17,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 18.383
+    },
+    {
+      "code": "J36",
+      "bounds": {
+        "x": 1056,
+        "y": 334,
+        "width": 8,
+        "height": 14,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 18.055
+    },
+    {
+      "code": "J38",
+      "bounds": {
+        "x": 1026,
+        "y": 334,
+        "width": 8,
+        "height": 14,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 19.689
+    },
+    {
+      "code": "J40",
+      "bounds": {
+        "x": 968,
+        "y": 309,
+        "width": 33,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 13.04
+    },
+    {
+      "code": "J44",
+      "bounds": {
+        "x": 940,
+        "y": 309,
+        "width": 28,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 13.894
+    },
+    {
+      "code": "J48",
+      "bounds": {
+        "x": 910,
+        "y": 309,
+        "width": 30,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 13.064
+    },
+    {
+      "code": "J52",
+      "bounds": {
+        "x": 872,
+        "y": 309,
+        "width": 38,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 13.089
+    },
+    {
+      "code": "J58",
+      "bounds": {
+        "x": 811,
+        "y": 309,
+        "width": 37,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 12.991
+    },
+    {
+      "code": "J60",
+      "bounds": {
+        "x": 712,
+        "y": 309,
+        "width": 99,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 14.353
+    },
+    {
+      "code": "J66",
+      "bounds": {
+        "x": 658,
+        "y": 309,
+        "width": 54,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 13.178
+    },
+    {
+      "code": "J68",
+      "bounds": {
+        "x": 580,
+        "y": 309,
+        "width": 52,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 6.462
+    },
+    {
+      "code": "J70",
+      "bounds": {
+        "x": 556,
+        "y": 309,
+        "width": 24,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 11.981
+    },
+    {
+      "code": "J74",
+      "bounds": {
+        "x": 436,
+        "y": 309,
+        "width": 49,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 9.256
+    },
+    {
+      "code": "J76",
+      "bounds": {
+        "x": 510,
+        "y": 309,
+        "width": 46,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 15.034
+    },
+    {
+      "code": "J78",
+      "bounds": {
+        "x": 418,
+        "y": 309,
+        "width": 18,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.589
+    },
+    {
+      "code": "J80",
+      "bounds": {
+        "x": 345,
+        "y": 309,
+        "width": 73,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 5.64
+    },
+    {
+      "code": "J86",
+      "bounds": {
+        "x": 308,
+        "y": 309,
+        "width": 37,
+        "height": 35,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.977
+    },
+    {
+      "code": "K20",
+      "bounds": {
+        "x": 1097,
+        "y": 210,
+        "width": 188,
+        "height": 76
+      },
+      "cost": 0
+    },
+    {
+      "code": "K26",
+      "bounds": {
+        "x": 694,
+        "y": 212,
+        "width": 18,
+        "height": 54,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 33.247
+    },
+    {
+      "code": "K28",
+      "bounds": {
+        "x": 1020,
+        "y": 212,
+        "width": 22,
+        "height": 54,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 20.315
+    },
+    {
+      "code": "K30",
+      "bounds": {
+        "x": 1042,
+        "y": 212,
+        "width": 22,
+        "height": 28,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 21.596
+    },
+    {
+      "code": "K32",
+      "bounds": {
+        "x": 962,
+        "y": 215,
+        "width": 18,
+        "height": 51,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 25.874
+    },
+    {
+      "code": "K33",
+      "bounds": {
+        "x": 889,
+        "y": 215,
+        "width": 37,
+        "height": 51,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 25.047
+    },
+    {
+      "code": "K38",
+      "bounds": {
+        "x": 926,
+        "y": 215,
+        "width": 36,
+        "height": 51,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 23.719
+    },
+    {
+      "code": "K40",
+      "bounds": {
+        "x": 857,
+        "y": 240,
+        "width": 11,
+        "height": 26,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 26.779
+    },
+    {
+      "code": "K42",
+      "bounds": {
+        "x": 857,
+        "y": 216,
+        "width": 11,
+        "height": 25,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 26.859
+    },
+    {
+      "code": "K54",
+      "bounds": {
+        "x": 656,
+        "y": 212,
+        "width": 38,
+        "height": 54,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 29.908
+    },
+    {
+      "code": "K56",
+      "bounds": {
+        "x": 542,
+        "y": 215,
+        "width": 10,
+        "height": 51,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 39.61
+    },
+    {
+      "code": "K58",
+      "bounds": {
+        "x": 1042,
+        "y": 240,
+        "width": 22,
+        "height": 26,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 23.074
+    },
+    {
+      "code": "K66",
+      "bounds": {
+        "x": 542,
+        "y": 204,
+        "width": 10,
+        "height": 62,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.316
+    },
+    {
+      "code": "K68",
+      "bounds": {
+        "x": 542,
+        "y": 204,
+        "width": 10,
+        "height": 12,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 4.765
+    },
+    {
+      "code": "K70",
+      "bounds": {
+        "x": 452,
+        "y": 215,
+        "width": 66,
+        "height": 51,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 3.668
+    },
+    {
+      "code": "K74",
+      "bounds": {
+        "x": 416,
+        "y": 240,
+        "width": 12,
+        "height": 26,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.19
+    },
+    {
+      "code": "K76",
+      "bounds": {
+        "x": 416,
+        "y": 216,
+        "width": 12,
+        "height": 25,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 1.099
+    },
+    {
+      "code": "K86",
+      "bounds": {
+        "x": 188,
+        "y": 212,
+        "width": 108,
+        "height": 80,
+        "topCoverage": 1,
+        "bottomCoverage": 1
+      },
+      "cost": 0.577
+    }
+  ]
+}
