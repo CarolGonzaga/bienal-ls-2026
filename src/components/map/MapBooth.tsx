@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { Heart, Bookmark, CheckCircle2 } from 'lucide-react'
+import { Heart, Bookmark } from 'lucide-react'
 import type { Exhibitor } from '../../types/index.ts'
 import type { MapFeature } from '../../data/map/map-layout.ts'
 import type { GraphicsQuality } from '../../stores/useMapStore.ts'
@@ -19,7 +19,7 @@ interface MapBoothProps {
   onSelect: () => void
 }
 
-const darker = (color: string) => color === '#7c3aed' ? '#4c1d95' : color === '#6d28d9' ? '#3b0764' : color === '#e54891' ? '#9d174d' : color === '#0f8f83' ? '#115e59' : color === '#d43276' ? '#8f174e' : color === '#b94185' ? '#742453' : color === '#e11d74' ? '#9b114c' : color === '#cf005e' ? '#85003d' : '#9ca3af'
+const darker = (color: string) => color === '#7c3aed' ? '#4c1d95' : color === '#6d28d9' ? '#3b0764' : color === '#e54891' ? '#9d174d' : color === '#0f766e' ? '#134e4a' : color === '#d97706' ? '#92400e' : color === '#d43276' ? '#8f174e' : color === '#b94185' ? '#742453' : color === '#e11d74' ? '#9b114c' : color === '#cf005e' ? '#85003d' : '#9ca3af'
 
 export const MapBooth = memo<MapBoothProps>(({ feature, exhibitor, selected, favorite, visited, inRoute, isometric, zoom, dark, quality, compact, onSelect }) => {
   const sourcePoints = feature.geometry.type === 'polygon' ? feature.geometry.points : null
@@ -35,7 +35,7 @@ export const MapBooth = memo<MapBoothProps>(({ feature, exhibitor, selected, fav
   const isMainEntrance = routeCode === 'HALL1'
   const fill = isDiscreetAccess ? 'transparent' : isBooth
     ? exhibitor
-      ? inRoute ? '#0f8f83' : favorite ? '#e54891' : selected ? '#cf005e' : '#b94185'
+      ? inRoute ? '#d97706' : visited ? '#0f766e' : favorite ? '#e54891' : selected ? '#cf005e' : '#b94185'
       : dark ? '#64748b' : '#cbd5e1'
     : dark ? '#4b1738' : '#f4e8ef'
   const stroke = isDiscreetAccess ? 'none' : isBooth
@@ -95,9 +95,9 @@ export const MapBooth = memo<MapBoothProps>(({ feature, exhibitor, selected, fav
       data-booth-label={isBooth ? label : undefined}
       data-service-label={!isBooth ? label : undefined}
     >{isMainEntrance ? 'ENTRADA · HALL 1' : label}</text>}
-    {exhibitor && quality !== 'eco' && (favorite || visited || inRoute) && zoom >= 1.1 && <g className="map-feature-status" transform={`translate(${x + width - 9},${y + 2})`} aria-hidden="true">
+    {exhibitor && quality !== 'eco' && (favorite || inRoute) && zoom >= 1.1 && <g className="map-feature-status" transform={`translate(${x + width - 9},${y + 2})`} aria-hidden="true">
       <circle cx="5" cy="5" r="5" fill="#fff" stroke={stroke} strokeWidth="1" />
-      {inRoute ? <Bookmark x="2" y="2" width="6" height="6" color="#0f766e" fill="#0f766e" /> : favorite ? <Heart x="2" y="2" width="6" height="6" color="#e11d48" fill="#e11d48" /> : <CheckCircle2 x="2" y="2" width="6" height="6" color="#059669" />}
+      {inRoute ? <Bookmark x="2" y="2" width="6" height="6" color="#b45309" fill="#b45309" /> : <Heart x="2" y="2" width="6" height="6" color="#e11d48" fill="#e11d48" />}
     </g>}
   </g>
 })
