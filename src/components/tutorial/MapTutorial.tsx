@@ -10,7 +10,7 @@ const STEPS: TutorialStep[] = [
   { title: 'Monte sua rota', text: 'Adicione os estandes que deseja visitar e organize a ordem das paradas em Minha Rota.', target: '[data-tutorial="route"]' },
   { title: 'Explore o mapa', text: 'Arraste o mapa para percorrer o pavilhão. Toque em um estande para ver detalhes, favoritar, marcar como visitado ou adicionar à rota.', target: '[data-tutorial="map"]' },
   { title: 'Zoom e centralização', text: 'Use estes botões para aproximar, afastar e recentralizar o mapa.', target: '[data-tutorial="map-controls"]' },
-  { title: 'Defina seu ponto de partida', text: 'Arraste o ícone de pessoa até o mapa. No Safari, você também pode pressioná-lo e depois tocar no local desejado. Um toque simples não altera sua posição.', target: '[data-tutorial="person"]' },
+  { title: 'Defina seu ponto de partida', text: 'Arraste o ícone de pessoa até o mapa. Se você estiver usando o navegador Safari, você também pode pressioná-lo e depois tocar no local desejado. Um toque simples não altera sua posição.', target: '[data-tutorial="person"]' },
   { title: 'Ajustes e limpeza', text: 'Aqui você pode escolher a qualidade visual, centralizar o mapa e limpar rotas e posições marcadas.', target: '[data-tutorial="map-settings"], [data-tutorial="mobile-settings"]' },
   { title: 'Seu perfil', text: 'Abra seu perfil para alterar nome, foto e senha. Use o botão de ajuda ao lado sempre que quiser rever este tutorial.', target: '[data-tutorial="profile"]' },
   { title: 'Tudo pronto!', text: 'Agora é só explorar a Bienal. O mapa e seus dados pessoais continuam disponíveis mesmo quando o sinal de internet estiver ruim.' }
