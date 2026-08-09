@@ -91,7 +91,7 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
   }
 
   if (variant === 'mobile-map') {
-    return <div data-testid="mobile-map-controls" className="absolute right-2.5 top-2.5 z-[35] flex flex-col items-center gap-1.5 lg:hidden">
+    return <div data-testid="mobile-map-controls" data-tutorial="map-controls" className="absolute right-2.5 top-2.5 z-[35] flex flex-col items-center gap-1.5 lg:hidden">
       <button aria-label="Centralizar mapa" title="Centralizar mapa" onClick={handleResetView} className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-md transition hover:bg-slate-50 active:scale-95"><Crosshair className="h-4 w-4"/></button>
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-md">
         <button aria-label="Aumentar zoom" title="Aumentar zoom" onClick={() => handleZoom('in')} className="flex h-9 w-9 items-center justify-center text-slate-800 transition hover:bg-slate-50 active:bg-slate-100"><ZoomIn className="h-4 w-4"/></button>
@@ -100,6 +100,7 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
       </div>
       <button
         {...bindPersonDrag()}
+        data-tutorial="person"
         aria-label="Arraste para definir o ponto de partida"
         title="Arraste para definir o ponto de partida"
         onContextMenu={event => event.preventDefault()}
@@ -125,12 +126,13 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
   }
 
   return <>
-    <div className={`absolute right-4 top-4 z-[60] hidden w-72 max-w-[calc(100%-1rem)] flex-col gap-3 pointer-events-auto lg:flex ${panelOpen ? 'lg:right-[466px]' : 'lg:right-4'}`}>
-      <div className="map-control-panel grid grid-cols-3 gap-2 rounded-2xl border p-2 shadow-xl" aria-label="Controles do mapa">
+    <div data-tutorial="map-settings" className={`absolute right-4 top-4 z-[60] hidden w-72 max-w-[calc(100%-1rem)] flex-col gap-3 pointer-events-auto lg:flex ${panelOpen ? 'lg:right-[466px]' : 'lg:right-4'}`}>
+      <div data-tutorial="map-controls" className="map-control-panel grid grid-cols-3 gap-2 rounded-2xl border p-2 shadow-xl" aria-label="Controles do mapa">
         <button aria-label="Diminuir zoom" onClick={() => handleZoom('out')} className="map-control-button"><ZoomOut className="w-4 h-4" /></button>
         <button aria-label="Aumentar zoom" onClick={() => handleZoom('in')} className="map-control-button"><ZoomIn className="w-4 h-4" /></button>
         <button
           {...bindPersonDrag()}
+          data-tutorial="person"
           aria-label="Arraste para definir o ponto de partida"
           title="Arraste para definir o ponto de partida"
           onContextMenu={event => event.preventDefault()}

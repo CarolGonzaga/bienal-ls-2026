@@ -1017,6 +1017,59 @@ html[data-theme='dark'] body {
   border-color: var(--site-surface);
 }
 
+/* Tutorial guiado */
+.tutorial-card {
+  border-color: #f0c4d8;
+  background: #fff;
+  color: #4b1738;
+}
+
+.tutorial-step-label,
+.tutorial-skip {
+  color: #d43276;
+}
+
+.tutorial-title {
+  color: #4b1738;
+}
+
+.tutorial-text {
+  color: #7b4b67;
+}
+
+.tutorial-close,
+.tutorial-secondary {
+  border-color: #efc5d8;
+  background: #fff0f6;
+  color: #9d245d;
+}
+
+.tutorial-primary {
+  background: linear-gradient(135deg, #e72878, #d43276);
+  box-shadow: 0 7px 18px rgb(212 50 118 / 0.24);
+}
+
+.theme-dark .tutorial-card {
+  border-color: var(--site-border);
+  background: var(--site-surface);
+  color: var(--site-text);
+}
+
+.theme-dark .tutorial-title {
+  color: var(--site-text);
+}
+
+.theme-dark .tutorial-text {
+  color: var(--site-text-muted);
+}
+
+.theme-dark .tutorial-close,
+.theme-dark .tutorial-secondary {
+  border-color: var(--site-border);
+  background: var(--site-surface-soft);
+  color: #fc94c3;
+}
+
 .map-control-button {
   display: flex;
   align-items: center;

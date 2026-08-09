@@ -8,7 +8,8 @@ import {
   LogOut,
   List,
   Route,
-  SlidersHorizontal
+  SlidersHorizontal,
+  CircleHelp
 } from 'lucide-react'
 import { useExhibitorStore } from './stores/useExhibitorStore'
 import { useMapStore } from './stores/useMapStore'
@@ -25,6 +26,7 @@ import { AccessibilityPanel } from './components/accessibility/AccessibilityPane
 import AuthModal from './components/AuthModal'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
 import { appPath, BASE_PATH } from './lib/paths'
+import { MapTutorial } from './components/tutorial/MapTutorial'
 
 const TEMPORARILY_DISABLED_TABS = new Set(['passport', 'schedule'])
 
@@ -58,6 +60,7 @@ export default function App() {
   const [isMobileMapSettingsOpen, setIsMobileMapSettingsOpen] = useState(false)
   const [remoteUserReady, setRemoteUserReady] = useState(false)
   const [authInitializing, setAuthInitializing] = useState(isSupabaseConfigured)
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = mapTheme
@@ -73,6 +76,15 @@ export default function App() {
       window.history.replaceState({}, '', BASE_PATH || '/')
     }
   }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    const tutorialKey = `mapasafico-tutorial-v1:${user.id}`
+    if (window.localStorage.getItem(tutorialKey)) return
+    setActiveTabMode('map')
+    const timer = window.setTimeout(() => setIsTutorialOpen(true), 500)
+    return () => window.clearTimeout(timer)
+  }, [setActiveTabMode, user])
 
   useEffect(() => {
     void loadExhibitors()
@@ -190,6 +202,18 @@ export default function App() {
     window.history.replaceState({}, '', appPath('/login'))
   }
 
+  const startTutorial = () => {
+    handleCloseDrawer()
+    setIsMobileMapSettingsOpen(false)
+    setActiveTabMode('map')
+    setIsTutorialOpen(true)
+  }
+
+  const finishTutorial = () => {
+    if (user) window.localStorage.setItem(`mapasafico-tutorial-v1:${user.id}`, 'completed')
+    setIsTutorialOpen(false)
+  }
+
   if (authInitializing) {
     return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src={appPath('/logo-icon.png')} alt="Mapa Sáfico" className="h-20 w-20 object-contain"/><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
   }
@@ -206,7 +230,7 @@ export default function App() {
         <div className="mx-auto flex h-20 w-full items-center justify-between gap-4 px-3 sm:px-4 lg:px-5">
           
           {/* Logo & Title */}
-          <button type="button" onClick={() => handleNavigate('map')} className="brand-lockup flex min-w-0 items-center gap-1.5 rounded-xl text-left transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d43276] sm:gap-2" aria-label="Voltar para o mapa" title="Voltar para o mapa">
+          <button data-tutorial="logo" type="button" onClick={() => handleNavigate('map')} className="brand-lockup flex min-w-0 items-center gap-1.5 rounded-xl text-left transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d43276] sm:gap-2" aria-label="Voltar para o mapa" title="Voltar para o mapa">
             <div className="relative h-11 w-11 shrink-0 overflow-hidden sm:h-12 sm:w-12">
               <img src={appPath('/logo-icon.png')} alt="" aria-hidden="true" className="absolute left-1/2 top-1/2 h-14 w-14 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-16 sm:w-16"/>
             </div>
@@ -229,7 +253,7 @@ export default function App() {
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="site-nav hidden items-center gap-1 rounded-full border p-1.5 md:flex">
+          <nav data-tutorial="navigation" className="site-nav hidden items-center gap-1 rounded-full border p-1.5 md:flex">
             {[
               { id: 'map', label: 'Mapa', icon: Compass },
               { id: 'list', label: 'Listas', icon: List },
@@ -242,6 +266,7 @@ export default function App() {
               return (
                 <button
                   key={tab.id}
+                  data-tutorial={tab.id === 'route' ? 'route' : undefined}
                   disabled={tab.disabled}
                   aria-disabled={tab.disabled}
                   title={tab.disabled ? 'Disponível em breve' : undefined}
@@ -263,6 +288,7 @@ export default function App() {
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-2">
+            <button onClick={startTutorial} className="site-header-action rounded-xl border p-2.5 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4"/></button>
             <button
               onClick={() => setIsAccessibilityOpen(true)}
               className="site-header-action rounded-xl border p-2.5 transition-colors"
@@ -272,7 +298,7 @@ export default function App() {
             </button>
 
             <div className="relative flex items-center gap-2">
-              <button onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Abrir perfil em nova aba">
+              <button data-tutorial="profile" onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Abrir perfil em nova aba">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
                   {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover"/> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
                 </div>
@@ -286,7 +312,7 @@ export default function App() {
         </div>
 
         {/* Mobile Navigation bar */}
-        <div className="site-mobile-nav flex items-center justify-around border-t px-2 py-2 text-xs font-semibold md:hidden">
+        <div data-tutorial="navigation" className="site-mobile-nav flex items-center justify-around border-t px-2 py-2 text-xs font-semibold md:hidden">
           {[
             { id: 'map', label: 'Mapa', icon: Compass },
             { id: 'list', label: 'Listas', icon: List },
@@ -299,6 +325,7 @@ export default function App() {
             return (
               <button
                 key={tab.id}
+                data-tutorial={tab.id === 'route' ? 'route' : undefined}
                 disabled={tab.disabled}
                 aria-disabled={tab.disabled}
                 title={tab.disabled ? 'Disponível em breve' : undefined}
@@ -328,17 +355,17 @@ export default function App() {
             <div data-testid="mobile-map-toolbar" className="flex shrink-0 flex-col gap-3 lg:hidden">
               <SearchBar />
               <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setActiveTabMode('route')} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#d43276] to-[#e11d74] px-3 text-sm font-black text-white shadow-lg shadow-[#cf005e]/20">
+                <button data-tutorial="route" onClick={() => setActiveTabMode('route')} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#d43276] to-[#e11d74] px-3 text-sm font-black text-white shadow-lg shadow-[#cf005e]/20">
                   <Route className="h-4 w-4"/><span>Montar minha rota</span>
                 </button>
-                <button aria-expanded={isMobileMapSettingsOpen} aria-controls="mobile-map-settings-panel" onClick={() => setIsMobileMapSettingsOpen(open => !open)} className="site-secondary-button flex min-h-12 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-black shadow-sm">
+                <button data-tutorial="mobile-settings" aria-expanded={isMobileMapSettingsOpen} aria-controls="mobile-map-settings-panel" onClick={() => setIsMobileMapSettingsOpen(open => !open)} className="site-secondary-button flex min-h-12 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-black shadow-sm">
                   <SlidersHorizontal className="h-4 w-4"/><span>Ajustar mapa</span>
                 </button>
               </div>
               {isMobileMapSettingsOpen && <div id="mobile-map-settings-panel"><MapControls variant="mobile-settings"/></div>}
             </div>
 
-            <div data-testid="mobile-map-frame" className="site-map-frame relative h-[58dvh] min-h-[420px] max-h-[620px] shrink-0 overflow-hidden rounded-3xl border shadow-2xl lg:absolute lg:inset-5 lg:h-auto lg:max-h-none lg:rounded-3xl lg:border">
+            <div data-testid="mobile-map-frame" data-tutorial="map" className="site-map-frame relative h-[58dvh] min-h-[420px] max-h-[620px] shrink-0 overflow-hidden rounded-3xl border shadow-2xl lg:absolute lg:inset-5 lg:h-auto lg:max-h-none lg:rounded-3xl lg:border">
               <BienalMap />
               <MapControls variant="mobile-map" />
               <MapControls variant="desktop" panelOpen={Boolean(selectedExhibitor)} />
@@ -367,6 +394,7 @@ export default function App() {
         isOpen={isAccessibilityOpen}
         onClose={() => setIsAccessibilityOpen(false)}
       />
+      <MapTutorial open={isTutorialOpen} onFinish={finishTutorial}/>
     </div>
   )
 }

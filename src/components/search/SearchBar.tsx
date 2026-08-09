@@ -7,7 +7,7 @@ export const SearchBar: React.FC = () => {
   const setSearchQuery = useExhibitorStore(s => s.setSearchQuery)
 
   return (
-    <div className="relative w-full max-w-xl">
+    <div data-tutorial="search" className="relative w-full max-w-xl">
       <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b94185]" />
       <input
         type="text"
