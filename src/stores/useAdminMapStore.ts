@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { MapVersion, StandGeometry, Point2D } from '../types'
 import { INITIAL_STAND_GEOMETRIES } from '../data/initialStands'
+import { appPath } from '../lib/paths'
 
 interface AdminMapState {
   currentVersion: MapVersion
@@ -29,7 +30,7 @@ export const useAdminMapStore = create<AdminMapState>((set, get) => ({
     eventName: "Bienal Internacional do Livro de SP 2026",
     originalWidth: 1376,
     originalHeight: 1118,
-    backgroundAsset: "/mapa/mapa-bienal-v4.webp",
+    backgroundAsset: appPath('/mapa/mapa-bienal-v4.webp'),
     version: "1.0.0",
     status: "published",
     publishedAt: "2026-08-01T12:00:00Z"

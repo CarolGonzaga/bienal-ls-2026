@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { appPath } from '../../lib/paths'
 import { 
   X, 
   MapPin, 
@@ -139,7 +140,7 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
         <div className="flex items-center gap-3">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#f2bfd8] bg-white p-1.5 shadow-md shadow-[#cf005e]/15">
             {!logoFailed ? (
-              <img src={`/expositores/${exhibitor.logo}`} alt={`Logo ${exhibitor.name}`} className="max-h-full max-w-full object-contain" onError={() => setLogoFailed(true)}/>
+              <img src={appPath(`/expositores/${exhibitor.logo}`)} alt={`Logo ${exhibitor.name}`} className="max-h-full max-w-full object-contain" onError={() => setLogoFailed(true)}/>
             ) : (
               <span className="font-extrabold text-lg text-[#b94185]">{exhibitor.name.substring(0, 2).toUpperCase()}</span>
             )}

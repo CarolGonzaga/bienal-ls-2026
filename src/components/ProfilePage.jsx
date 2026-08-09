@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Camera, Check, Lock, Save, User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useMapStore } from '../stores/useMapStore'
+import { appPath } from '../lib/paths'
 
 const MAX_AVATAR_SIZE = 2 * 1024 * 1024
 const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -26,7 +27,7 @@ export default function ProfilePage() {
   useEffect(() => {
     void supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) {
-        window.location.replace('/')
+        window.location.replace(appPath('/login'))
         return
       }
       setAccount(data.user)
@@ -94,7 +95,7 @@ export default function ProfilePage() {
 
   const goBack = () => {
     if (window.opener) window.close()
-    else window.location.assign('/')
+    else window.location.assign(appPath('/login'))
   }
 
   if (loading && !account) return <div className={`site-theme theme-${mapTheme}`}><div className="auth-page flex min-h-[100dvh] items-center justify-center"><span className="auth-muted text-sm font-bold">Carregando perfil...</span></div></div>

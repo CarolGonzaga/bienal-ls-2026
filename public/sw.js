@@ -1,5 +1,6 @@
-const CACHE_NAME = 'mapasafico-v1'
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/logo-icon.png', '/logo-texto.png', '/logo-completo.png']
+const CACHE_NAME = 'mapasafico-v2'
+const BASE = '/mapasaficobienal'
+const APP_SHELL = [`${BASE}/login`, `${BASE}/index.html`, `${BASE}/manifest.json`, `${BASE}/logo-icon.png`, `${BASE}/logo-texto.png`, `${BASE}/logo-completo.png`]
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()))
@@ -18,9 +19,9 @@ self.addEventListener('fetch', event => {
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).then(response => {
       const copy = response.clone()
-      caches.open(CACHE_NAME).then(cache => cache.put('/index.html', copy))
+      caches.open(CACHE_NAME).then(cache => cache.put(`${BASE}/index.html`, copy))
       return response
-    }).catch(() => caches.match('/index.html')))
+    }).catch(() => caches.match(`${BASE}/index.html`)))
     return
   }
 

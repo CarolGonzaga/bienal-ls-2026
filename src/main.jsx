@@ -3,10 +3,12 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import ProfilePage from './components/ProfilePage.jsx'
 import PasswordResetPage from './components/PasswordResetPage.jsx'
+import { appPath as buildAppPath } from './lib/paths'
 import './index.css'
 
-const appPath = window.location.pathname.replace(/^\/mapasaficobienal/, '') || '/'
-const Page = appPath === '/perfil' ? ProfilePage : appPath === '/recuperar-senha' ? PasswordResetPage : App
+const routedPath = window.location.pathname.replace(/^\/mapasaficobienal/, '') || '/'
+if (routedPath === '/') window.history.replaceState({}, '', buildAppPath('/login'))
+const Page = routedPath === '/perfil' ? ProfilePage : routedPath === '/recuperar-senha' ? PasswordResetPage : App
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

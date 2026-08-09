@@ -1,10 +1,11 @@
 import type { Point2D, StandGeometry } from '../../types/index.ts'
 import { MAPA_PNG_SPACES, type MapaPngSpaceType } from './mapaPngSpaces.ts'
 import { MAP_VIEWBOX_HEIGHT, MAP_VIEWBOX_WIDTH } from './map-reference-calibration.ts'
+import { appPath } from '../../lib/paths.ts'
 
 export const MAP_WIDTH = MAP_VIEWBOX_WIDTH
 export const MAP_HEIGHT = MAP_VIEWBOX_HEIGHT
-export const MAP_REFERENCE_ASSET = '/mapa/mapa-guia-2d.png'
+export const MAP_REFERENCE_ASSET = appPath('/mapa/mapa-guia-2d.png')
 export const MAP_GRID_SIZE = 24
 
 export type MapFeatureType = 'booth' | 'street' | 'gate' | 'entrance' | 'exit' | 'bathroom' | 'food' | 'stage' | 'service' | 'special-area' | 'external-area' | 'wall' | 'obstacle' | 'information'

@@ -26,6 +26,7 @@ import { ScheduleView } from './components/schedule/ScheduleView'
 import { AccessibilityPanel } from './components/accessibility/AccessibilityPanel'
 import AuthModal from './components/AuthModal'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
+import { appPath } from './lib/paths'
 
 export default function App() {
   const activeTabMode = useExhibitorStore(s => s.activeTabMode)
@@ -177,7 +178,7 @@ export default function App() {
   }
 
   if (authInitializing) {
-    return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src="/logo-icon.png" alt="Mapa SÃ¡fico" className="h-20 w-20 object-contain"/><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
+    return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src={appPath('/logo-icon.png')} alt="Mapa Sáfico" className="h-20 w-20 object-contain"/><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
   }
 
   if (!user) {
@@ -194,10 +195,10 @@ export default function App() {
           {/* Logo & Title */}
           <div className="brand-lockup flex min-w-0 items-center gap-1.5 sm:gap-2">
             <div className="relative h-11 w-11 shrink-0 overflow-hidden sm:h-12 sm:w-12">
-              <img src="/logo-icon.png" alt="" aria-hidden="true" className="absolute left-1/2 top-1/2 h-14 w-14 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-16 sm:w-16"/>
+              <img src={appPath('/logo-icon.png')} alt="" aria-hidden="true" className="absolute left-1/2 top-1/2 h-14 w-14 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-16 sm:w-16"/>
             </div>
             <div className="relative h-9 w-28 shrink-0 overflow-hidden sm:h-10 sm:w-36">
-              <img src="/logo-texto.png" alt="Mapa Sáfico · Bienal do Livro 2026" className="absolute left-1/2 top-1/2 h-32 w-32 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-40 sm:w-40"/>
+              <img src={appPath('/logo-texto.png')} alt="Mapa Sáfico · Bienal do Livro 2026" className="absolute left-1/2 top-1/2 h-32 w-32 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-40 sm:w-40"/>
             </div>
             <div className="sr-only">
               <span className="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-white via-slate-200 to-pink-300 bg-clip-text text-transparent leading-tight block">
@@ -253,7 +254,7 @@ export default function App() {
             </button>
 
             <div className="relative flex items-center gap-2">
-              <button onClick={() => window.open('/perfil', '_blank', 'noopener,noreferrer')} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Abrir perfil em nova aba">
+              <button onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Abrir perfil em nova aba">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
                   {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover"/> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
                 </div>

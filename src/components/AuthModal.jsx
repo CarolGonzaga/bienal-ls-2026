@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { ArrowLeft, ArrowRight, AtSign, Check, Eye, EyeOff, Lock, Mail, ShieldCheck, User } from 'lucide-react'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { appPath } from '../lib/paths'
 
 const DISCOVERY_OPTIONS = ['Google', 'Instagram', 'X (Twitter)', 'Tik Tok', 'Grupo de Whatsapp', 'Outros']
 
@@ -42,7 +43,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = fa
     setLoading(true)
     try {
       if (!configuredSupabase) throw new Error('O Supabase não está configurado neste ambiente.')
-      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/recuperar-senha` })
+      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}${appPath('/recuperar-senha')}` })
       if (recoveryError) throw recoveryError
       setNotice('Enviamos um link para redefinir sua senha. Verifique também a caixa de spam.')
     } catch (recoveryError) {
@@ -111,7 +112,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = fa
         </button>}
 
         <div className="mb-6 flex items-center gap-3">
-          <div className="relative h-12 w-12 overflow-hidden"><img src="/logo-icon.png" alt="" className="absolute left-1/2 top-1/2 h-16 w-16 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain" /></div>
+          <div className="relative h-12 w-12 overflow-hidden"><img src={appPath('/logo-icon.png')} alt="" className="absolute left-1/2 top-1/2 h-16 w-16 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain" /></div>
           <div><h1 className="auth-title text-2xl font-black">{mode === 'login' ? 'Boas-vindas' : mode === 'recovery' ? 'Recupere sua senha' : 'Crie sua conta'}</h1><p className="auth-muted mt-0.5 text-sm">{mode === 'login' ? 'Mapa Sáfico da Bienal 2026' : mode === 'recovery' ? 'Receba por e-mail um link seguro para criar uma nova senha.' : 'Faça parte da comunidade mapasáfico.'}</p></div>
         </div>
 
