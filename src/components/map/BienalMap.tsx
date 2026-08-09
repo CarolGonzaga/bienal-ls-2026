@@ -11,6 +11,7 @@ import { buildRouteSegments, parseMapRouteParams } from '../../services/mapRouti
 import { MapBooth } from './MapBooth.tsx'
 import { MapRoute } from './MapRoute.tsx'
 import { toWorldCoordinates } from '../../utils/coordinates.ts'
+import { appPath } from '../../lib/paths.ts'
 
 const pointsString = (points: Array<{ x: number; y: number }>) => points.map(point => `${point.x},${point.y}`).join(' ')
 
@@ -201,6 +202,11 @@ export const BienalMap: React.FC = () => {
         </svg>
       </div>
     </div>
+    <div
+      aria-hidden="true"
+      className="map-copyright-watermark pointer-events-none absolute inset-0 z-20"
+      style={{ backgroundImage: `url(${appPath('/logo-ls-watermark.png')})` }}
+    />
     <div className={`absolute bottom-3 left-3 hidden rounded-xl border px-3 py-2 text-xs font-bold shadow-lg lg:block ${dark ? 'border-slate-700 bg-slate-900/90 text-slate-100' : 'border-slate-300 bg-white/95 text-slate-700'}`}><span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-pink-500"/>Mapa 2D • {Math.round(transform.zoom * 100)}%</span></div>
     {isChoosingRouteOrigin && <div className="absolute left-1/2 top-3 z-30 -translate-x-1/2 rounded-xl bg-[#b94185] px-4 py-2 text-sm font-black text-white shadow-xl">Clique em uma rua ou ponto próximo para definir a origem</div>}
     {isChoosingUserPosition && <div className="absolute left-1/2 top-3 z-30 max-w-[calc(100%-7rem)] -translate-x-1/2 rounded-xl bg-[#b94185] px-4 py-2 text-center text-xs font-black text-white shadow-xl sm:text-sm">Clique em uma rua, espaço livre ou estande para marcar sua posição</div>}

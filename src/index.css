@@ -1049,6 +1049,27 @@ html[data-theme='dark'] body {
   transform-style: flat;
 }
 
+.map-copyright-watermark {
+  background-position: 2.5rem 2rem;
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  opacity: 0.035;
+  transform: rotate(-8deg) scale(1.08);
+  transform-origin: center;
+}
+
+.theme-dark .map-copyright-watermark {
+  opacity: 0.055;
+  filter: grayscale(0.15) brightness(1.25);
+}
+
+@media (max-width: 767px) {
+  .map-copyright-watermark {
+    background-size: 125px 125px;
+    opacity: 0.045;
+  }
+}
+
 @media (max-width: 1023px) {
   [data-map-quality="high"] [data-map-face="top"] {
     filter: none;
