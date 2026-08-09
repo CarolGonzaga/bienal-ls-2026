@@ -20,13 +20,13 @@ import { MapControls } from './components/map/MapControls'
 import { ExhibitorList } from './components/exhibitors/ExhibitorList'
 import { ExhibitorBottomSheet } from './components/exhibitors/ExhibitorBottomSheet'
 import { SearchBar } from './components/search/SearchBar'
-import { SapphicPassport } from './components/passport/SapphicPassport'
 import { RoutePlanner } from './components/route/RoutePlanner'
-import { ScheduleView } from './components/schedule/ScheduleView'
 import { AccessibilityPanel } from './components/accessibility/AccessibilityPanel'
 import AuthModal from './components/AuthModal'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
 import { appPath } from './lib/paths'
+
+const TEMPORARILY_DISABLED_TABS = new Set(['passport', 'schedule'])
 
 export default function App() {
   const activeTabMode = useExhibitorStore(s => s.activeTabMode)
@@ -63,6 +63,10 @@ export default function App() {
     document.documentElement.dataset.theme = mapTheme
     document.documentElement.style.colorScheme = mapTheme
   }, [mapTheme])
+
+  useEffect(() => {
+    if (TEMPORARILY_DISABLED_TABS.has(activeTabMode)) setActiveTabMode('map')
+  }, [activeTabMode, setActiveTabMode])
 
   useEffect(() => {
     void loadExhibitors()
@@ -157,6 +161,7 @@ export default function App() {
   }
 
   const handleNavigate = tabId => {
+    if (TEMPORARILY_DISABLED_TABS.has(tabId)) return
     setIsAuthOpen(false)
     handleCloseDrawer()
     setActiveTabMode(tabId)
@@ -220,18 +225,23 @@ export default function App() {
             {[
               { id: 'map', label: 'Mapa', icon: Compass },
               { id: 'list', label: 'Listas', icon: List },
-              { id: 'passport', label: 'Passaporte', icon: Award },
+              { id: 'passport', label: 'Passaporte', icon: Award, disabled: true },
               { id: 'route', label: 'Minha Rota', icon: Bookmark },
-              { id: 'schedule', label: 'Programação', icon: Calendar }
+              { id: 'schedule', label: 'Programação', icon: Calendar, disabled: true }
             ].map(tab => {
               const Icon = tab.icon
               const isActive = activeTabMode === tab.id
               return (
                 <button
                   key={tab.id}
+                  disabled={tab.disabled}
+                  aria-disabled={tab.disabled}
+                  title={tab.disabled ? 'Disponível em breve' : undefined}
                   onClick={() => handleNavigate(tab.id)}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    isActive 
+                    tab.disabled
+                      ? 'cursor-not-allowed text-[#98617f] opacity-40'
+                      : isActive 
                       ? 'bg-[#d43276] text-white shadow-md shadow-[#d43276]/25'
                       : 'text-[#7b3a60] hover:bg-white hover:text-[#cf005e]'
                   }`}
@@ -272,18 +282,21 @@ export default function App() {
           {[
             { id: 'map', label: 'Mapa', icon: Compass },
             { id: 'list', label: 'Listas', icon: List },
-            { id: 'passport', label: 'Passaporte', icon: Award },
+            { id: 'passport', label: 'Passaporte', icon: Award, disabled: true },
             { id: 'route', label: 'Rota', icon: Bookmark },
-            { id: 'schedule', label: 'Agenda', icon: Calendar }
+            { id: 'schedule', label: 'Agenda', icon: Calendar, disabled: true }
           ].map(tab => {
             const Icon = tab.icon
             const isActive = activeTabMode === tab.id
             return (
               <button
                 key={tab.id}
+                disabled={tab.disabled}
+                aria-disabled={tab.disabled}
+                title={tab.disabled ? 'Disponível em breve' : undefined}
                 onClick={() => handleNavigate(tab.id)}
                 className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
-                  isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
+                  tab.disabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -326,9 +339,7 @@ export default function App() {
         ) : (
           <>
             {activeTabMode === 'list' && <ExhibitorList />}
-            {activeTabMode === 'passport' && <SapphicPassport />}
             {activeTabMode === 'route' && <RoutePlanner />}
-            {activeTabMode === 'schedule' && <ScheduleView />}
           </>
         )}
       </main>
