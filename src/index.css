@@ -995,6 +995,28 @@ html[data-theme='dark'] body {
   color: var(--site-text);
 }
 
+.profile-avatar {
+  border-color: #f3c1d8;
+  background: #fff0f6;
+}
+
+.profile-section {
+  border-color: #f0c4d8;
+}
+
+.theme-dark .profile-avatar {
+  border-color: #713052;
+  background: #35152f;
+}
+
+.theme-dark .profile-section {
+  border-color: var(--site-border);
+}
+
+.theme-dark .profile-avatar + button {
+  border-color: var(--site-surface);
+}
+
 .map-control-button {
   display: flex;
   align-items: center;
