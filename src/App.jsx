@@ -24,7 +24,7 @@ import { RoutePlanner } from './components/route/RoutePlanner'
 import { AccessibilityPanel } from './components/accessibility/AccessibilityPanel'
 import AuthModal from './components/AuthModal'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
-import { appPath } from './lib/paths'
+import { appPath, BASE_PATH } from './lib/paths'
 
 const TEMPORARILY_DISABLED_TABS = new Set(['passport', 'schedule'])
 
@@ -67,6 +67,12 @@ export default function App() {
   useEffect(() => {
     if (TEMPORARILY_DISABLED_TABS.has(activeTabMode)) setActiveTabMode('map')
   }, [activeTabMode, setActiveTabMode])
+
+  useEffect(() => {
+    if (user && window.location.pathname === appPath('/login')) {
+      window.history.replaceState({}, '', BASE_PATH || '/')
+    }
+  }, [user])
 
   useEffect(() => {
     void loadExhibitors()
@@ -169,6 +175,7 @@ export default function App() {
 
   const handleLoginSuccess = (userData, rememberConnected = false) => {
     setUser(userData)
+    window.history.replaceState({}, '', BASE_PATH || '/')
     window.localStorage.setItem('mapasafico-offline-user', JSON.stringify(userData))
     if (rememberConnected) window.localStorage.setItem('mapasafico-remembered-user', JSON.stringify(userData))
     else window.localStorage.removeItem('mapasafico-remembered-user')
@@ -180,6 +187,7 @@ export default function App() {
     if (isSupabaseConfigured) await supabase.auth.signOut()
     clearUserData()
     setUser(null)
+    window.history.replaceState({}, '', appPath('/login'))
   }
 
   if (authInitializing) {
@@ -195,7 +203,7 @@ export default function App() {
       
       {/* Header Navigation */}
       <header className="site-header sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <div className="mx-auto flex h-20 w-full items-center justify-between gap-4 px-3 sm:px-4 lg:px-5">
           
           {/* Logo & Title */}
           <div className="brand-lockup flex min-w-0 items-center gap-1.5 sm:gap-2">
