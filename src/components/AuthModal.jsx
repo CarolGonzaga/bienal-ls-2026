@@ -32,21 +32,23 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = fa
     resetMessages()
   }
 
-  const handleRecovery = async () => {
+  const handleRecovery = async event => {
+    event?.preventDefault()
     resetMessages()
-    if (!identifier.includes('@')) {
-      setError('Informe seu e-mail no campo de acesso para recuperar a senha.')
+    if (!email.includes('@')) {
+      setError('Informe o e-mail cadastrado para recuperar a senha.')
       return
     }
+    setLoading(true)
     try {
       if (!configuredSupabase) throw new Error('O Supabase não está configurado neste ambiente.')
-      if (configuredSupabase) {
-        const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(identifier, { redirectTo: window.location.origin })
-        if (recoveryError) throw recoveryError
-      }
-      setNotice('Enviamos as instruções de recuperação para o e-mail informado.')
+      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/recuperar-senha` })
+      if (recoveryError) throw recoveryError
+      setNotice('Enviamos um link para redefinir sua senha. Verifique também a caixa de spam.')
     } catch (recoveryError) {
       setError(recoveryError.message || 'Não foi possível iniciar a recuperação da senha.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -110,19 +112,24 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = fa
 
         <div className="mb-6 flex items-center gap-3">
           <div className="relative h-12 w-12 overflow-hidden"><img src="/logo-icon.png" alt="" className="absolute left-1/2 top-1/2 h-16 w-16 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain" /></div>
-          <div><h1 className="auth-title text-2xl font-black">{mode === 'login' ? 'Boas-vindas de volta' : 'Crie sua conta'}</h1><p className="auth-muted mt-0.5 text-sm">{mode === 'login' ? 'Acesse seu mapa e seus favoritos.' : 'Faça parte da comunidade mapasáfico.'}</p></div>
+          <div><h1 className="auth-title text-2xl font-black">{mode === 'login' ? 'Boas-vindas' : mode === 'recovery' ? 'Recupere sua senha' : 'Crie sua conta'}</h1><p className="auth-muted mt-0.5 text-sm">{mode === 'login' ? 'Mapa Sáfico da Bienal 2026' : mode === 'recovery' ? 'Receba por e-mail um link seguro para criar uma nova senha.' : 'Faça parte da comunidade mapasáfico.'}</p></div>
         </div>
 
-        <div className="auth-mode-tabs mb-6 grid grid-cols-2 rounded-2xl border p-1">
+        {mode !== 'recovery' && <div className="auth-mode-tabs mb-6 grid grid-cols-2 rounded-2xl border p-1">
           <button type="button" onClick={() => changeMode('login')} className={`rounded-xl py-2.5 text-xs font-black ${mode === 'login' ? 'is-active' : ''}`}>Entrar</button>
           <button type="button" onClick={() => changeMode('register')} className={`rounded-xl py-2.5 text-xs font-black ${mode === 'register' ? 'is-active' : ''}`}>Criar conta</button>
-        </div>
+        </div>}
 
         {error && <div role="alert" className="auth-error mb-4 rounded-xl border px-3 py-2.5 text-xs font-semibold">{error}</div>}
         {notice && <div role="status" className="auth-notice mb-4 rounded-xl border px-3 py-2.5 text-xs font-semibold">{notice}</div>}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {mode === 'login' ? (
+        <form onSubmit={mode === 'recovery' ? handleRecovery : handleSubmit} className="flex flex-col gap-4">
+          {mode === 'recovery' ? <>
+            <label className="auth-field-label flex flex-col gap-1.5 text-xs font-bold">E-mail cadastrado
+              <span className="relative"><Mail className="auth-field-icon absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"/><input required type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} className={fieldClass} placeholder="voce@exemplo.com" /></span>
+            </label>
+            <button type="button" onClick={() => changeMode('login')} className="auth-link flex items-center gap-2 self-start text-xs font-bold"><ArrowLeft className="h-4 w-4"/>Voltar para entrar</button>
+          </> : mode === 'login' ? (
             <>
               <label className="auth-field-label flex flex-col gap-1.5 text-xs font-bold">E-mail ou nome de usuário
                 <span className="relative"><AtSign className="auth-field-icon absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"/><input required autoComplete="username" value={identifier} onChange={event => setIdentifier(event.target.value)} className={fieldClass} placeholder="seu e-mail ou usuário" /></span>
@@ -132,13 +139,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = fa
               </label>
               <div className="flex items-center justify-between gap-3 text-xs">
                 <label className="auth-remember flex cursor-pointer items-center gap-2 font-semibold"><input type="checkbox" checked={rememberConnected} onChange={event => setRememberConnected(event.target.checked)} className="h-4 w-4 accent-[#d43276]"/>Manter conectado</label>
-                <button type="button" onClick={handleRecovery} className="auth-link font-bold">Recuperar senha</button>
+                <button type="button" onClick={() => { setEmail(identifier.includes('@') ? identifier : ''); changeMode('recovery') }} className="auth-link font-bold">Recuperar senha</button>
               </div>
             </>
           ) : (
             <>
               <label className="auth-field-label flex flex-col gap-1.5 text-xs font-bold">Nome de usuário
-                <span className="relative"><User className="auth-field-icon absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"/><input required autoComplete="username" value={username} onChange={event => setUsername(event.target.value)} className={fieldClass} placeholder="Como você quer ser chamada" /></span>
+                <span className="relative"><User className="auth-field-icon absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"/><input required autoComplete="username" value={username} onChange={event => setUsername(event.target.value)} className={fieldClass} placeholder="Informe um nome ou apelido" /></span>
               </label>
               <label className="auth-field-label flex flex-col gap-1.5 text-xs font-bold">E-mail
                 <span className="relative"><Mail className="auth-field-icon absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"/><input required type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} className={fieldClass} placeholder="voce@exemplo.com" /></span>
@@ -157,7 +164,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess, isGate = fa
           )}
 
           <button type="submit" disabled={loading} className="auth-submit mt-1 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-white disabled:opacity-60">
-            <span>{loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : 'Criar minha conta'}</span><ArrowRight className="h-4 w-4" />
+            <span>{loading ? 'Aguarde...' : mode === 'login' ? 'Entrar' : mode === 'recovery' ? 'Enviar link de recuperação' : 'Criar minha conta'}</span><ArrowRight className="h-4 w-4" />
           </button>
         </form>
       </div>

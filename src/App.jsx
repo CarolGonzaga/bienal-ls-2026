@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
   Calendar,
-  User, 
   Compass, 
   Award, 
   Bookmark, 
@@ -58,7 +57,6 @@ export default function App() {
   const [isMobileMapSettingsOpen, setIsMobileMapSettingsOpen] = useState(false)
   const [remoteUserReady, setRemoteUserReady] = useState(false)
   const [authInitializing, setAuthInitializing] = useState(isSupabaseConfigured)
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = mapTheme
@@ -255,20 +253,15 @@ export default function App() {
             </button>
 
             <div className="relative flex items-center gap-2">
-              <button onClick={() => setIsProfileOpen(open => !open)} aria-expanded={isProfileOpen} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Perfil">
+              <button onClick={() => window.open('/perfil', '_blank', 'noopener,noreferrer')} className="site-user-chip flex items-center gap-2 rounded-2xl border px-2.5 py-1.5" title="Abrir perfil em nova aba">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
-                  {(user.user_metadata?.name || user.email)[0].toUpperCase()}
+                  {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover"/> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
                 </div>
                 <span className="hidden text-xs font-semibold sm:inline">Perfil</span>
               </button>
               <button onClick={handleLogout} title="Sair da conta" className="site-header-action flex items-center gap-1.5 rounded-xl border p-2.5 text-xs font-bold transition-colors sm:px-3">
                 <LogOut className="h-4 w-4"/><span className="hidden sm:inline">Sair</span>
               </button>
-              {isProfileOpen && <div className="site-user-chip absolute right-0 top-[calc(100%+0.6rem)] z-50 w-64 rounded-2xl border p-4 shadow-xl">
-                <div className="mb-1 text-xs font-black uppercase tracking-wide text-[#d43276]">Meu perfil</div>
-                <div className="truncate text-sm font-bold">{user.user_metadata?.name || user.user_metadata?.username || 'UsuÃ¡ria'}</div>
-                <div className="mt-1 truncate text-xs opacity-70">{user.email}</div>
-              </div>}
             </div>
           </div>
         </div>
