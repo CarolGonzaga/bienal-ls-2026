@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useDrag } from '@use-gesture/react'
 import {
   Crosshair,
   RotateCcw,
@@ -24,78 +25,55 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
   const routeOriginGateId = useMapStore(s => s.routeOriginGateId)
   const setRouteOriginGateId = useMapStore(s => s.setRouteOriginGateId)
   const clearRoute = useUserStore(s => s.clearRoute)
-  const dragStartRef = useRef<{ x: number; y: number } | null>(null)
-  const lastDragPointRef = useRef<{ x: number; y: number } | null>(null)
   const [personDragOffset, setPersonDragOffset] = useState({ x: 0, y: 0 })
+  const longPressTimerRef = useRef<number | null>(null)
+  const fallbackActivatedRef = useRef(false)
 
   useEffect(() => {
-    const movePerson = (clientX: number, clientY: number) => {
-      const start = dragStartRef.current
-      if (!start) return
-      lastDragPointRef.current = { x: clientX, y: clientY }
-      setPersonDragOffset({ x: clientX - start.x, y: clientY - start.y })
-    }
-    const finishPerson = (clientX: number, clientY: number) => {
-      const start = dragStartRef.current
-      if (!start) return
-      const dragged = Math.hypot(clientX - start.x, clientY - start.y) >= 8
-      if (dragged) (window as any).__mapControls?.setCustomOriginAtClientPoint?.(clientX, clientY)
-      dragStartRef.current = null
-      lastDragPointRef.current = null
-      setPersonDragOffset({ x: 0, y: 0 })
-    }
-    const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType === 'touch') return
-      if (!dragStartRef.current) return
-      event.preventDefault()
-      movePerson(event.clientX, event.clientY)
-    }
-    const onPointerUp = (event: PointerEvent) => { if (event.pointerType !== 'touch') finishPerson(event.clientX, event.clientY) }
-    const onPointerCancel = (event: PointerEvent) => {
-      if (event.pointerType === 'touch') return
-      dragStartRef.current = null; lastDragPointRef.current = null; setPersonDragOffset({ x: 0, y: 0 })
-    }
-    const onTouchMove = (event: TouchEvent) => {
-      if (!dragStartRef.current || !event.touches[0]) return
-      event.preventDefault()
-      movePerson(event.touches[0].clientX, event.touches[0].clientY)
-    }
-    const onTouchEnd = (event: TouchEvent) => {
-      const touch = event.changedTouches[0]
-      if (touch) finishPerson(touch.clientX, touch.clientY)
-    }
-    const onTouchCancel = () => {
-      const point = lastDragPointRef.current
-      if (point) finishPerson(point.x, point.y)
-    }
-    const onMouseMove = (event: MouseEvent) => movePerson(event.clientX, event.clientY)
-    const onMouseUp = (event: MouseEvent) => finishPerson(event.clientX, event.clientY)
-
-    document.addEventListener('pointermove', onPointerMove, { passive: false })
-    document.addEventListener('pointerup', onPointerUp)
-    document.addEventListener('pointercancel', onPointerCancel)
-    document.addEventListener('touchmove', onTouchMove, { passive: false })
-    document.addEventListener('touchend', onTouchEnd)
-    document.addEventListener('touchcancel', onTouchCancel)
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
     return () => {
-      document.removeEventListener('pointermove', onPointerMove)
-      document.removeEventListener('pointerup', onPointerUp)
-      document.removeEventListener('pointercancel', onPointerCancel)
-      document.removeEventListener('touchmove', onTouchMove)
-      document.removeEventListener('touchend', onTouchEnd)
-      document.removeEventListener('touchcancel', onTouchCancel)
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
+      if (longPressTimerRef.current !== null) window.clearTimeout(longPressTimerRef.current)
     }
   }, [])
 
-  const beginPersonDrag = (clientX: number, clientY: number) => {
-    dragStartRef.current = { x: clientX, y: clientY }
-    lastDragPointRef.current = { x: clientX, y: clientY }
-    setPersonDragOffset({ x: 0, y: 0 })
-  }
+  const bindPersonDrag = useDrag(({ first, last, tap, canceled, movement: [x, y], xy: [clientX, clientY], event }) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const distance = Math.hypot(x, y)
+
+    if (first) {
+      fallbackActivatedRef.current = false
+      longPressTimerRef.current = window.setTimeout(() => {
+        fallbackActivatedRef.current = true
+        setIsChoosingUserPosition(true)
+        setPersonDragOffset({ x: 0, y: 0 })
+      }, 550)
+    }
+
+    if (distance >= 8 && longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+
+    if (!last) setPersonDragOffset({ x, y })
+
+    if (last) {
+      if (longPressTimerRef.current !== null) window.clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+      if (!fallbackActivatedRef.current && !tap && distance >= 8) {
+        ;(window as any).__mapControls?.setCustomOriginAtClientPoint?.(clientX, clientY)
+      } else if (canceled && distance >= 8) {
+        setIsChoosingUserPosition(true)
+      }
+      fallbackActivatedRef.current = false
+      setPersonDragOffset({ x: 0, y: 0 })
+    }
+  }, {
+    filterTaps: true,
+    threshold: 8,
+    preventDefault: true,
+    eventOptions: { passive: false },
+    pointer: { capture: true, touch: true }
+  })
 
   const handleResetView = () => (window as any).__mapControls?.resetView?.()
   const handleZoom = (direction: 'in' | 'out') => direction === 'in'
@@ -121,26 +99,9 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
         <button aria-label="Diminuir zoom" title="Diminuir zoom" onClick={() => handleZoom('out')} className="flex h-9 w-9 items-center justify-center text-slate-800 transition hover:bg-slate-50 active:bg-slate-100"><ZoomOut className="h-4 w-4"/></button>
       </div>
       <button
+        {...bindPersonDrag()}
         aria-label="Arraste para definir o ponto de partida"
         title="Arraste para definir o ponto de partida"
-        onPointerDown={event => {
-          if (event.pointerType === 'touch') return
-          event.preventDefault()
-          event.stopPropagation()
-          beginPersonDrag(event.clientX, event.clientY)
-        }}
-        onTouchStart={event => {
-          if (!event.touches[0]) return
-          event.preventDefault()
-          event.stopPropagation()
-          beginPersonDrag(event.touches[0].clientX, event.touches[0].clientY)
-        }}
-        onMouseDown={event => {
-          if ('PointerEvent' in window) return
-          event.preventDefault()
-          event.stopPropagation()
-          beginPersonDrag(event.clientX, event.clientY)
-        }}
         onContextMenu={event => event.preventDefault()}
         draggable={false}
         style={{ transform: `translate(${personDragOffset.x}px, ${personDragOffset.y}px)`, touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
@@ -169,11 +130,9 @@ export const MapControls: React.FC<{ panelOpen?: boolean; variant?: MapControlsV
         <button aria-label="Diminuir zoom" onClick={() => handleZoom('out')} className="map-control-button"><ZoomOut className="w-4 h-4" /></button>
         <button aria-label="Aumentar zoom" onClick={() => handleZoom('in')} className="map-control-button"><ZoomIn className="w-4 h-4" /></button>
         <button
+          {...bindPersonDrag()}
           aria-label="Arraste para definir o ponto de partida"
           title="Arraste para definir o ponto de partida"
-          onPointerDown={event => { if (event.pointerType === 'touch') return; event.preventDefault(); event.stopPropagation(); beginPersonDrag(event.clientX, event.clientY) }}
-          onTouchStart={event => { if (!event.touches[0]) return; event.preventDefault(); event.stopPropagation(); beginPersonDrag(event.touches[0].clientX, event.touches[0].clientY) }}
-          onMouseDown={event => { if ('PointerEvent' in window) return; event.preventDefault(); event.stopPropagation(); beginPersonDrag(event.clientX, event.clientY) }}
           onContextMenu={event => event.preventDefault()}
           draggable={false}
           style={{ transform: `translate(${personDragOffset.x}px, ${personDragOffset.y}px)`, touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
