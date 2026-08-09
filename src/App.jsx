@@ -206,7 +206,7 @@ export default function App() {
         <div className="mx-auto flex h-20 w-full items-center justify-between gap-4 px-3 sm:px-4 lg:px-5">
           
           {/* Logo & Title */}
-          <div className="brand-lockup flex min-w-0 items-center gap-1.5 sm:gap-2">
+          <button type="button" onClick={() => handleNavigate('map')} className="brand-lockup flex min-w-0 items-center gap-1.5 rounded-xl text-left transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d43276] sm:gap-2" aria-label="Voltar para o mapa" title="Voltar para o mapa">
             <div className="relative h-11 w-11 shrink-0 overflow-hidden sm:h-12 sm:w-12">
               <img src={appPath('/logo-icon.png')} alt="" aria-hidden="true" className="absolute left-1/2 top-1/2 h-14 w-14 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-16 sm:w-16"/>
             </div>
@@ -221,7 +221,7 @@ export default function App() {
                 Bienal SP 2026
               </span>
             </div>
-          </div>
+          </button>
 
           {/* Search Bar in Header for larger screens */}
           <div className="hidden lg:block flex-1 max-w-md">

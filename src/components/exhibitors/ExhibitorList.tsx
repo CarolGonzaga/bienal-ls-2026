@@ -77,7 +77,7 @@ export const ExhibitorList: React.FC = () => {
   }
 
   return (
-    <div className="list-page mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-5 sm:py-6">
+    <div className="list-page flex min-h-full w-full flex-col gap-4 px-3 py-4 sm:px-4 sm:py-6 lg:px-5">
       <div className="lg:hidden"><SearchBar /></div>
       <ExhibitorFilters activeMode={listMode} onChange={setListMode} />
 
