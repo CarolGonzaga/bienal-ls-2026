@@ -10,7 +10,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "G36",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Ficção Científica", "Clássicos", "Distopia"]
+    categories: []
   },
   {
     id: "amazon",
@@ -21,7 +21,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "A58",
     active: true,
     relevanceLevel: "titulos_pontuais",
-    categories: ["Loja & E-readers", "KDP", "Independentes"]
+    categories: []
   },
   {
     id: "autentica",
@@ -32,7 +32,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "F40",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Romance", "Fantasia", "Jovem Adulto", "Gutenberg"]
+    categories: []
   },
   {
     id: "autores-independentes-do-brasil",
@@ -44,7 +44,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     active: true,
     relevanceLevel: "catalogo_confirmado",
     relevanceReasons: ["Representatividade declarada", "Autoras independentes sáficas"],
-    categories: ["Autoras Independentes", "Diversidade", "Nacional"]
+    categories: []
   },
   {
     id: "avec-editora",
@@ -55,7 +55,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "G03",
     active: true,
     relevanceLevel: "titulos_pontuais",
-    categories: ["Quadrinhos", "Fantasia", "Ficção"]
+    categories: []
   },
   {
     id: "cabana-vermelha",
@@ -66,7 +66,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "K28",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Fantasia", "Terror", "Romance", "Suspense"]
+    categories: []
   },
   {
     id: "citadel-e-altabooks",
@@ -77,7 +77,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "G70",
     active: true,
     relevanceLevel: "titulos_pontuais",
-    categories: ["Desenvolvimento", "Ficção", "Negócios"]
+    categories: []
   },
   {
     id: "companhia-das-letras",
@@ -88,7 +88,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "E60",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Literatura Contemporânea", "Selo Seguinte", "Romance", "Y.A."]
+    categories: []
   },
   {
     id: "drummond-livraria",
@@ -99,7 +99,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "C28",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Livraria", "Curadoria", "Autógrafos", "Geek"]
+    categories: []
   },
   {
     id: "editora-buzz",
@@ -110,7 +110,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "H70",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Pop Culture", "Romance", "Biografias"]
+    categories: []
   },
   {
     id: "editora-caliope",
@@ -122,7 +122,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     active: true,
     relevanceLevel: "catalogo_confirmado",
     relevanceReasons: ["Representatividade e apoio a novos escritores"],
-    categories: ["Representatividade", "Nacional", "Diversidade"]
+    categories: []
   },
   {
     id: "editora-globo",
@@ -133,7 +133,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "E70",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Selo Alt", "Literatura Jovem", "Romance", "Biografias"]
+    categories: []
   },
   {
     id: "editora-planeta",
@@ -144,7 +144,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "G40",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Romance", "Fantasia", "Essência", "Planeta Minotauro"]
+    categories: []
   },
   {
     id: "editora-rocco",
@@ -155,7 +155,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "F70",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Romance", "Jovem Adulto", "Franquias", "Fantasia"]
+    categories: []
   },
   {
     id: "editora-sunbee",
@@ -168,7 +168,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     relevanceLevel: "curadoria_direta",
     relevanceReasons: ["Foco explícito no protagonismo LGBTQIAP+ e Sáfico"],
     featured: true,
-    categories: ["Protagonismo Sáfico", "LGBTQIAP+", "Edições Especiais", "Independente"]
+    categories: []
   },
   {
     id: "euphoria",
@@ -179,7 +179,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "K66",
     active: true,
     relevanceLevel: "titulos_pontuais",
-    categories: ["Ficção", "Romance", "Jovem Adulto"]
+    categories: []
   },
   {
     id: "faro-editorial",
@@ -190,7 +190,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "C20",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Suspense", "Romance", "Mistério"]
+    categories: []
   },
   {
     id: "flyve",
@@ -201,7 +201,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "A80",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Autoras Nacionais", "Roleta de Brindes", "Autógrafos"]
+    categories: []
   },
   {
     id: "grupo-editorial-record",
@@ -212,7 +212,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "F60",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Romance", "Selo Galera Record", "Y.A.", "Best-sellers"]
+    categories: []
   },
   {
     id: "harper-collins",
@@ -223,7 +223,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "D58",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Fantasia", "Romance", "Ficção"]
+    categories: []
   },
   {
     id: "intrinseca",
@@ -234,7 +234,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "E30",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Romance", "Suspense", "Y.A.", "Best-sellers"]
+    categories: []
   },
   {
     id: "new-pop",
@@ -247,7 +247,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     relevanceLevel: "curadoria_direta",
     relevanceReasons: ["Pioneira em séries Girls Love (GL) e obras orientais sáficas"],
     featured: true,
-    categories: ["Girls Love (GL)", "Mangás Sáficos", "Manhwa", "Light Novels"]
+    categories: []
   },
   {
     id: "novo-seculo",
@@ -258,7 +258,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "A60",
     active: true,
     relevanceLevel: "titulos_pontuais",
-    categories: ["Geektopia", "Ficção", "HQ's"]
+    categories: []
   },
   {
     id: "qualis",
@@ -270,7 +270,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     active: true,
     relevanceLevel: "catalogo_confirmado",
     relevanceReasons: ["Vozes diversas e literatura sáfica nacional inclusiva"],
-    categories: ["Autoras Nacionais", "Diversidade", "Independente"]
+    categories: []
   },
   {
     id: "sextante-e-arqueiro",
@@ -281,7 +281,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "D30",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Arqueiro", "Romance de Época", "Suspense"]
+    categories: []
   },
   {
     id: "skeelo",
@@ -292,7 +292,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "B30",
     active: true,
     relevanceLevel: "titulos_pontuais",
-    categories: ["E-books", "Audiobooks", "Aplicativo"]
+    categories: []
   },
   {
     id: "uiclap",
@@ -303,7 +303,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "B79",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Auto-publicação", "Autoras Independentes", "Nacional"]
+    categories: []
   },
   {
     id: "universo-dos-livros",
@@ -314,7 +314,7 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "H60",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Romance", "Licenciamento", "Ficção"]
+    categories: []
   },
   {
     id: "vr-editora-plataforma-21-amore-latitude",
@@ -325,6 +325,6 @@ export const INITIAL_EXHIBITORS: Exhibitor[] = [
     standCode: "G50",
     active: true,
     relevanceLevel: "catalogo_confirmado",
-    categories: ["Plataforma 21", "Amore", "Romance Sáfico", "Fantasia"]
+    categories: []
   }
 ]

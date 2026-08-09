@@ -121,11 +121,11 @@ export const ExhibitorList: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {exhibitor.categories.length > 0 && <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   {exhibitor.categories.slice(0, 2).map(category => (
                     <span key={category} className="list-category rounded-full px-2.5 py-1 text-[10px] font-semibold">{category}</span>
                   ))}
-                </div>
+                </div>}
 
                 <div className="mt-2.5 flex items-center justify-between gap-3">
                   {isVerified ? (

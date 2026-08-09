@@ -296,7 +296,7 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
             )}
 
             {/* Categories */}
-            <div className="flex flex-col gap-2">
+            {exhibitor.categories.length > 0 && <div className="flex flex-col gap-2">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Categorias</h3>
               <div className="flex flex-wrap gap-1.5">
                 {exhibitor.categories.map((cat, idx) => (
@@ -305,7 +305,7 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
                   </span>
                 ))}
               </div>
-            </div>
+            </div>}
 
             {/* Suggest Correction Button */}
             <div className="mt-auto pt-4 border-t border-slate-800/80">

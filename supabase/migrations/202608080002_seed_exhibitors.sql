@@ -38,3 +38,6 @@ on conflict (id) do update set
   reason_to_visit = excluded.reason_to_visit, stand_code = excluded.stand_code, active = excluded.active,
   relevance_level = excluded.relevance_level, relevance_reasons = excluded.relevance_reasons,
   categories = excluded.categories, featured = excluded.featured, updated_at = now();
+
+-- Categorias editoriais não fazem parte dos dados oficiais recebidos.
+update public.exhibitors set categories = '{}'::text[];

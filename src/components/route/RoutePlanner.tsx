@@ -110,7 +110,7 @@ export const RoutePlanner: React.FC = () => {
                     <span className="route-stand-code rounded px-2 py-0.5 text-xs font-bold">{exhibitor.standCode}</span>
                     <h4 className="route-title truncate text-sm font-bold sm:text-base">{exhibitor.name}</h4>
                   </div>
-                  <span className="route-muted mt-1 block break-words text-xs">{exhibitor.categories.join(', ')}</span>
+                  {exhibitor.categories.length > 0 && <span className="route-muted mt-1 block break-words text-xs">{exhibitor.categories.join(', ')}</span>}
                 </div>
                 <div className="col-span-2 flex shrink-0 items-center justify-end gap-2 sm:col-span-1 sm:justify-start">
                   <div className="flex flex-col gap-1">
