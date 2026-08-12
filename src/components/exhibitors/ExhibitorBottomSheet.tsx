@@ -390,7 +390,7 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
               relatedEvents.map(evt => (
                 <div key={evt.id} className="glass-card p-4 rounded-xl border border-slate-800 flex flex-col gap-2">
                   <div className="flex items-center justify-between text-xs text-indigo-400 font-bold">
-                    <span>{evt.startTime} - {evt.endTime}</span>
+                    <span>{evt.startTime ? `${evt.startTime}${evt.endTime ? ` - ${evt.endTime}` : ''}` : 'Horário a confirmar'}</span>
                     <span>{evt.date}</span>
                   </div>
                   <h4 className="text-sm font-bold text-white">{evt.title}</h4>

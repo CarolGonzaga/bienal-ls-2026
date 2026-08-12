@@ -11,6 +11,7 @@ const formatEventDay = (date: string) => new Intl.DateTimeFormat('pt-BR', {
 
 export const ScheduleView: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>('all')
+  const [selectedType, setSelectedType] = useState<'all' | 'autograph'>('all')
   const [favoriteEvents, setFavoriteEvents] = useState<Set<string>>(() => new Set())
   const [showSubmitNotice, setShowSubmitNotice] = useState(false)
   const setSelectedStandId = useMapStore(s => s.setSelectedStandId)
@@ -20,12 +21,12 @@ export const ScheduleView: React.FC = () => {
 
   const eventDays = useMemo(() => [...new Set(events.filter(event => event.active).map(event => event.date))].sort(), [events])
   const groupedEvents = useMemo(() => {
-    const visible = events.filter(event => event.active && (selectedDay === 'all' || event.date === selectedDay))
+    const visible = events.filter(event => event.active && (selectedDay === 'all' || event.date === selectedDay) && (selectedType === 'all' || event.categories.includes('sessao de autografo')))
     return eventDays
       .filter(day => selectedDay === 'all' || day === selectedDay)
       .map(day => ({ day, events: visible.filter(event => event.date === day).sort((a, b) => a.startTime.localeCompare(b.startTime)) }))
       .filter(group => group.events.length > 0)
-  }, [eventDays, events, selectedDay])
+  }, [eventDays, events, selectedDay, selectedType])
 
   const toggleFavorite = (eventId: string) => setFavoriteEvents(current => {
     const next = new Set(current)
@@ -53,6 +54,11 @@ export const ScheduleView: React.FC = () => {
         {eventDays.map(day => <button key={day} type="button" aria-pressed={selectedDay === day} onClick={() => setSelectedDay(day)} className={`schedule-filter-chip ${selectedDay === day ? 'is-active' : ''}`}>{formatEventDay(day)}</button>)}
       </div>
 
+      <div className="schedule-filter-row flex gap-2 overflow-x-auto pb-1" aria-label="Filtrar agenda por tipo">
+        <button type="button" aria-pressed={selectedType === 'all'} onClick={() => setSelectedType('all')} className={`schedule-filter-chip ${selectedType === 'all' ? 'is-active' : ''}`}>Todos os eventos</button>
+        <button type="button" aria-pressed={selectedType === 'autograph'} onClick={() => setSelectedType('autograph')} className={`schedule-filter-chip ${selectedType === 'autograph' ? 'is-active' : ''}`}>Sessões de autógrafo</button>
+      </div>
+
       {showSubmitNotice && (
         <div className="schedule-notice flex items-start justify-between gap-3 rounded-2xl border p-4 text-sm">
           <div><strong>Cadastro de sessão</strong><p className="mt-1 text-xs opacity-75">O envio comunitário será conectado ao novo painel de aprovação.</p></div>
@@ -69,12 +75,12 @@ export const ScheduleView: React.FC = () => {
             <div className="grid gap-3 lg:grid-cols-2">
               {group.events.map(event => {
                 const favorite = favoriteEvents.has(event.id)
-                const hour = event.startTime.split(':')[0]
+                const hour = event.startTime ? event.startTime.split(':')[0] : '--'
                 const displayName = event.speakers[0] || event.title
                 return (
                   <article key={event.id} className="schedule-card grid grid-cols-[60px_minmax(0,1fr)_44px] items-center gap-4 rounded-3xl border p-4">
                     <div className="schedule-time flex h-[62px] w-[60px] flex-col items-center justify-center rounded-2xl text-white">
-                      <strong className="text-xl leading-none">{hour}</strong><span className="mt-1 text-[10px] font-bold">horas</span>
+                      <strong className="text-xl leading-none">{hour}</strong><span className="mt-1 text-[10px] font-bold">{event.startTime ? 'horas' : 'a definir'}</span>
                     </div>
                     <div className="min-w-0">
                       <h4 className="schedule-title truncate text-base font-black">{displayName}</h4>

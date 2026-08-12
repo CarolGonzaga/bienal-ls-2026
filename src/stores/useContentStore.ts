@@ -20,6 +20,6 @@ export const useContentStore = create<ContentState>(set => ({
       supabase.from('events').select('*').eq('active', true).order('event_date').order('start_time')
     ])
     if (!booksResult.error) set({ books: (booksResult.data || []).map(row => ({ id: row.id, title: row.title, authorName: row.author_name, publisher: row.publisher, synopsis: row.notes || `Livro de ${row.author_name}`, tropes: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], standCode: row.stand_code })) })
-    if (!eventsResult.error) set({ events: (eventsResult.data || []).map(row => ({ id: row.id, date: row.event_date, startTime: String(row.start_time).slice(0, 5), endTime: '', locationName: row.location_text || row.stand_code || 'Local a confirmar', title: (row.books || []).join(', ') || 'Sessão de autógrafo', description: row.notes || '', speakers: [row.author_name], categories: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], active: row.active })) })
+    if (!eventsResult.error) set({ events: (eventsResult.data || []).map(row => ({ id: row.id, date: row.event_date, startTime: row.start_time ? String(row.start_time).slice(0, 5) : '', endTime: row.end_time ? String(row.end_time).slice(0, 5) : '', locationName: row.location_text || row.stand_code || 'Local a confirmar', title: (row.books || []).join(', ') || 'Sessão de autógrafo', description: row.notes || '', speakers: [row.author_name], categories: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], active: row.active })) })
   }
 }))
