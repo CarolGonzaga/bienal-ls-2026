@@ -17,8 +17,7 @@ import {
 import { Exhibitor, StandGeometry } from '../../types'
 import { useUserStore } from '../../stores/useUserStore'
 import { useExhibitorStore } from '../../stores/useExhibitorStore'
-import { INITIAL_BOOKS } from '../../data/initialBooks'
-import { INITIAL_EVENTS } from '../../data/initialEvents'
+import { useContentStore } from '../../stores/useContentStore'
 
 interface ExhibitorBottomSheetProps {
   exhibitor: Exhibitor
@@ -51,8 +50,8 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
   const addToRoute = useUserStore(s => s.addToRoute)
   const removeFromRoute = useUserStore(s => s.removeFromRoute)
 
-  const relatedBooks = INITIAL_BOOKS.filter(b => b.exhibitorIds.includes(exhibitor.id))
-  const relatedEvents = INITIAL_EVENTS.filter(e => e.exhibitorIds.includes(exhibitor.id))
+  const relatedBooks = useContentStore(s => s.books).filter(b => b.exhibitorIds.includes(exhibitor.id))
+  const relatedEvents = useContentStore(s => s.events).filter(e => e.exhibitorIds.includes(exhibitor.id))
 
   const handleShare = () => {
     if (navigator.share) {

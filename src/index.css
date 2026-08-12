@@ -1070,6 +1070,137 @@ html[data-theme='dark'] body {
   color: #fc94c3;
 }
 
+/* Contribuições da comunidade */
+.contribution-floating,
+.contribution-submit,
+.admin-primary {
+  background: linear-gradient(135deg, #e72878, #b94185);
+  box-shadow: 0 10px 28px rgb(212 50 118 / 0.3);
+}
+
+.contribution-sheet {
+  border-color: var(--site-border);
+  background: var(--site-surface);
+  color: var(--site-text);
+}
+
+.contribution-title,
+.contribution-label {
+  color: var(--site-text);
+}
+
+.contribution-muted {
+  color: var(--site-text-muted);
+}
+
+.contribution-close,
+.contribution-option-icon {
+  background: var(--site-surface-soft);
+  color: var(--site-accent);
+}
+
+.contribution-option,
+.contribution-input,
+.contribution-role,
+.contribution-divider {
+  border-color: var(--site-border);
+}
+
+.contribution-option,
+.contribution-input {
+  background: var(--site-surface);
+  color: var(--site-text);
+}
+
+.contribution-option:hover {
+  border-color: var(--site-accent);
+  background: var(--site-surface-soft);
+}
+
+.contribution-input::placeholder {
+  color: color-mix(in srgb, var(--site-text-muted) 62%, transparent);
+}
+
+.contribution-input:focus {
+  border-color: var(--site-accent);
+  box-shadow: 0 0 0 3px rgb(212 50 118 / 0.1);
+}
+
+.contribution-tag,
+.contribution-role {
+  background: var(--site-surface-soft);
+  color: var(--site-accent-strong);
+}
+
+.contribution-tag.is-active,
+.contribution-role.is-active {
+  background: var(--site-accent);
+  color: white;
+}
+
+.contribution-link {
+  color: var(--site-accent);
+}
+
+/* Dashboard administrativo */
+.admin-page,
+.admin-header,
+.admin-sidebar {
+  background: var(--site-bg);
+  color: var(--site-text);
+}
+
+.admin-header,
+.admin-sidebar,
+.admin-card,
+.admin-input,
+.admin-secondary,
+.admin-notice {
+  border-color: var(--site-border);
+}
+
+.admin-header,
+.admin-card,
+.admin-input,
+.admin-secondary,
+.admin-notice {
+  background: var(--site-surface);
+  color: var(--site-text);
+}
+
+.admin-nav {
+  color: var(--site-text-muted);
+}
+
+.admin-nav:hover,
+.admin-nav.is-active {
+  background: var(--site-surface-soft);
+  color: var(--site-accent);
+}
+
+.admin-icon {
+  border-radius: 0.65rem;
+  padding: 0.5rem;
+  color: var(--site-text-muted);
+}
+
+.admin-icon:hover {
+  background: var(--site-surface-soft);
+  color: var(--site-accent);
+}
+
+.admin-status {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.625rem;
+  font-weight: 900;
+}
+
+.admin-status.status-pending { background: #fff3d3; color: #8a5700; }
+.admin-status.status-approved { background: #d9f8ee; color: #087665; }
+.admin-status.status-rejected { background: #ffe1e6; color: #a9274b; }
+
 .map-control-button {
   display: flex;
   align-items: center;

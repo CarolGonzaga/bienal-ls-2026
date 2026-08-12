@@ -9,7 +9,9 @@ import {
   List,
   Route,
   SlidersHorizontal,
-  CircleHelp
+  CircleHelp,
+  Plus,
+  ShieldCheck
 } from 'lucide-react'
 import { useExhibitorStore } from './stores/useExhibitorStore'
 import { useMapStore } from './stores/useMapStore'
@@ -27,6 +29,9 @@ import AuthModal from './components/AuthModal'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
 import { appPath, BASE_PATH } from './lib/paths'
 import { MapTutorial } from './components/tutorial/MapTutorial'
+import { ContributionModal } from './components/contributions/ContributionModal'
+import { flushQueuedContributions } from './lib/contributions'
+import { useContentStore } from './stores/useContentStore'
 
 const TEMPORARILY_DISABLED_TABS = new Set(['passport', 'schedule'])
 
@@ -37,6 +42,7 @@ export default function App() {
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
   const exhibitors = useExhibitorStore(s => s.exhibitors)
   const loadExhibitors = useExhibitorStore(s => s.loadExhibitors)
+  const loadContent = useContentStore(s => s.loadContent)
 
   const selectedStandId = useMapStore(s => s.selectedStandId)
   const setSelectedStandId = useMapStore(s => s.setSelectedStandId)
@@ -61,6 +67,8 @@ export default function App() {
   const [remoteUserReady, setRemoteUserReady] = useState(false)
   const [authInitializing, setAuthInitializing] = useState(isSupabaseConfigured)
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
+  const [isContributionOpen, setIsContributionOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = mapTheme
@@ -87,8 +95,24 @@ export default function App() {
   }, [setActiveTabMode, user])
 
   useEffect(() => {
+    if (!user || !isSupabaseConfigured) return setIsAdmin(false)
+    void supabase.from('profiles').select('role').eq('id', user.id).maybeSingle().then(({ data }) => setIsAdmin(data?.role === 'admin'))
+  }, [user])
+
+  useEffect(() => {
     void loadExhibitors()
-  }, [loadExhibitors])
+    void loadContent()
+  }, [loadContent, loadExhibitors])
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user) return
+    const channel = supabase.channel(`published-content-${user.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'exhibitors' }, () => { void loadExhibitors() })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'books' }, () => { void loadContent() })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => { void loadContent() })
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  }, [loadContent, loadExhibitors, user])
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -139,13 +163,15 @@ export default function App() {
     const synchronize = () => {
       void syncUserData(user.id)
       void loadExhibitors()
+      void loadContent()
+      void flushQueuedContributions()
       void supabase.from('user_route_settings').upsert({
         user_id: user.id, origin_id: routeOriginGateId, user_position: userPosition
       })
     }
     window.addEventListener('online', synchronize)
     return () => window.removeEventListener('online', synchronize)
-  }, [loadExhibitors, routeOriginGateId, syncUserData, user, userPosition])
+  }, [loadContent, loadExhibitors, routeOriginGateId, syncUserData, user, userPosition])
 
   useEffect(() => {
     if (!isSupabaseConfigured || !user || !remoteUserReady) return
@@ -288,23 +314,24 @@ export default function App() {
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-2">
-            <button onClick={startTutorial} className="site-header-action rounded-xl border p-2.5 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4"/></button>
+            <button onClick={startTutorial} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4"/></button>
+            {isAdmin && <button onClick={() => window.open(appPath('/admin'), '_blank', 'noopener,noreferrer')} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Painel administrativo" aria-label="Painel administrativo"><ShieldCheck className="h-4 w-4"/></button>}
             <button
               onClick={() => setIsAccessibilityOpen(true)}
-              className="site-header-action rounded-xl border p-2.5 transition-colors"
+              className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors"
               title="Acessibilidade"
             >
               <Eye className="w-4 h-4" />
             </button>
 
             <div className="relative flex items-center gap-2">
-              <button data-tutorial="profile" onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex h-9 w-9 items-center justify-center gap-2 rounded-full border-0 p-1 sm:w-auto sm:rounded-xl sm:border sm:px-2" title="Abrir perfil em nova aba">
+              <button data-tutorial="profile" onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full border-0 p-1 sm:w-auto sm:rounded-xl sm:border sm:px-2" title="Abrir perfil em nova aba">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
                   {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover"/> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
                 </div>
                 <span className="hidden text-xs font-semibold sm:inline">Perfil</span>
               </button>
-              <button onClick={handleLogout} title="Sair da conta" className="site-header-action flex items-center gap-1.5 rounded-xl border p-2.5 text-xs font-bold transition-colors sm:px-3">
+              <button onClick={handleLogout} title="Sair da conta" className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center gap-1.5 rounded-xl border p-0 text-xs font-bold transition-colors sm:w-auto sm:px-3">
                 <LogOut className="h-4 w-4"/><span className="hidden sm:inline">Sair</span>
               </button>
             </div>
@@ -395,6 +422,8 @@ export default function App() {
         onClose={() => setIsAccessibilityOpen(false)}
       />
       <MapTutorial open={isTutorialOpen} onFinish={finishTutorial}/>
+      <button type="button" onClick={() => setIsContributionOpen(true)} aria-label="Adicionar informação" title="Adicionar informação" className="contribution-floating fixed bottom-4 right-4 z-[70] flex h-11 w-11 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"><Plus className="h-5 w-5 sm:h-7 sm:w-7"/></button>
+      <ContributionModal open={isContributionOpen} onClose={() => setIsContributionOpen(false)} user={user} exhibitors={exhibitors}/>
     </div>
   )
 }

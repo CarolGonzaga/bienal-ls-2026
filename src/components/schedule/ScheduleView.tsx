@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { BookOpen, Calendar, Heart, MapPin, Plus, X } from 'lucide-react'
-import { INITIAL_EVENTS } from '../../data/initialEvents'
+import { useContentStore } from '../../stores/useContentStore'
 import { useExhibitorStore } from '../../stores/useExhibitorStore'
 import { useMapStore } from '../../stores/useMapStore'
 
@@ -16,15 +16,16 @@ export const ScheduleView: React.FC = () => {
   const setSelectedStandId = useMapStore(s => s.setSelectedStandId)
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
   const setActiveTabMode = useExhibitorStore(s => s.setActiveTabMode)
+  const events = useContentStore(s => s.events)
 
-  const eventDays = useMemo(() => [...new Set(INITIAL_EVENTS.filter(event => event.active).map(event => event.date))].sort(), [])
+  const eventDays = useMemo(() => [...new Set(events.filter(event => event.active).map(event => event.date))].sort(), [events])
   const groupedEvents = useMemo(() => {
-    const visible = INITIAL_EVENTS.filter(event => event.active && (selectedDay === 'all' || event.date === selectedDay))
+    const visible = events.filter(event => event.active && (selectedDay === 'all' || event.date === selectedDay))
     return eventDays
       .filter(day => selectedDay === 'all' || day === selectedDay)
       .map(day => ({ day, events: visible.filter(event => event.date === day).sort((a, b) => a.startTime.localeCompare(b.startTime)) }))
       .filter(group => group.events.length > 0)
-  }, [eventDays, selectedDay])
+  }, [eventDays, events, selectedDay])
 
   const toggleFavorite = (eventId: string) => setFavoriteEvents(current => {
     const next = new Set(current)

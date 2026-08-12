@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { AlertCircle, Bookmark, Check, CheckCircle2, ChevronRight, Heart, MapPin, Plus } from 'lucide-react'
+import { AlertCircle, Bookmark, Check, CheckCircle2, ChevronRight, Heart, MapPin } from 'lucide-react'
 import { useExhibitorStore } from '../../stores/useExhibitorStore'
 import { useMapStore } from '../../stores/useMapStore'
 import { useUserStore } from '../../stores/useUserStore'
@@ -26,7 +26,6 @@ export const ExhibitorList: React.FC = () => {
   const exhibitors = useExhibitorStore(s => s.exhibitors)
   const searchQuery = useExhibitorStore(s => s.searchQuery)
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
-  const setActiveTabMode = useExhibitorStore(s => s.setActiveTabMode)
   const setSelectedStandId = useMapStore(s => s.setSelectedStandId)
   const favorites = useUserStore(s => s.favorites)
   const visits = useUserStore(s => s.visits)
@@ -149,15 +148,6 @@ export const ExhibitorList: React.FC = () => {
         </div>
       )}
 
-      <button
-        type="button"
-        aria-label="Montar minha rota"
-        title="Montar minha rota"
-        onClick={() => setActiveTabMode('route')}
-        className="list-floating-action fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-xl md:bottom-8 md:right-8"
-      >
-        <Plus className="h-7 w-7" />
-      </button>
     </div>
   )
 }
