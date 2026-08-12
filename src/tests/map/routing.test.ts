@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { boothAccessPoint, buildMapLayout } from '../../data/map/map-layout.ts'
 import { INITIAL_STAND_GEOMETRIES } from '../../data/initialStands.ts'
 import { buildRoutingGraph, CUSTOM_ROUTE_ORIGIN_ID, MAIN_CROSS_AISLES, withCustomRouteOrigin } from '../../data/map/map-routing-graph.ts'
-import { buildRouteSegments, findRoute, parseMapRouteParams } from '../../services/mapRoutingService.ts'
+import { buildRouteSegments, findRoute, optimizeRouteStops, parseMapRouteParams } from '../../services/mapRoutingService.ts'
 import { validateGraph, validateRouteObstacles } from '../../services/mapLayoutValidationService.ts'
 
 const features = buildMapLayout(INITIAL_STAND_GEOMETRIES)
@@ -122,6 +122,24 @@ test('origem personalizada atualiza o início e preserva a ordem dos destinos', 
   assert.equal(segments[0].points[0].x, customPoint.x)
   assert.equal(segments[0].points[0].y, customPoint.y)
   assert.deepEqual(segments.map(segment => segment.destinationExhibitorId), [first.exhibitorId, second.exhibitorId])
+})
+
+test('ordena automaticamente os destinos do mais próximo ao mais distante', () => {
+  const near = features.find(feature => feature.boothCode === 'A58' && feature.exhibitorId)!
+  const far = features.find(feature => feature.boothCode === 'K70' && feature.exhibitorId)!
+  const optimized = optimizeRouteStops(graph, features, 'HALL1', [
+    { exhibitorId: far.exhibitorId!, standCode: far.boothCode!, visited: false, order: 1 },
+    { exhibitorId: near.exhibitorId!, standCode: near.boothCode!, visited: false, order: 2 }
+  ])
+  assert.deepEqual(optimized.map(stop => stop.exhibitorId), [near.exhibitorId, far.exhibitorId])
+})
+
+test('não desenha novamente um destino marcado como visitado', () => {
+  const target = features.find(feature => feature.boothCode === 'G36' && feature.exhibitorId)!
+  const segments = buildRouteSegments(graph, features, 'HALL1', [
+    { exhibitorId: target.exhibitorId!, standCode: target.boothCode!, visited: true, order: 1 }
+  ])
+  assert.deepEqual(segments, [])
 })
 
 test('arestas caminháveis não atravessam estandes ou áreas fechadas', () => {

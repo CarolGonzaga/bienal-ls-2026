@@ -7,7 +7,7 @@ import { useUserStore } from '../../stores/useUserStore'
 import { useMapInteraction } from '../../hooks/useMapInteraction'
 import { MAP_ANNOTATIONS, MAP_HEIGHT, MAP_STREETS, MAP_WIDTH, buildMapLayout, type MapFeature } from '../../data/map/map-layout.ts'
 import { buildRoutingGraph, CUSTOM_ROUTE_ORIGIN_ID, withCustomRouteOrigin } from '../../data/map/map-routing-graph.ts'
-import { buildRouteSegments, parseMapRouteParams } from '../../services/mapRoutingService.ts'
+import { buildRouteSegments, optimizeRouteStops, parseMapRouteParams } from '../../services/mapRoutingService.ts'
 import { MapBooth } from './MapBooth.tsx'
 import { MapRoute } from './MapRoute.tsx'
 import { toWorldCoordinates } from '../../utils/coordinates.ts'
@@ -37,9 +37,11 @@ export const BienalMap: React.FC = () => {
   const visits = useUserStore(state => state.visits)
   const routeStops = useUserStore(state => state.routeStops)
   const addToRoute = useUserStore(state => state.addToRoute)
+  const setRouteOrder = useUserStore(state => state.setRouteOrder)
   const features = useMemo(() => buildMapLayout(databaseGeometries), [databaseGeometries])
   const svgRef = useRef<SVGSVGElement>(null)
   const lastHandledSearchRef = useRef('')
+  const lastOptimizedRouteSignatureRef = useRef('')
   const [compactViewport, setCompactViewport] = useState(() => window.matchMedia('(max-width: 1023px)').matches)
 
   useEffect(() => {
@@ -75,6 +77,16 @@ export const BienalMap: React.FC = () => {
   const graph = useMemo(() => withCustomRouteOrigin(buildRoutingGraph(features), customOriginPoint), [features, customOriginPoint?.x, customOriginPoint?.y])
   const routeSegments = useMemo(() => buildRouteSegments(graph, features, routeOriginGateId, routeStops), [features, graph, routeOriginGateId, routeStops])
   const routePoints = useMemo(() => routeSegments.flatMap(segment => segment.points), [routeSegments])
+
+  useEffect(() => {
+    const activeStops = routeStops.filter(stop => !visits[stop.exhibitorId])
+    const originSignature = userPosition ? `${userPosition.worldX.toFixed(3)},${userPosition.worldZ.toFixed(3)}` : routeOriginGateId
+    const signature = `${originSignature}|${activeStops.map(stop => stop.exhibitorId).sort().join(',')}`
+    if (!activeStops.length || signature === lastOptimizedRouteSignatureRef.current) return
+    lastOptimizedRouteSignatureRef.current = signature
+    const optimized = optimizeRouteStops(graph, features, routeOriginGateId, activeStops)
+    if (optimized.length === activeStops.length) setRouteOrder(optimized.map(stop => stop.exhibitorId))
+  }, [features, graph, routeOriginGateId, routeStops, setRouteOrder, userPosition, visits])
 
   useEffect(() => {
     const customOriginIsValid = routeOriginGateId === CUSTOM_ROUTE_ORIGIN_ID && Boolean(userPosition)

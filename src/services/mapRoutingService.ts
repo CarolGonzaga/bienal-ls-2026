@@ -63,7 +63,7 @@ export const buildRouteSegments = (graph: RoutingGraph, features: MapFeature[], 
   let currentId = originId
   let currentLabel = originId === 'HALL1' ? 'Entrada Hall 1' : graph.nodes.find(node => node.id === originId)?.label || 'Origem'
 
-  for (const stop of [...stops].sort((a, b) => a.order - b.order)) {
+  for (const stop of [...stops].filter(stop => !stop.visited).sort((a, b) => a.order - b.order)) {
     const destination = features.find(feature => feature.exhibitorId === stop.exhibitorId)
     if (!destination?.boothCode) continue
     const destinationId = `access-${destination.id}`
@@ -85,6 +85,36 @@ export const buildRouteSegments = (graph: RoutingGraph, features: MapFeature[], 
   }
 
   return segments
+}
+
+export const optimizeRouteStops = (graph: RoutingGraph, features: MapFeature[], originId: string, stops: RouteStop[]): RouteStop[] => {
+  const remaining = [...stops].filter(stop => !stop.visited)
+  const optimized: RouteStop[] = []
+  let currentId = originId
+
+  while (remaining.length) {
+    let bestIndex = -1
+    let bestDistance = Number.POSITIVE_INFINITY
+    remaining.forEach((stop, index) => {
+      const destination = features.find(feature => feature.exhibitorId === stop.exhibitorId)
+      if (!destination) return
+      const route = findRoute(graph, currentId, `access-${destination.id}`)
+      if (route && route.distance < bestDistance) {
+        bestIndex = index
+        bestDistance = route.distance
+      }
+    })
+    if (bestIndex < 0) {
+      optimized.push(...remaining)
+      break
+    }
+    const [next] = remaining.splice(bestIndex, 1)
+    optimized.push(next)
+    const destination = features.find(feature => feature.exhibitorId === next.exhibitorId)
+    if (destination) currentId = `access-${destination.id}`
+  }
+
+  return optimized.map((stop, index) => ({ ...stop, order: index + 1 }))
 }
 
 const directionBetween = (a: Point2D, b: Point2D) => Math.abs(b.x - a.x) > Math.abs(b.y - a.y) ? (b.x > a.x ? 'leste' : 'oeste') : (b.y > a.y ? 'sul' : 'norte')

@@ -14,7 +14,7 @@ const formatEventDay = (date: string) => new Intl.DateTimeFormat('pt-BR', {
 export const ScheduleView: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>('all')
   const [selectedType, setSelectedType] = useState<'all' | 'autograph' | 'presence'>('all')
-  const [favoriteEvents, setFavoriteEvents] = useState<Set<string>>(() => new Set())
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [showSubmitNotice, setShowSubmitNotice] = useState(false)
   const setSelectedStandId = useMapStore(s => s.setSelectedStandId)
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
@@ -25,22 +25,17 @@ export const ScheduleView: React.FC = () => {
   const routeStops = useUserStore(s => s.routeStops)
   const addToRoute = useUserStore(s => s.addToRoute)
   const removeFromRoute = useUserStore(s => s.removeFromRoute)
+  const eventFavorites = useUserStore(s => s.eventFavorites)
+  const toggleEventFavorite = useUserStore(s => s.toggleEventFavorite)
 
   const eventDays = useMemo(() => [...new Set(events.filter(event => event.active).map(event => event.date))].sort(), [events])
   const groupedEvents = useMemo(() => {
-    const visible = events.filter(event => event.active && (selectedDay === 'all' || event.date === selectedDay) && (selectedType === 'all' || event.eventType === selectedType))
+    const visible = events.filter(event => event.active && (selectedDay === 'all' || event.date === selectedDay) && (selectedType === 'all' || event.eventType === selectedType) && (!favoritesOnly || eventFavorites.includes(event.id)))
     return eventDays
       .filter(day => selectedDay === 'all' || day === selectedDay)
       .map(day => ({ day, events: visible.filter(event => event.date === day).sort((a, b) => a.startTime.localeCompare(b.startTime)) }))
       .filter(group => group.events.length > 0)
-  }, [eventDays, events, selectedDay, selectedType])
-
-  const toggleFavorite = (eventId: string) => setFavoriteEvents(current => {
-    const next = new Set(current)
-    if (next.has(eventId)) next.delete(eventId)
-    else next.add(eventId)
-    return next
-  })
+  }, [eventDays, eventFavorites, events, favoritesOnly, selectedDay, selectedType])
 
   const handleVerNoMapa = (mapSpaceId?: string, exhibitorIds?: string[]) => {
     if (!mapSpaceId) return
@@ -65,6 +60,7 @@ export const ScheduleView: React.FC = () => {
         <button type="button" aria-pressed={selectedType === 'all'} onClick={() => setSelectedType('all')} className={`schedule-filter-chip ${selectedType === 'all' ? 'is-active' : ''}`}>Todos os eventos</button>
         <button type="button" aria-pressed={selectedType === 'autograph'} onClick={() => setSelectedType('autograph')} className={`schedule-filter-chip ${selectedType === 'autograph' ? 'is-active' : ''}`}>Sessões de autógrafo</button>
         <button type="button" aria-pressed={selectedType === 'presence'} onClick={() => setSelectedType('presence')} className={`schedule-filter-chip ${selectedType === 'presence' ? 'is-active' : ''}`}>Presenças</button>
+        <button type="button" aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly(value => !value)} className={`schedule-filter-chip ${favoritesOnly ? 'is-active' : ''}`}><Heart className="h-3.5 w-3.5" /> Favoritos</button>
       </div>
 
       {showSubmitNotice && (
@@ -82,7 +78,7 @@ export const ScheduleView: React.FC = () => {
             </h3>
             <div className="grid gap-3 lg:grid-cols-2">
               {group.events.map(event => {
-                const favorite = favoriteEvents.has(event.id)
+                const favorite = eventFavorites.includes(event.id)
                 const hour = event.startTime ? event.startTime.split(':')[0] : '--'
                 const displayName = event.speakers[0] || event.title
                 const standExhibitors = event.standCode ? exhibitors.filter(exhibitor => exhibitor.standCode.toUpperCase() === event.standCode?.toUpperCase()) : []
@@ -107,7 +103,7 @@ export const ScheduleView: React.FC = () => {
                       <p className="schedule-book mt-1 flex items-center gap-1 text-xs"><BookOpen className="h-3.5 w-3.5 shrink-0" /><span>{event.bookTitle || 'Não informado'}</span></p>
                     </div>
                     <div className="col-span-2 flex gap-2 sm:col-span-1 sm:flex-col">
-                      <button type="button" aria-label={`${favorite ? 'Remover' : 'Adicionar'} ${event.title} dos favoritos`} aria-pressed={favorite} onClick={() => toggleFavorite(event.id)} className={`schedule-favorite flex h-11 w-11 items-center justify-center rounded-xl ${favorite ? 'is-active' : ''}`}><Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} /></button>
+                      <button type="button" aria-label={`${favorite ? 'Remover' : 'Adicionar'} ${event.title} dos favoritos`} aria-pressed={favorite} onClick={() => toggleEventFavorite(event.id)} className={`schedule-favorite flex h-11 w-11 items-center justify-center rounded-xl ${favorite ? 'is-active' : ''}`}><Heart className={`h-5 w-5 ${favorite ? 'fill-current' : ''}`} /></button>
                       <button type="button" disabled={!routeExhibitor || !geometry} aria-label={inRoute ? 'Remover local da rota' : 'Adicionar local à rota'} onClick={() => routeExhibitor && (inRoute ? removeFromRoute(routeExhibitor.id) : addToRoute(routeExhibitor.id, routeExhibitor.standCode))} className={`schedule-favorite flex h-11 w-11 items-center justify-center rounded-xl disabled:cursor-not-allowed disabled:opacity-35 ${inRoute ? 'is-active' : ''}`}><Route className="h-5 w-5" /></button>
                     </div>
                   </article>
