@@ -33,6 +33,7 @@ import { ContributionModal } from './components/contributions/ContributionModal'
 import { flushQueuedContributions } from './lib/contributions'
 import { useContentStore } from './stores/useContentStore'
 import { ScheduleView } from './components/schedule/ScheduleView'
+import { ContributionNotifications } from './components/notifications/ContributionNotifications'
 
 const TEMPORARILY_DISABLED_TABS = new Set(['passport'])
 
@@ -428,6 +429,7 @@ export default function App() {
       <MapTutorial open={isTutorialOpen} onFinish={finishTutorial}/>
       <button type="button" onClick={() => setIsContributionOpen(true)} aria-label="Adicionar informação" title="Adicionar informação" className="contribution-floating fixed bottom-4 right-4 z-[70] flex h-11 w-11 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"><Plus className="h-5 w-5 sm:h-7 sm:w-7"/></button>
       <ContributionModal open={isContributionOpen} onClose={() => setIsContributionOpen(false)} user={user} exhibitors={exhibitors}/>
+      <ContributionNotifications user={user}/>
     </div>
   )
 }

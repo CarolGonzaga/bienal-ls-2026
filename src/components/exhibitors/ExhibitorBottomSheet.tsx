@@ -49,6 +49,8 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
   const isInRoute = useUserStore(s => s.isInRoute(exhibitor.id))
   const addToRoute = useUserStore(s => s.addToRoute)
   const removeFromRoute = useUserStore(s => s.removeFromRoute)
+  const allExhibitors = useExhibitorStore(s => s.exhibitors)
+  const standExhibitors = allExhibitors.filter(item => item.standCode.trim().toUpperCase() === exhibitor.standCode.trim().toUpperCase())
 
   const relatedBooks = useContentStore(s => s.books).filter(b => b.exhibitorIds.includes(exhibitor.id))
   const relatedEvents = useContentStore(s => s.events).filter(e => e.exhibitorIds.includes(exhibitor.id))
@@ -160,6 +162,7 @@ export const ExhibitorBottomSheet: React.FC<ExhibitorBottomSheetProps> = ({ exhi
             <h2 className="text-xl font-bold text-white mt-1 leading-tight">
               {exhibitor.name}
             </h2>
+            {standExhibitors.length > 1 && <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Editoras presentes neste estande">{standExhibitors.map(item => <span key={item.id} className="rounded-full border border-[#d43276]/40 bg-[#fff0f6] px-2 py-1 text-[10px] font-bold text-[#9b376c] dark:bg-[#59163f] dark:text-[#fc94c3]">{item.name}</span>)}</div>}
           </div>
         </div>
 

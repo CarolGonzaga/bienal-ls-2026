@@ -105,7 +105,7 @@ export const useUserStore = create<UserState>()(persist((set, get) => ({
 
   addToRoute: (exhibitorId, standCode) => {
     const stops = get().routeStops
-    if (stops.some(stop => stop.exhibitorId === exhibitorId)) return
+    if (stops.some(stop => stop.exhibitorId === exhibitorId || stop.standCode.trim().toUpperCase() === standCode.trim().toUpperCase())) return
     const next = [...stops, { exhibitorId, standCode, visited: false, order: stops.length + 1 }]
     set({ routeStops: next, hasPendingSync: !navigator.onLine })
     const userId = get().user?.id
