@@ -60,7 +60,7 @@ export const ScheduleView: React.FC = () => {
         <button type="button" aria-pressed={selectedType === 'all'} onClick={() => setSelectedType('all')} className={`schedule-filter-chip ${selectedType === 'all' ? 'is-active' : ''}`}>Todos os eventos</button>
         <button type="button" aria-pressed={selectedType === 'autograph'} onClick={() => setSelectedType('autograph')} className={`schedule-filter-chip ${selectedType === 'autograph' ? 'is-active' : ''}`}>Sessões de autógrafo</button>
         <button type="button" aria-pressed={selectedType === 'presence'} onClick={() => setSelectedType('presence')} className={`schedule-filter-chip ${selectedType === 'presence' ? 'is-active' : ''}`}>Presenças</button>
-        <button type="button" aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly(value => !value)} className={`schedule-filter-chip ${favoritesOnly ? 'is-active' : ''}`}><Heart className="h-3.5 w-3.5" /> Favoritos</button>
+        <button type="button" aria-pressed={favoritesOnly} onClick={() => setFavoritesOnly(value => !value)} className={`schedule-filter-chip ${favoritesOnly ? 'is-active' : ''}`}>Favoritos</button>
       </div>
 
       {showSubmitNotice && (
