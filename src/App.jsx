@@ -32,8 +32,9 @@ import { MapTutorial } from './components/tutorial/MapTutorial'
 import { ContributionModal } from './components/contributions/ContributionModal'
 import { flushQueuedContributions } from './lib/contributions'
 import { useContentStore } from './stores/useContentStore'
+import { ScheduleView } from './components/schedule/ScheduleView'
 
-const TEMPORARILY_DISABLED_TABS = new Set(['passport', 'schedule'])
+const TEMPORARILY_DISABLED_TABS = new Set(['passport'])
 
 export default function App() {
   const activeTabMode = useExhibitorStore(s => s.activeTabMode)
@@ -285,20 +286,21 @@ export default function App() {
               { id: 'list', label: 'Listas', icon: List },
               { id: 'passport', label: 'Passaporte', icon: Award, disabled: true },
               { id: 'route', label: 'Minha Rota', icon: Bookmark },
-              { id: 'schedule', label: 'Programação', icon: Calendar, disabled: true }
+              { id: 'schedule', label: 'Programação', icon: Calendar }
             ].map(tab => {
               const Icon = tab.icon
               const isActive = activeTabMode === tab.id
+              const isDisabled = tab.disabled
               return (
                 <button
                   key={tab.id}
                   data-tutorial={tab.id === 'route' ? 'route' : undefined}
-                  disabled={tab.disabled}
-                  aria-disabled={tab.disabled}
-                  title={tab.disabled ? 'Disponível em breve' : undefined}
+                  disabled={isDisabled}
+                  aria-disabled={isDisabled}
+                  title={isDisabled ? 'Disponível em breve' : undefined}
                   onClick={() => handleNavigate(tab.id)}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    tab.disabled
+                    isDisabled
                       ? 'cursor-not-allowed text-[#98617f] opacity-40'
                       : isActive 
                       ? 'bg-[#d43276] text-white shadow-md shadow-[#d43276]/25'
@@ -345,20 +347,21 @@ export default function App() {
             { id: 'list', label: 'Listas', icon: List },
             { id: 'passport', label: 'Passaporte', icon: Award, disabled: true },
             { id: 'route', label: 'Rota', icon: Bookmark },
-            { id: 'schedule', label: 'Agenda', icon: Calendar, disabled: true }
+            { id: 'schedule', label: 'Agenda', icon: Calendar }
           ].map(tab => {
             const Icon = tab.icon
             const isActive = activeTabMode === tab.id
+            const isDisabled = tab.disabled
             return (
               <button
                 key={tab.id}
                 data-tutorial={tab.id === 'route' ? 'route' : undefined}
-                disabled={tab.disabled}
-                aria-disabled={tab.disabled}
-                title={tab.disabled ? 'Disponível em breve' : undefined}
+                disabled={isDisabled}
+                aria-disabled={isDisabled}
+                title={isDisabled ? 'Disponível em breve' : undefined}
                 onClick={() => handleNavigate(tab.id)}
                 className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
-                  tab.disabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
+                  isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -402,6 +405,7 @@ export default function App() {
           <>
             {activeTabMode === 'list' && <ExhibitorList />}
             {activeTabMode === 'route' && <RoutePlanner />}
+            {activeTabMode === 'schedule' && <ScheduleView />}
           </>
         )}
       </main>

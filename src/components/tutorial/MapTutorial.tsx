@@ -6,7 +6,7 @@ type TutorialStep = { title: string; text: string; target?: string }
 const STEPS: TutorialStep[] = [
   { title: 'Bem-vinda ao Mapa Sáfico', text: 'Este guia rápido mostra como encontrar expositores, montar sua rota e usar os controles do mapa.' },
   { title: 'Encontre rapidamente', text: 'Busque pelo nome da editora, autora, livro ou estande. Os resultados são atualizados enquanto você digita.', target: '[data-tutorial="search"]' },
-  { title: 'Navegue pelo site', text: 'Use este menu para abrir o mapa, consultar a lista de expositores e organizar sua rota. Passaporte e Programação estarão disponíveis em breve.', target: '[data-tutorial="navigation"]' },
+  { title: 'Navegue pelo site', text: 'Use este menu para abrir o mapa, consultar a lista de expositores, conferir a programação e organizar sua rota. O Passaporte estará disponível em breve.', target: '[data-tutorial="navigation"]' },
   { title: 'Monte sua rota', text: 'Adicione os estandes que deseja visitar e organize a ordem das paradas em Minha Rota.', target: '[data-tutorial="route"]' },
   { title: 'Explore o mapa', text: 'Arraste o mapa para percorrer o pavilhão. Toque em um estande para ver detalhes, favoritar, marcar como visitado ou adicionar à rota.', target: '[data-tutorial="map"]' },
   { title: 'Zoom e centralização', text: 'Use estes botões para aproximar, afastar e recentralizar o mapa.', target: '[data-tutorial="map-controls"]' },
