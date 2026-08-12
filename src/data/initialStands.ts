@@ -2,7 +2,7 @@ import type { StandGeometry } from '../types/index.ts'
 
 /**
  * Initial Stand Geometries (7955x6436 reference plan coordinates normalized to 0..1).
- * Maps ALL 29 Exhibitors saved in the database plus neutral floor plan spaces.
+ * Maps every exhibitor whose stand exists in the official floor plan.
  */
 export const INITIAL_STAND_GEOMETRIES: StandGeometry[] = [
   // ==========================================
@@ -537,5 +537,39 @@ export const INITIAL_STAND_GEOMETRIES: StandGeometry[] = [
     verified: true,
     verifiedBy: "admin-bienal",
     notes: "Espaço digital Skeelo de leitura e e-books no Pavilhão Principal (A61)."
+  },
+  {
+    id: "stand-h85",
+    mapVersionId: "v1-bienal-sp-2026",
+    exhibitorId: "editora-venus",
+    standCode: "H85",
+    type: "polygon",
+    polygon: [
+      { x: 320 / 1420, y: 437 / 940 },
+      { x: 339 / 1420, y: 437 / 940 },
+      { x: 339 / 1420, y: 454 / 940 },
+      { x: 320 / 1420, y: 454 / 940 }
+    ],
+    height: 1,
+    neutral: false,
+    verified: true,
+    verifiedBy: "admin-bienal"
+  },
+  {
+    id: "stand-k40",
+    mapVersionId: "v1-bienal-sp-2026",
+    exhibitorId: "editora-bezz",
+    standCode: "K40",
+    type: "polygon",
+    polygon: [
+      { x: 857 / 1420, y: 240 / 940 },
+      { x: 868 / 1420, y: 240 / 940 },
+      { x: 868 / 1420, y: 266 / 940 },
+      { x: 857 / 1420, y: 266 / 940 }
+    ],
+    height: 1,
+    neutral: false,
+    verified: true,
+    verifiedBy: "admin-bienal"
   }
 ]
