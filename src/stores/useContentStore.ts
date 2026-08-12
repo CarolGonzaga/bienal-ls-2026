@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
 
 export type PublishedBook = { id: string; title: string; authorName: string; publisher?: string; synopsis: string; tropes: string[]; exhibitorIds: string[]; standCode?: string }
-export type PublishedEvent = { id: string; date: string; startTime: string; endTime: string; locationName: string; mapSpaceId?: string; title: string; description: string; speakers: string[]; categories: string[]; exhibitorIds: string[]; active: boolean }
+export type PublishedEvent = { id: string; eventType: 'autograph' | 'presence'; date: string; startTime: string; endTime: string; standCode?: string; locationName: string; mapSpaceId?: string; bookTitle?: string; title: string; description: string; speakers: string[]; categories: string[]; exhibitorIds: string[]; active: boolean }
 
 interface ContentState {
   books: PublishedBook[]
@@ -20,6 +20,10 @@ export const useContentStore = create<ContentState>(set => ({
       supabase.from('events').select('*').eq('active', true).order('event_date').order('start_time')
     ])
     if (!booksResult.error) set({ books: (booksResult.data || []).map(row => ({ id: row.id, title: row.title, authorName: row.author_name, publisher: row.publisher, synopsis: row.notes || `Livro de ${row.author_name}`, tropes: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], standCode: row.stand_code })) })
-    if (!eventsResult.error) set({ events: (eventsResult.data || []).map(row => ({ id: row.id, date: row.event_date, startTime: row.start_time ? String(row.start_time).slice(0, 5) : '', endTime: row.end_time ? String(row.end_time).slice(0, 5) : '', locationName: row.location_text || row.stand_code || 'Local a confirmar', title: (row.books || []).join(', ') || 'Sessão de autógrafo', description: row.notes || '', speakers: [row.author_name], categories: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], active: row.active })) })
+    if (!eventsResult.error) set({ events: (eventsResult.data || []).map(row => {
+      const books = (row.books || []).filter(Boolean)
+      const eventType = row.event_type === 'presence' ? 'presence' : 'autograph'
+      return { id: row.id, eventType, date: row.event_date, startTime: row.start_time ? String(row.start_time).slice(0, 5) : '', endTime: row.end_time ? String(row.end_time).slice(0, 5) : '', standCode: row.stand_code || undefined, locationName: row.location_text || row.stand_code || 'Local a confirmar', bookTitle: books.join(', ') || undefined, title: eventType === 'presence' ? 'Presença na Bienal' : 'Sessão de autógrafo', description: row.notes || '', speakers: [row.author_name], categories: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], active: row.active }
+    }) })
   }
 }))

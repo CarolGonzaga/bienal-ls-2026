@@ -57,7 +57,7 @@ export const MAPA_PNG_SPACES: MapaPngSpace[] = [
   b('J28', 1042, 301, 1084, 318), b('J26', 1084, 301, 1104, 318), b('J20', 1104, 301, 1132, 318),
   s('IF07', 'Praça de Alimentação · IF07', 'food', 120, 309, 290, 406),
   u('TRAVESSA-01', 'service', 1026, 334, 1041, 348), u('TRAVESSA-02', 'service', 1056, 334, 1070, 348), u('TRAVESSA-03', 'service', 1086, 334, 1100, 348), u('TRAVESSA-04', 'service', 1115, 334, 1130, 348),
-  u('TRAVESSA-05', 'service', 1026, 364, 1040, 378), u('TRAVESSA-06', 'service', 1056, 364, 1070, 378), u('TRAVESSA-07', 'service', 1086, 364, 1100, 378), u('TRAVESSA-08', 'service', 1116, 364, 1129, 378),
+  u('TRAVESSA-05', 'service', 1026, 364, 1040, 378), u('TRAVESSA-06', 'service', 1056, 364, 1070, 378), u('TRAVESSA-07', 'service', 1086, 364, 1100, 378), b('TRAVESSA LITERÁRIA 24', 1116, 364, 1129, 378),
   u('TRAVESSA-09', 'service', 1026, 392, 1041, 406), u('TRAVESSA-10', 'service', 1056, 392, 1071, 406), u('TRAVESSA-11', 'service', 1085, 392, 1100, 406), u('TRAVESSA-12', 'service', 1115, 392, 1130, 406),
 
   // Faixa H

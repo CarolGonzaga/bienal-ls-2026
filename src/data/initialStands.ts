@@ -571,5 +571,22 @@ export const INITIAL_STAND_GEOMETRIES: StandGeometry[] = [
     neutral: false,
     verified: true,
     verifiedBy: "admin-bienal"
+  },
+  {
+    id: "stand-travessa-literaria-24",
+    mapVersionId: "v1-bienal-sp-2026",
+    exhibitorId: "literunico",
+    standCode: "TRAVESSA LITERÁRIA 24",
+    type: "polygon",
+    polygon: [
+      { x: 1116 / 1420, y: 364 / 940 },
+      { x: 1129 / 1420, y: 364 / 940 },
+      { x: 1129 / 1420, y: 378 / 940 },
+      { x: 1116 / 1420, y: 378 / 940 }
+    ],
+    height: 1,
+    neutral: false,
+    verified: true,
+    verifiedBy: "admin-bienal"
   }
 ]

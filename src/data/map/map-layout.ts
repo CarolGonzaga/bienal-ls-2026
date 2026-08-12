@@ -123,6 +123,7 @@ export const OFFICIAL_LAYOUT_FEATURES: MapFeature[] = MAPA_PNG_SPACES.map((item,
 }))
 
 export const streetForBoothCode = (code: string) => {
+  if (code.toUpperCase().startsWith('TRAVESSA LITERÁRIA')) return MAP_STREETS.find(item => item.name === 'Rua J')
   const prefix = ['DD', 'CC', 'BB', 'AA'].find(value => code.startsWith(value)) || code.charAt(0)
   return MAP_STREETS.find(item => item.name === `Rua ${prefix}`)
 }

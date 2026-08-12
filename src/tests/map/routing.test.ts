@@ -87,9 +87,9 @@ test('separa Hall 1 → K70 e K70 → G36 em trechos de cores diferentes', () =>
   assert.equal(segments[0].nodeIds.at(-1), segments[1].nodeIds[0])
 })
 
-test('todos os 31 expositores presentes no mapa possuem acesso e rota pelo grafo', () => {
+test('todos os 32 expositores presentes no mapa possuem acesso e rota pelo grafo', () => {
   const confirmed = features.filter(feature => feature.exhibitorId)
-  assert.equal(confirmed.length, 31)
+  assert.equal(confirmed.length, 32)
   confirmed.forEach(feature => assert.ok(findRoute(graph, 'P8', `access-${feature.id}`), feature.boothCode))
 })
 
