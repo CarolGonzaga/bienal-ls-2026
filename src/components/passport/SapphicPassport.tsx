@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { BookOpen, CalendarDays, Check, CircleHelp, MapPin, MessageCircle, Navigation, ScanLine, Search, Stamp } from 'lucide-react'
 import { usePassportStore } from '../../stores/usePassportStore'
+import { useContentStore } from '../../stores/useContentStore'
 import { useUserStore } from '../../stores/useUserStore'
 import { useExhibitorStore } from '../../stores/useExhibitorStore'
 import { QrScannerModal } from './QrScannerModal'
@@ -11,6 +12,8 @@ type Page = 'index' | 'profile' | 'agenda' | 'stamp' | 'how'
 type Filter = 'all' | 'found' | 'missing'
 type PassportLocation = { exhibitor_id?: string; stand_code?: string; date?: string; start_time?: string; end_time?: string; location_text?: string; books?: string[]; guaranteed?: boolean }
 
+const normalizeName = (value = '') => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLocaleLowerCase('pt-BR')
+
 const formatDay = (date?: string) => date ? new Date(`${date}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Data a confirmar'
 const formatTime = (time?: string) => time ? String(time).slice(0, 5) : 'Horário não informado'
 
@@ -20,6 +23,7 @@ export const SapphicPassport: React.FC = () => {
   const setActiveTabMode = useExhibitorStore(s => s.setActiveTabMode)
   const setSelectedExhibitorId = useExhibitorStore(s => s.setSelectedExhibitorId)
   const { authors, profiles, stamps, redeemPassportCode } = usePassportStore()
+  const scheduleEvents = useContentStore(s => s.events)
   const [page, setPage] = useState<Page>('index')
   const [filter, setFilter] = useState<Filter>('all')
   const [query, setQuery] = useState('')
@@ -37,10 +41,31 @@ export const SapphicPassport: React.FC = () => {
   const found = Boolean(selected && stamps.some(stamp => stamp.authorId === selected.id))
   const selectedStamp = selected ? stamps.find(stamp => stamp.authorId === selected.id) : undefined
   const photoUrl = profile?.photo_path ? (profile.photo_path.startsWith('http') ? profile.photo_path : supabase.storage.from('passport-photos').getPublicUrl(profile.photo_path).data.publicUrl) : ''
-  const agenda = useMemo(() => [
-    ...(profile?.presences || []).map((item: any) => ({ ...item, kind: 'presence' })),
-    ...(profile?.autograph_sessions || []).map((item: any) => ({ ...item, kind: 'autograph' }))
-  ].sort((a: any, b: any) => `${a.date || ''}${a.start_time || ''}`.localeCompare(`${b.date || ''}${b.start_time || ''}`)), [profile])
+  const agenda = useMemo(() => {
+    const officialEvents = scheduleEvents
+      .filter(event => event.active && (event.authorSourceId === selected?.id || normalizeName(event.speakers[0]) === normalizeName(selected?.name)))
+      .map(event => ({
+        id: event.id,
+        kind: event.eventType,
+        date: event.date,
+        start_time: event.startTime,
+        end_time: event.endTime,
+        stand_code: event.standCode,
+        exhibitor_id: event.exhibitorIds[0],
+        location_text: event.locationName,
+        books: event.bookTitle ? event.bookTitle.split(',').map(book => book.trim()) : []
+      }))
+    const profileEvents = [
+      ...(profile?.presences || []).map((item: any) => ({ ...item, kind: 'presence' })),
+      ...(profile?.autograph_sessions || []).map((item: any) => ({ ...item, kind: 'autograph' }))
+    ]
+    const unique = new Map<string, any>()
+    for (const item of [...officialEvents, ...profileEvents]) {
+      const key = item.id || `${item.kind}:${item.date || ''}:${item.start_time || ''}:${item.stand_code || ''}`
+      if (!unique.has(key)) unique.set(key, item)
+    }
+    return [...unique.values()].sort((a: any, b: any) => `${a.date || ''}${a.start_time || ''}`.localeCompare(`${b.date || ''}${b.start_time || ''}`))
+  }, [profile, scheduleEvents, selected?.id, selected?.name])
   const selectAuthor = (id: string) => { setSelectedId(id); setPage('profile'); setNotice('') }
   const showOnMap = (item: PassportLocation) => { if (!item.exhibitor_id) return setNotice('Este local ainda não está vinculado a um estande navegável no mapa.'); setSelectedExhibitorId(item.exhibitor_id); setActiveTabMode('map') }
   const addLocationToRoute = (item: PassportLocation) => { if (!item.exhibitor_id || !item.stand_code) return setNotice('Este local ainda não possui um estande navegável para adicionar à rota.'); addToRoute(item.exhibitor_id, item.stand_code); setNotice('Local adicionado à sua rota.') }
