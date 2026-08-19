@@ -767,6 +767,7 @@ export default function AdminDashboard() {
               authors={data.authors}
               profiles={data.passportProfiles}
               requests={data.authorRequests}
+              books={data.books}
               onReload={load}
               notify={notify}
             />
