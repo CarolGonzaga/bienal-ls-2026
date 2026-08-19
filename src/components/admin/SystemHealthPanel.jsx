@@ -1,0 +1,15 @@
+import React from 'react'
+import { AlertTriangle, CheckCircle2, Database, HardDrive, RefreshCw } from 'lucide-react'
+
+const LABELS = {
+  authors_published: 'Autoras publicadas', authors_incomplete: 'Perfis incompletos', pending_contributions: 'Contribuições pendentes', urgent_changes: 'Alterações urgentes', events_without_location: 'Eventos sem localização', events_without_time: 'Eventos sem horário', books_without_cover: 'Livros sem capa', profiles_without_photo: 'Perfis sem foto', sync_errors: 'Filas de sync com erro', content_version: 'Versão do conteúdo'
+}
+
+export default function SystemHealthPanel({ health, budget, onReload, loading }) {
+  const quotaRows = [
+    ['Banco de dados', health?.database_bytes, budget?.database_budget_bytes, Database],
+    ['Armazenamento', health?.storage_bytes, budget?.storage_budget_bytes, HardDrive]
+  ]
+  const issues = ['authors_incomplete', 'pending_contributions', 'urgent_changes', 'events_without_location', 'events_without_time', 'profiles_without_photo']
+  return <section><div className="mb-5 flex items-start justify-between"><div><h2 className="text-2xl font-black">Saúde do sistema</h2><p className="text-sm opacity-65">Integridade editorial, sincronização e limites do plano gratuito.</p></div><button onClick={onReload} className="admin-secondary rounded-xl border p-2.5" title="Atualizar"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /></button></div><div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{Object.entries(LABELS).map(([key, label]) => { const value = health?.[key]; const warning = issues.includes(key) && Number(value) > 0; return <article key={key} className="admin-card rounded-2xl border p-4"><div className="flex items-center gap-2">{warning ? <AlertTriangle className="h-4 w-4 text-amber-500" /> : <CheckCircle2 className="h-4 w-4 text-emerald-500" />}<span className="text-xs font-bold opacity-65">{label}</span></div><strong className="mt-2 block text-2xl font-black">{value ?? '—'}</strong></article> })}</div><div className="grid gap-3 sm:grid-cols-2">{quotaRows.map(([label, used, limit, Icon]) => { const known = Number.isFinite(Number(used)); const percent = known && limit ? Math.round(Number(used) / Number(limit) * 100) : null; return <article key={label} className="admin-card rounded-2xl border p-4"><div className="flex items-center gap-2"><Icon className="h-4 w-4 text-[#d43276]" /><strong className="text-sm">{label}</strong></div>{known ? <><p className="mt-3 text-xs">{percent}% do limite configurado</p><div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full bg-[#d43276]" style={{ width: `${Math.min(percent, 100)}%` }} /></div></> : <p className="mt-3 text-xs opacity-65">A API pública não expõe esta quota com segurança. Verifique manualmente no Supabase Dashboard.</p>}</article> })}</div><p className="mt-5 text-xs opacity-55">Última publicação: {health?.last_publication ? new Date(health.last_publication).toLocaleString('pt-BR') : 'não informada'}.</p></section>
+}

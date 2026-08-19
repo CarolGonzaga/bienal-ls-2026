@@ -10,17 +10,17 @@ export function ContributionNotifications({ user }) {
 
   const load = useCallback(async () => {
     if (!isSupabaseConfigured || !user?.id) return
-    const { data, error } = await supabase.from('contribution_notifications').select('*').eq('user_id', user.id).is('read_at', null).order('created_at')
+    const { data, error } = await supabase.from('contribution_notifications').select('id,contribution_id,contribution_type,status,record_label,created_at,read_at').eq('user_id', user.id).is('read_at', null).order('created_at')
     if (!error) setItems(data || [])
   }, [user?.id])
 
   useEffect(() => {
     void load()
-    if (!isSupabaseConfigured || !user?.id) return
-    const channel = supabase.channel(`contribution-notifications-${user.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'contribution_notifications', filter: `user_id=eq.${user.id}` }, () => { void load() })
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
+    const refresh = () => { if (navigator.onLine) void load() }
+    const foreground = () => { if (document.visibilityState === 'visible') refresh() }
+    window.addEventListener('online', refresh)
+    document.addEventListener('visibilitychange', foreground)
+    return () => { window.removeEventListener('online', refresh); document.removeEventListener('visibilitychange', foreground) }
   }, [load, user?.id])
 
   if (!items.length) return null

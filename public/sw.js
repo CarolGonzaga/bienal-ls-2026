@@ -1,4 +1,5 @@
 const CACHE_NAME = 'mapasafico-v2'
+const OFFLINE_ASSET_CACHE = 'mapasafico-offline-assets-v1'
 const BASE = '/mapasaficobienal'
 const APP_SHELL = [`${BASE}/login`, `${BASE}/index.html`, `${BASE}/manifest.json`, `${BASE}/logo-icon.png`, `${BASE}/logo-texto.png`, `${BASE}/logo-completo.png`, `${BASE}/logo-ls-watermark.png`]
 
@@ -7,7 +8,7 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()))
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => ![CACHE_NAME, OFFLINE_ASSET_CACHE].includes(key)).map(key => caches.delete(key)))).then(() => self.clients.claim()))
 })
 
 self.addEventListener('fetch', event => {

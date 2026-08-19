@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import type { User, Visit, RouteStop } from '../types'
 import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
+import { getPersonalOfflineData, putPersonalOfflineData } from '../lib/offlineDb'
 
 interface UserState {
   user: User | null
@@ -43,7 +43,7 @@ const syncRoute = async (userId: string, stops: RouteStop[]) => {
   reportSyncError('sincronizar rota', error)
 }
 
-export const useUserStore = create<UserState>()(persist((set, get) => ({
+export const useUserStore = create<UserState>()((set, get) => ({
   user: null,
   favorites: [],
   eventFavorites: [],
@@ -151,7 +151,9 @@ export const useUserStore = create<UserState>()(persist((set, get) => ({
   },
 
   loadUserData: async userId => {
-    if (!isSupabaseConfigured) return
+    const cached = await getPersonalOfflineData<Pick<UserState, 'favorites' | 'eventFavorites' | 'visits' | 'routeStops'>>(userId, 'userState')
+    if (cached) set(cached)
+    if (!isSupabaseConfigured || !navigator.onLine) return
     if (get().hasPendingSync) {
       await get().syncUserData(userId)
       return
@@ -180,6 +182,7 @@ export const useUserStore = create<UserState>()(persist((set, get) => ({
   },
 
   syncUserData: async userId => {
+    if (!get().hasPendingSync || !navigator.onLine) return
     if (!isSupabaseConfigured) return
     const { favorites, eventFavorites, visits, routeStops } = get()
     const [favoritesDelete, eventFavoritesDelete, visitsDelete] = await Promise.all([
@@ -205,7 +208,20 @@ export const useUserStore = create<UserState>()(persist((set, get) => ({
   },
 
   clearUserData: () => set({ favorites: [], eventFavorites: [], visits: {}, routeStops: [], hasPendingSync: false })
-}), {
-  name: 'mapasafico-offline-user-data',
-  partialize: state => ({ favorites: state.favorites, eventFavorites: state.eventFavorites, visits: state.visits, routeStops: state.routeStops, hasPendingSync: state.hasPendingSync })
 }))
+
+let persistTimer: number | undefined
+useUserStore.subscribe(state => {
+  const userId = state.user?.id
+  if (!userId) return
+  window.clearTimeout(persistTimer)
+  persistTimer = window.setTimeout(() => {
+    void putPersonalOfflineData(userId, 'userState', {
+      favorites: state.favorites,
+      eventFavorites: state.eventFavorites,
+      visits: state.visits,
+      routeStops: state.routeStops,
+      hasPendingSync: state.hasPendingSync
+    })
+  }, 100)
+})

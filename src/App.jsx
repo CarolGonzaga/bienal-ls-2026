@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useState } from 'react'
 import {
   Calendar,
-  Compass, 
-  Award, 
-  Bookmark, 
+  Compass,
+  Award,
+  Bookmark,
   Eye,
   LogOut,
   List,
@@ -11,7 +11,9 @@ import {
   SlidersHorizontal,
   CircleHelp,
   Plus,
-  ShieldCheck
+  ShieldCheck,
+  Download,
+  UserRoundCheck
 } from 'lucide-react'
 import { useExhibitorStore } from './stores/useExhibitorStore'
 import { useMapStore } from './stores/useMapStore'
@@ -34,8 +36,15 @@ import { flushQueuedContributions } from './lib/contributions'
 import { useContentStore } from './stores/useContentStore'
 import { ScheduleView } from './components/schedule/ScheduleView'
 import { ContributionNotifications } from './components/notifications/ContributionNotifications'
+import PublicMapLanding from './components/PublicMapLanding'
+import { OfflinePreparationPanel } from './components/offline/OfflinePreparationPanel'
+import { useOfflineStore } from './stores/useOfflineStore'
+import { clearPersonalOfflineData } from './lib/offlineDb'
+import { usePassportStore } from './stores/usePassportStore'
 
-const TEMPORARILY_DISABLED_TABS = new Set(['passport'])
+const SapphicPassport = lazy(() => import('./components/passport/SapphicPassport').then(module => ({ default: module.SapphicPassport })))
+
+const TEMPORARILY_DISABLED_TABS = new Set([])
 
 export default function App() {
   const activeTabMode = useExhibitorStore(s => s.activeTabMode)
@@ -70,7 +79,22 @@ export default function App() {
   const [authInitializing, setAuthInitializing] = useState(isSupabaseConfigured)
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
   const [isContributionOpen, setIsContributionOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [profileRole, setProfileRole] = useState('reader')
+  const isAdmin = profileRole === 'admin'
+  const isAuthor = profileRole === 'author'
+  const [isOfflinePanelOpen, setIsOfflinePanelOpen] = useState(false)
+  const setOnline = useOfflineStore(s => s.setOnline)
+  const online = useOfflineStore(s => s.online)
+  const offlineReadiness = useOfflineStore(s => s.readiness)
+  const refreshOfflineStatus = useOfflineStore(s => s.refreshStatus)
+  const passportEnabled = usePassportStore(s => s.enabled)
+  const loadPassport = usePassportStore(s => s.load)
+
+  const currentPath =
+    window.location.pathname.replace(/^\/mapasaficobienal/, '') || '/'
+
+  const isPublicLanding =
+    currentPath === '/' || currentPath === ''
 
   useEffect(() => {
     document.documentElement.dataset.theme = mapTheme
@@ -78,8 +102,8 @@ export default function App() {
   }, [mapTheme])
 
   useEffect(() => {
-    if (TEMPORARILY_DISABLED_TABS.has(activeTabMode)) setActiveTabMode('map')
-  }, [activeTabMode, setActiveTabMode])
+    if (TEMPORARILY_DISABLED_TABS.has(activeTabMode) || (activeTabMode === 'passport' && !passportEnabled)) setActiveTabMode('map')
+  }, [activeTabMode, passportEnabled, setActiveTabMode])
 
   useEffect(() => {
     if (user && window.location.pathname === appPath('/login')) {
@@ -97,24 +121,28 @@ export default function App() {
   }, [setActiveTabMode, user])
 
   useEffect(() => {
-    if (!user || !isSupabaseConfigured) return setIsAdmin(false)
-    void supabase.from('profiles').select('role').eq('id', user.id).maybeSingle().then(({ data }) => setIsAdmin(data?.role === 'admin'))
+    if (!user || !isSupabaseConfigured) return setProfileRole('reader')
+    void supabase.from('profiles').select('role').eq('id', user.id).maybeSingle().then(({ data }) => setProfileRole(data?.role || 'reader'))
   }, [user])
 
   useEffect(() => {
     void loadExhibitors()
     void loadContent()
-  }, [loadContent, loadExhibitors])
+    void refreshOfflineStatus()
+  }, [loadContent, loadExhibitors, refreshOfflineStatus])
+
+  useEffect(() => { if (user?.id) void loadPassport(user.id) }, [loadPassport, user?.id])
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !user) return
-    const channel = supabase.channel(`published-content-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'exhibitors' }, () => { void loadExhibitors() })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'books' }, () => { void loadContent() })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => { void loadContent() })
-      .subscribe()
-    return () => { void supabase.removeChannel(channel) }
-  }, [loadContent, loadExhibitors, user])
+    const refreshContent = () => { if (navigator.onLine && user) { void loadExhibitors(); void loadContent(); void loadPassport(user.id) } }
+    const reconnect = () => { setOnline(true); refreshContent(); void syncUserData(user.id); void flushQueuedContributions(user.id); void supabase.from('user_route_settings').upsert({ user_id: user.id, origin_id: routeOriginGateId, user_position: userPosition }) }
+    const disconnect = () => setOnline(false)
+    const foreground = () => { if (document.visibilityState === 'visible') refreshContent() }
+    window.addEventListener('online', reconnect)
+    window.addEventListener('offline', disconnect)
+    document.addEventListener('visibilitychange', foreground)
+    return () => { window.removeEventListener('online', reconnect); window.removeEventListener('offline', disconnect); document.removeEventListener('visibilitychange', foreground) }
+  }, [loadContent, loadExhibitors, loadPassport, routeOriginGateId, setOnline, syncUserData, user, userPosition])
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -161,21 +189,6 @@ export default function App() {
   }, [clearUserData, loadUserData, setRouteOriginGateId, setUser, setUserPosition])
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !user) return
-    const synchronize = () => {
-      void syncUserData(user.id)
-      void loadExhibitors()
-      void loadContent()
-      void flushQueuedContributions()
-      void supabase.from('user_route_settings').upsert({
-        user_id: user.id, origin_id: routeOriginGateId, user_position: userPosition
-      })
-    }
-    window.addEventListener('online', synchronize)
-    return () => window.removeEventListener('online', synchronize)
-  }, [loadContent, loadExhibitors, routeOriginGateId, syncUserData, user, userPosition])
-
-  useEffect(() => {
     if (!isSupabaseConfigured || !user || !remoteUserReady) return
     const timer = window.setTimeout(() => {
       void supabase.from('user_route_settings').upsert({
@@ -207,7 +220,7 @@ export default function App() {
   }
 
   const handleNavigate = tabId => {
-    if (TEMPORARILY_DISABLED_TABS.has(tabId)) return
+    if (TEMPORARILY_DISABLED_TABS.has(tabId) || (tabId === 'passport' && !passportEnabled)) return
     setIsAuthOpen(false)
     handleCloseDrawer()
     setActiveTabMode(tabId)
@@ -222,10 +235,13 @@ export default function App() {
   }
 
   const handleLogout = async () => {
+    const userId = user?.id
     window.localStorage.removeItem('mapasafico-remembered-user')
     window.localStorage.removeItem('mapasafico-offline-user')
+    window.localStorage.removeItem('mapasafico-offline-user-data')
     if (isSupabaseConfigured) await supabase.auth.signOut()
     clearUserData()
+    if (userId) await clearPersonalOfflineData(userId)
     setUser(null)
     window.history.replaceState({}, '', appPath('/login'))
   }
@@ -243,7 +259,11 @@ export default function App() {
   }
 
   if (authInitializing) {
-    return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src={appPath('/logo-icon.png')} alt="Mapa Sáfico" className="h-20 w-20 object-contain"/><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
+    return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src={appPath('/logo-icon.png')} alt="Mapa Sáfico" className="h-20 w-20 object-contain" /><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
+  }
+
+  if (!user && isPublicLanding) {
+    return <PublicMapLanding />
   }
 
   if (!user) {
@@ -252,18 +272,18 @@ export default function App() {
 
   return (
     <div className={`brand-shell site-theme theme-${mapTheme} relative flex min-h-[100dvh] flex-col overflow-x-hidden font-sans lg:overflow-hidden ${reducedMotion ? 'reduce-motion' : ''}`}>
-      
+
       {/* Header Navigation */}
       <header className="site-header sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex h-20 w-full items-center justify-between gap-4 px-3 sm:px-4 lg:px-5">
-          
+
           {/* Logo & Title */}
           <button data-tutorial="logo" type="button" onClick={() => handleNavigate('map')} className="brand-lockup flex min-w-0 items-center gap-1.5 rounded-xl text-left transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d43276] sm:gap-2" aria-label="Voltar para o mapa" title="Voltar para o mapa">
             <div className="relative h-11 w-11 shrink-0 overflow-hidden sm:h-12 sm:w-12">
-              <img src={appPath('/logo-icon.png')} alt="" aria-hidden="true" className="absolute left-1/2 top-1/2 h-14 w-14 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-16 sm:w-16"/>
+              <img src={appPath('/logo-icon.png')} alt="" aria-hidden="true" className="absolute left-1/2 top-1/2 h-14 w-14 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-16 sm:w-16" />
             </div>
             <div className="relative h-9 w-28 shrink-0 overflow-hidden sm:h-10 sm:w-36">
-              <img src={appPath('/logo-texto.png')} alt="Mapa Sáfico · Bienal do Livro 2026" className="absolute left-1/2 top-1/2 h-32 w-32 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-40 sm:w-40"/>
+              <img src={appPath('/logo-texto.png')} alt="Mapa Sáfico · Bienal do Livro 2026" className="absolute left-1/2 top-1/2 h-32 w-32 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain sm:h-40 sm:w-40" />
             </div>
             <div className="sr-only">
               <span className="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-white via-slate-200 to-pink-300 bg-clip-text text-transparent leading-tight block">
@@ -285,7 +305,7 @@ export default function App() {
             {[
               { id: 'map', label: 'Mapa', icon: Compass },
               { id: 'list', label: 'Listas', icon: List },
-              { id: 'passport', label: 'Passaporte', icon: Award, disabled: true },
+              { id: 'passport', label: 'Passaporte', icon: Award, disabled: !passportEnabled },
               { id: 'route', label: 'Minha Rota', icon: Bookmark },
               { id: 'schedule', label: 'Programação', icon: Calendar }
             ].map(tab => {
@@ -300,13 +320,12 @@ export default function App() {
                   aria-disabled={isDisabled}
                   title={isDisabled ? 'Disponível em breve' : undefined}
                   onClick={() => handleNavigate(tab.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    isDisabled
-                      ? 'cursor-not-allowed text-[#98617f] opacity-40'
-                      : isActive 
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${isDisabled
+                    ? 'cursor-not-allowed text-[#98617f] opacity-40'
+                    : isActive
                       ? 'bg-[#d43276] text-white shadow-md shadow-[#d43276]/25'
                       : 'text-[#7b3a60] hover:bg-white hover:text-[#cf005e]'
-                  }`}
+                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{tab.label}</span>
@@ -317,8 +336,10 @@ export default function App() {
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-2">
-            <button onClick={startTutorial} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4"/></button>
-            {isAdmin && <button onClick={() => window.open(appPath('/admin'), '_blank', 'noopener,noreferrer')} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Painel administrativo" aria-label="Painel administrativo"><ShieldCheck className="h-4 w-4"/></button>}
+            <button onClick={startTutorial} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4" /></button>
+            <button onClick={() => setIsOfflinePanelOpen(true)} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Preparar para uso offline" aria-label="Preparar para uso offline"><Download className="h-4 w-4" /></button>
+            {isAdmin && <button onClick={() => window.open(appPath('/admin'), '_blank', 'noopener,noreferrer')} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Painel administrativo" aria-label="Painel administrativo"><ShieldCheck className="h-4 w-4" /></button>}
+            {isAuthor && <button onClick={() => window.open(appPath('/autora'), '_blank', 'noopener,noreferrer')} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Painel da autora" aria-label="Painel da autora"><UserRoundCheck className="h-4 w-4" /></button>}
             <button
               onClick={() => setIsAccessibilityOpen(true)}
               className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors"
@@ -330,12 +351,12 @@ export default function App() {
             <div className="relative flex items-center gap-2">
               <button data-tutorial="profile" onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full border-0 p-1 sm:w-auto sm:rounded-xl sm:border sm:px-2" title="Abrir perfil em nova aba">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
-                  {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover"/> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
+                  {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover" /> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
                 </div>
                 <span className="hidden text-xs font-semibold sm:inline">Perfil</span>
               </button>
               <button onClick={handleLogout} title="Sair da conta" className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center gap-1.5 rounded-xl border p-0 text-xs font-bold transition-colors sm:w-auto sm:px-3">
-                <LogOut className="h-4 w-4"/><span className="hidden sm:inline">Sair</span>
+                <LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sair</span>
               </button>
             </div>
           </div>
@@ -346,7 +367,7 @@ export default function App() {
           {[
             { id: 'map', label: 'Mapa', icon: Compass },
             { id: 'list', label: 'Listas', icon: List },
-            { id: 'passport', label: 'Passaporte', icon: Award, disabled: true },
+            { id: 'passport', label: 'Passaporte', icon: Award, disabled: !passportEnabled },
             { id: 'route', label: 'Rota', icon: Bookmark },
             { id: 'schedule', label: 'Agenda', icon: Calendar }
           ].map(tab => {
@@ -361,9 +382,8 @@ export default function App() {
                 aria-disabled={isDisabled}
                 title={isDisabled ? 'Disponível em breve' : undefined}
                 onClick={() => handleNavigate(tab.id)}
-                className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
-                  isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
-                }`}
+                className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 <span className="text-[10px]">{tab.label}</span>
@@ -372,6 +392,8 @@ export default function App() {
           })}
         </div>
       </header>
+
+      {!online && <div className="z-30 flex shrink-0 items-center justify-center bg-amber-100 px-3 py-2 text-center text-xs font-bold text-amber-900">Você está usando os dados salvos neste aparelho.{offlineReadiness?.lastUpdated ? ` Última atualização: ${new Date(offlineReadiness.lastUpdated).toLocaleString('pt-BR')}.` : ''}</div>}
 
       {/* Main Content Render */}
       <main className="site-main relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto lg:h-[calc(100dvh-80px)] lg:overflow-hidden">
@@ -387,13 +409,13 @@ export default function App() {
               <SearchBar />
               <div className="grid grid-cols-2 gap-2">
                 <button data-tutorial="route" onClick={() => setActiveTabMode('route')} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#d43276] to-[#e11d74] px-3 text-sm font-black text-white shadow-lg shadow-[#cf005e]/20">
-                  <Route className="h-4 w-4"/><span>Montar minha rota</span>
+                  <Route className="h-4 w-4" /><span>Montar minha rota</span>
                 </button>
                 <button data-tutorial="mobile-settings" aria-expanded={isMobileMapSettingsOpen} aria-controls="mobile-map-settings-panel" onClick={() => setIsMobileMapSettingsOpen(open => !open)} className="site-secondary-button flex min-h-12 items-center justify-center gap-2 rounded-2xl border px-3 text-sm font-black shadow-sm">
-                  <SlidersHorizontal className="h-4 w-4"/><span>Ajustar mapa</span>
+                  <SlidersHorizontal className="h-4 w-4" /><span>Ajustar mapa</span>
                 </button>
               </div>
-              {isMobileMapSettingsOpen && <div id="mobile-map-settings-panel"><MapControls variant="mobile-settings"/></div>}
+              {isMobileMapSettingsOpen && <div id="mobile-map-settings-panel"><MapControls variant="mobile-settings" /></div>}
             </div>
 
             <div data-testid="mobile-map-frame" data-tutorial="map" className="site-map-frame relative h-[58dvh] min-h-[420px] max-h-[620px] shrink-0 overflow-hidden rounded-3xl border shadow-2xl lg:absolute lg:inset-5 lg:h-auto lg:max-h-none lg:rounded-3xl lg:border">
@@ -407,6 +429,7 @@ export default function App() {
             {activeTabMode === 'list' && <ExhibitorList />}
             {activeTabMode === 'route' && <RoutePlanner />}
             {activeTabMode === 'schedule' && <ScheduleView />}
+            {activeTabMode === 'passport' && passportEnabled && <Suspense fallback={<div className="p-8 text-center text-sm font-bold">Abrindo Passaporte...</div>}><SapphicPassport /></Suspense>}
           </>
         )}
       </main>
@@ -426,10 +449,11 @@ export default function App() {
         isOpen={isAccessibilityOpen}
         onClose={() => setIsAccessibilityOpen(false)}
       />
-      <MapTutorial open={isTutorialOpen} onFinish={finishTutorial}/>
-      <button type="button" onClick={() => setIsContributionOpen(true)} aria-label="Adicionar informação" title="Adicionar informação" className="contribution-floating fixed bottom-4 right-4 z-[70] flex h-11 w-11 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"><Plus className="h-5 w-5 sm:h-7 sm:w-7"/></button>
-      <ContributionModal open={isContributionOpen} onClose={() => setIsContributionOpen(false)} user={user} exhibitors={exhibitors}/>
-      <ContributionNotifications user={user}/>
+      <MapTutorial open={isTutorialOpen} onFinish={finishTutorial} />
+      <button type="button" onClick={() => setIsContributionOpen(true)} aria-label="Adicionar informação" title="Adicionar informação" className="contribution-floating fixed bottom-4 right-4 z-[70] flex h-11 w-11 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"><Plus className="h-5 w-5 sm:h-7 sm:w-7" /></button>
+      <ContributionModal open={isContributionOpen} onClose={() => setIsContributionOpen(false)} user={user} exhibitors={exhibitors} />
+      <ContributionNotifications user={user} />
+      <OfflinePreparationPanel open={isOfflinePanelOpen} onClose={() => setIsOfflinePanelOpen(false)}/>
     </div>
   )
 }

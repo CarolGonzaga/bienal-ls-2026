@@ -1,7 +1,9 @@
 import { create } from 'zustand'
 import { Exhibitor, RelevanceLevel } from '../types'
 import { INITIAL_EXHIBITORS } from '../data/initialExhibitors'
-import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
+import { isSupabaseConfigured } from '../lib/supabase.js'
+import { getOfflineDataset } from '../lib/offlineDb'
+import { syncPublicContent } from '../lib/contentSync'
 
 export type ActiveTabMode = 'map' | 'list' | 'passport' | 'route' | 'schedule' | 'admin'
 
@@ -57,14 +59,10 @@ export const useExhibitorStore = create<ExhibitorState>((set) => ({
     filterRouteOnly: false
   }),
   loadExhibitors: async () => {
-    if (!isSupabaseConfigured) return
-    const { data, error } = await supabase.from('exhibitors').select('*').eq('active', true).order('name')
-    if (error) {
-      console.error('[Supabase] carregar expositores:', error)
-      return
-    }
-    if (!data?.length) return
-    set({ exhibitors: data.map(row => ({
+    const applyRows = (rows: any[]) => {
+      const activeRows = rows.filter(row => row.active && !row.deleted_at)
+      if (!activeRows.length) return
+      set({ exhibitors: activeRows.map(row => ({
       id: row.id,
       logo: row.logo,
       name: row.name,
@@ -78,6 +76,15 @@ export const useExhibitorStore = create<ExhibitorState>((set) => ({
       featured: row.featured,
       createdAt: row.created_at,
       updatedAt: row.updated_at
-    })) })
+      })) })
+    }
+    const cached = await getOfflineDataset<any[]>('exhibitors')
+    if (cached?.data?.length) applyRows(cached.data)
+    if (!isSupabaseConfigured || !navigator.onLine) return
+    try {
+      await syncPublicContent({ sections: ['exhibitors'] })
+      const fresh = await getOfflineDataset<any[]>('exhibitors')
+      if (fresh?.data?.length) applyRows(fresh.data)
+    } catch (error) { console.error('[Offline] sincronizar expositores:', error) }
   }
 }))
