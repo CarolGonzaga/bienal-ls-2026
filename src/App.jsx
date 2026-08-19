@@ -22,10 +22,8 @@ import { useUserStore } from './stores/useUserStore'
 
 import { BienalMap } from './components/map/BienalMap'
 import { MapControls } from './components/map/MapControls'
-import { ExhibitorList } from './components/exhibitors/ExhibitorList'
 import { ExhibitorBottomSheet } from './components/exhibitors/ExhibitorBottomSheet'
 import { SearchBar } from './components/search/SearchBar'
-import { RoutePlanner } from './components/route/RoutePlanner'
 import { AccessibilityPanel } from './components/accessibility/AccessibilityPanel'
 import AuthModal from './components/AuthModal'
 import { isSupabaseConfigured, supabase } from './lib/supabase'
@@ -34,7 +32,6 @@ import { MapTutorial } from './components/tutorial/MapTutorial'
 import { ContributionModal } from './components/contributions/ContributionModal'
 import { flushQueuedContributions } from './lib/contributions'
 import { useContentStore } from './stores/useContentStore'
-import { ScheduleView } from './components/schedule/ScheduleView'
 import { ContributionNotifications } from './components/notifications/ContributionNotifications'
 import PublicMapLanding from './components/PublicMapLanding'
 import { OfflinePreparationPanel } from './components/offline/OfflinePreparationPanel'
@@ -43,6 +40,10 @@ import { clearPersonalOfflineData } from './lib/offlineDb'
 import { usePassportStore } from './stores/usePassportStore'
 
 const SapphicPassport = lazy(() => import('./components/passport/SapphicPassport').then(module => ({ default: module.SapphicPassport })))
+const ExhibitorList = lazy(() => import('./components/exhibitors/ExhibitorList').then(module => ({ default: module.ExhibitorList })))
+const RoutePlanner = lazy(() => import('./components/route/RoutePlanner').then(module => ({ default: module.RoutePlanner })))
+const ScheduleView = lazy(() => import('./components/schedule/ScheduleView').then(module => ({ default: module.ScheduleView })))
+const TabFallback = () => <div className="p-8 text-center text-sm font-bold">Carregando…</div>
 
 const TEMPORARILY_DISABLED_TABS = new Set([])
 
@@ -426,10 +427,10 @@ export default function App() {
           </div>
         ) : (
           <>
-            {activeTabMode === 'list' && <ExhibitorList />}
-            {activeTabMode === 'route' && <RoutePlanner />}
-            {activeTabMode === 'schedule' && <ScheduleView />}
-            {activeTabMode === 'passport' && passportEnabled && <Suspense fallback={<div className="p-8 text-center text-sm font-bold">Abrindo Passaporte...</div>}><SapphicPassport /></Suspense>}
+            {activeTabMode === 'list' && <Suspense fallback={<TabFallback />}><ExhibitorList /></Suspense>}
+            {activeTabMode === 'route' && <Suspense fallback={<TabFallback />}><RoutePlanner /></Suspense>}
+            {activeTabMode === 'schedule' && <Suspense fallback={<TabFallback />}><ScheduleView /></Suspense>}
+            {activeTabMode === 'passport' && passportEnabled && <Suspense fallback={<TabFallback />}><SapphicPassport /></Suspense>}
           </>
         )}
       </main>
