@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getOfflineDataset, getOfflineMeta, getPersonalOfflineData, putOfflineMeta, putPersonalOfflineData, enqueueOfflineMutation, listOfflineMutations, removeOfflineMutation } from '../lib/offlineDb'
+import { getOfflineDataset, getPersonalOfflineData, putPersonalOfflineData, enqueueOfflineMutation, listOfflineMutations, removeOfflineMutation } from '../lib/offlineDb'
 import { syncPublicContent } from '../lib/contentSync'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { codeIsValidAt, extractPassportCode, sha256Hex } from '../lib/passportCode'
@@ -20,23 +20,26 @@ export const usePassportStore = create<PassportState>((set, get) => ({
   load: async userId => {
     const [authors, profiles, codes, stamps, cachedFlag] = await Promise.all([
       getOfflineDataset<PassportAuthor[]>('authors'), getOfflineDataset<PassportProfile[]>('passport'), getOfflineDataset<PassportCodeHash[]>('passport_codes'),
-      getPersonalOfflineData<LocalPassportStamp[]>(userId, 'passportStamps'), getOfflineMeta<boolean>('passportEnabled')
+      getPersonalOfflineData<LocalPassportStamp[]>(userId, 'passportStamps'), getPersonalOfflineData<boolean>(userId, 'passportAccess')
     ])
     set({ authors: authors?.data || [], profiles: profiles?.data || [], codes: codes?.data || [], stamps: stamps || [], enabled: Boolean(cachedFlag), loaded: true })
     if (!isSupabaseConfigured || !navigator.onLine) return
     try {
+      const accessResult = await supabase.rpc('can_access_feature', { target_key: 'passport' })
+      const accessEnabled = accessResult.error ? Boolean(cachedFlag) : Boolean(accessResult.data)
+      if (!accessResult.error) await putPersonalOfflineData(userId, 'passportAccess', accessEnabled)
+      set({ enabled: accessEnabled })
+      if (!accessEnabled) return
       await syncPublicContent({ sections: ['authors', 'passport', 'passport_codes'] })
-      const [freshAuthors, freshProfiles, freshCodes, flagResult, stampResult] = await Promise.all([
+      const [freshAuthors, freshProfiles, freshCodes, stampResult] = await Promise.all([
         getOfflineDataset<PassportAuthor[]>('authors'), getOfflineDataset<PassportProfile[]>('passport'), getOfflineDataset<PassportCodeHash[]>('passport_codes'),
-        supabase.from('feature_flags').select('enabled').eq('key', 'passport').maybeSingle(),
         supabase.from('passport_stamps').select('author_id,redeemed_at,source,author:authors(name,slug)').eq('user_id', userId)
       ])
       const remoteStamps: LocalPassportStamp[] = (stampResult.data || []).map(row => ({ authorId: row.author_id, authorName: row.author?.name, authorSlug: row.author?.slug, redeemedAtLocal: row.redeemed_at, source: row.source, status: 'confirmed', syncAttempts: 0 }))
       const pending = get().stamps.filter(item => item.status === 'pending_sync' && !remoteStamps.some(remote => remote.authorId === item.authorId))
       const merged = [...remoteStamps, ...pending]
       await putPersonalOfflineData(userId, 'passportStamps', merged)
-      if (!flagResult.error) await putOfflineMeta('passportEnabled', Boolean(flagResult.data?.enabled))
-      set({ authors: freshAuthors?.data || [], profiles: freshProfiles?.data || [], codes: freshCodes?.data || [], stamps: merged, enabled: Boolean(flagResult.data?.enabled), loaded: true })
+      set({ authors: freshAuthors?.data || [], profiles: freshProfiles?.data || [], codes: freshCodes?.data || [], stamps: merged, enabled: accessEnabled, loaded: true })
       await get().syncPendingStamps(userId)
     } catch (error) { console.error('[Passaporte] usando dados offline:', error) }
   },
