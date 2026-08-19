@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { BookOpen, CalendarDays, MapPin, Send, Store } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { LOCAL_AUTHOR_EXHIBITORS } from '../../data/localAuthorScenarios'
 
 const EVENT_START = '2026-09-04'
 const EVENT_END = '2026-09-13'
@@ -8,15 +9,23 @@ const emptyPresence = { presence_date: '', start_time: '', end_time: '', exhibit
 const emptyBook = { title: '', publisher: '', notes: '', tags: '', featured: false }
 const emptyAvailability = { book_id: '', exhibitor_id: '', stand_code: '', available_for_sale: true }
 const emptyAutograph = { event_date: '', start_time: '', end_time: '', exhibitor_id: '', stand_code: '', location_text: '', books: '', notes: '' }
+const requestTypeLabel = { presence: 'Presença na Bienal', book: 'Livro', availability: 'Local de venda', autograph: 'Sessão de autógrafos' }
+const requestStatusLabel = { draft: 'Rascunho', pending: 'Em revisão', approved: 'Aprovada', rejected: 'Precisa de ajuste' }
 
 const SelectExhibitor = ({ exhibitors, value, onChange }) => <select value={value} onChange={event => onChange(event.target.value)} className="auth-input mt-1 w-full rounded-xl border p-3 text-sm"><option value="">Selecione o expositor/estande…</option>{exhibitors.map(item => <option key={item.id} value={item.id}>{item.stand_code} — {item.name}</option>)}</select>
 const TextInput = ({ label, value, onChange, type = 'text', required = false, ...props }) => <label className="block text-xs font-bold">{label}{required ? ' *' : ''}<input type={type} value={value} onChange={event => onChange(event.target.value)} required={required} className="auth-input mt-1 w-full rounded-xl border p-3 text-sm" {...props}/></label>
 
-export default function AuthorContentRequests({ authorId, notice, agendaOnly = false }) {
+export default function AuthorContentRequests({ authorId, notice, agendaOnly = false, localScenario = null }) {
   const [exhibitors, setExhibitors] = useState([]); const [books, setBooks] = useState([]); const [requests, setRequests] = useState([])
   const [kind, setKind] = useState('presence'); const [presence, setPresence] = useState(emptyPresence); const [book, setBook] = useState(emptyBook); const [availability, setAvailability] = useState(emptyAvailability); const [autograph, setAutograph] = useState(emptyAutograph); const [saving, setSaving] = useState(false)
   const selectedExhibitor = useMemo(() => new Map(exhibitors.map(item => [item.id, item])), [exhibitors])
   const load = async () => {
+    if (localScenario) {
+      setExhibitors(LOCAL_AUTHOR_EXHIBITORS)
+      setBooks([])
+      setRequests(localScenario.existingRequests || [])
+      return
+    }
     const [exhibitorResult, linksResult, requestResult] = await Promise.all([
       supabase.from('exhibitors').select('id,name,stand_code').eq('active', true).is('deleted_at', null).order('stand_code'),
       supabase.from('author_books').select('book_id,book:books(id,title)').eq('author_id', authorId).is('deleted_at', null),
@@ -24,11 +33,17 @@ export default function AuthorContentRequests({ authorId, notice, agendaOnly = f
     ])
     setExhibitors(exhibitorResult.data || []); setBooks((linksResult.data || []).map(link => link.book).filter(Boolean)); setRequests(requestResult.data || [])
   }
-  useEffect(() => { void load() }, [authorId])
+  useEffect(() => { void load() }, [authorId, localScenario])
   const chooseExhibitor = (setter, current) => id => { const exhibitor = selectedExhibitor.get(id); setter({ ...current, exhibitor_id: id, stand_code: exhibitor?.stand_code || current.stand_code }) }
   const submit = async event => {
     event.preventDefault(); setSaving(true)
     const payload = kind === 'presence' ? presence : kind === 'book' ? { ...book, tags: book.tags.split(',').map(tag => tag.trim()).filter(Boolean) } : kind === 'availability' ? availability : { ...autograph, books: autograph.books.split(',').map(title => title.trim()).filter(Boolean) }
+    if (localScenario) {
+      setRequests(current => [{ id: `local-${Date.now()}`, request_type: kind, payload, status: 'pending', created_at: new Date().toISOString() }, ...current])
+      setSaving(false); notice('Simulação: informação enviada para revisão local.')
+      if (kind === 'presence') setPresence(emptyPresence); if (kind === 'book') setBook(emptyBook); if (kind === 'availability') setAvailability(emptyAvailability); if (kind === 'autograph') setAutograph(emptyAutograph)
+      return
+    }
     const { error } = await supabase.rpc('submit_author_content_request', { p_request_type: kind, p_payload: payload })
     setSaving(false)
     if (error) return notice(error.message)
@@ -42,7 +57,7 @@ export default function AuthorContentRequests({ authorId, notice, agendaOnly = f
     {kind === 'presence' && <><TextInput label="Data" type="date" required min={EVENT_START} max={EVENT_END} value={presence.presence_date} onChange={value => setPresence({ ...presence, presence_date: value })}/><div className="grid gap-3 sm:grid-cols-2"><TextInput label="Horário inicial" type="time" required value={presence.start_time} onChange={value => setPresence({ ...presence, start_time: value })}/><TextInput label="Horário final" type="time" value={presence.end_time} onChange={value => setPresence({ ...presence, end_time: value })}/></div><label className="text-xs font-bold">Expositor/estande<SelectExhibitor exhibitors={exhibitors} value={presence.exhibitor_id} onChange={chooseExhibitor(setPresence, presence)}/></label><TextInput label="Código do estande" value={presence.stand_code} onChange={value => setPresence({ ...presence, stand_code: value })}/><label className="text-xs font-bold">Observação<textarea value={presence.notes} onChange={event => setPresence({ ...presence, notes: event.target.value })} className="auth-input mt-1 h-20 w-full rounded-xl border p-3 text-sm"/></label><label className="flex gap-2 text-xs font-bold"><input type="checkbox" checked={presence.guaranteed} onChange={event => setPresence({ ...presence, guaranteed: event.target.checked })}/>Este horário está garantido.</label></>}
     {kind === 'book' && <><TextInput label="Título" required value={book.title} onChange={value => setBook({ ...book, title: value })}/><TextInput label="Editora" value={book.publisher} onChange={value => setBook({ ...book, publisher: value })}/><TextInput label="Tags separadas por vírgula" value={book.tags} onChange={value => setBook({ ...book, tags: value })}/><label className="text-xs font-bold">Observações<textarea value={book.notes} onChange={event => setBook({ ...book, notes: event.target.value })} className="auth-input mt-1 h-20 w-full rounded-xl border p-3 text-sm"/></label><label className="flex gap-2 text-xs font-bold"><input type="checkbox" checked={book.featured} onChange={event => setBook({ ...book, featured: event.target.checked })}/>Destacar no Passaporte</label></>}
     {kind === 'availability' && <><label className="text-xs font-bold">Livro<select required value={availability.book_id} onChange={event => setAvailability({ ...availability, book_id: event.target.value })} className="auth-input mt-1 w-full rounded-xl border p-3 text-sm"><option value="">Selecione…</option>{books.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label className="text-xs font-bold">Expositor/estande<SelectExhibitor exhibitors={exhibitors} value={availability.exhibitor_id} onChange={chooseExhibitor(setAvailability, availability)}/></label><TextInput label="Código do estande" value={availability.stand_code} onChange={value => setAvailability({ ...availability, stand_code: value })}/></>}
-    {kind === 'autograph' && <><div className="grid gap-3 sm:grid-cols-2"><TextInput label="Data" type="date" required min={EVENT_START} max={EVENT_END} value={autograph.event_date} onChange={value => setAutograph({ ...autograph, event_date: value })}/><TextInput label="Horário inicial" type="time" required value={autograph.start_time} onChange={value => setAutograph({ ...autograph, start_time: value })}/></div><TextInput label="Horário final" type="time" value={autograph.end_time} onChange={value => setAutograph({ ...autograph, end_time: value })}/><label className="text-xs font-bold">Expositor/estande<SelectExhibitor exhibitors={exhibitors} value={autograph.exhibitor_id} onChange={chooseExhibitor(setAutograph, autograph)}/></label><TextInput label="Código do estande" value={autograph.stand_code} onChange={value => setAutograph({ ...autograph, stand_code: value })}/><TextInput label="Livros (separados por vírgula)" value={autograph.books} onChange={value => setAutograph({ ...autograph, books: value })}/><TextInput label="Local textual" value={autograph.location_text} onChange={value => setAutograph({ ...autograph, location_text: value })}/><label className="text-xs font-bold">Observações<textarea value={autograph.notes} onChange={event => setAutograph({ ...autograph, notes: event.target.value })} className="auth-input mt-1 h-20 w-full rounded-xl border p-3 text-sm"/></label></>}
+    {kind === 'autograph' && <><div className="grid gap-3 sm:grid-cols-2"><TextInput label="Data" type="date" required min={EVENT_START} max={EVENT_END} value={autograph.event_date} onChange={value => setAutograph({ ...autograph, event_date: value })}/><TextInput label="Horário inicial" type="time" required value={autograph.start_time} onChange={value => setAutograph({ ...autograph, start_time: value })}/></div><TextInput label="Horário final" type="time" value={autograph.end_time} onChange={value => setAutograph({ ...autograph, end_time: value })}/><label className="text-xs font-bold">Expositor/estande<SelectExhibitor exhibitors={exhibitors} value={autograph.exhibitor_id} onChange={chooseExhibitor(setAutograph, autograph)}/></label><TextInput label="Código do estande" value={autograph.stand_code} onChange={value => setAutograph({ ...autograph, stand_code: value })}/><TextInput label="Livros (separados por vírgula)" value={autograph.books} onChange={value => setAutograph({ ...autograph, books: value })}/><TextInput label="Onde as leitoras poderão te encontrar na Bienal? (Caso não esteja em um estande específico)" value={autograph.location_text} onChange={value => setAutograph({ ...autograph, location_text: value })}/><label className="text-xs font-bold">Observações<textarea value={autograph.notes} onChange={event => setAutograph({ ...autograph, notes: event.target.value })} className="auth-input mt-1 h-20 w-full rounded-xl border p-3 text-sm"/></label></>}
     <button disabled={saving} className="route-primary-button mt-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-50"><Send className="h-4 w-4"/>{saving ? 'Enviando…' : 'Enviar para revisão'}</button>
-  </form><div className="mt-5 border-t pt-4"><h3 className="text-xs font-black uppercase tracking-wide">Solicitações enviadas</h3><div className="mt-2 space-y-2">{requests.slice(0, 5).map(request => <div key={request.id} className="rounded-xl bg-black/5 p-3 text-xs dark:bg-white/5"><strong>{request.request_type}</strong> · <span className="capitalize">{request.status}</span></div>)}{!requests.length && <p className="text-xs opacity-60">Nenhuma solicitação enviada ainda.</p>}</div></div></section>
+  </form><div className="mt-5 border-t pt-4"><h3 className="text-xs font-black uppercase tracking-wide">Solicitações enviadas</h3><div className="mt-2 space-y-2">{requests.slice(0, 5).map(request => <div key={request.id} className="flex items-center justify-between gap-3 rounded-xl bg-black/5 p-3 text-xs dark:bg-white/5"><strong>{requestTypeLabel[request.request_type] || 'Informação enviada'}</strong><span className="rounded-full bg-white/70 px-2 py-1 font-bold text-[#8a3a63] dark:bg-black/20">{requestStatusLabel[request.status] || request.status}</span></div>)}{!requests.length && <p className="text-xs opacity-60">Nenhuma solicitação enviada ainda.</p>}</div></div></section>
 }

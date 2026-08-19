@@ -21,7 +21,7 @@ html[data-theme='dark'] body {
 .passport-book { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 1180px; margin: 0 auto; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 28px 70px rgb(0 0 0 / .45), 0 0 0 6px #c696d3; }
 .passport-paper { position: relative; min-height: 720px; overflow: hidden; background: #fff8ed; box-shadow: inset 0 0 55px rgb(116 70 52 / .12); }
 .passport-paper + .passport-paper { border-left: 3px solid rgb(92 53 55 / .25); box-shadow: inset 18px 0 26px rgb(74 45 42 / .12), inset 0 0 55px rgb(116 70 52 / .12); }
-.passport-paper-grain { position: absolute; inset: 0; pointer-events: none; opacity: .48; background-image: radial-gradient(#ad7e6a 0.6px, transparent .7px), radial-gradient(#dab7a3 0.5px, transparent .65px); background-size: 9px 11px, 13px 17px; mix-blend-mode: multiply; }
+.passport-paper-grain { position: absolute; inset: 0; pointer-events: none; opacity: .22; background: linear-gradient(112deg, rgb(135 91 70 / .05), transparent 30%, rgb(255 255 255 / .28) 56%, rgb(135 91 70 / .04)); mix-blend-mode: multiply; }
 .passport-paper-border { position: absolute; inset: 1.45rem; border: 1px dashed rgb(205 122 158 / .48); border-radius: 1rem; pointer-events: none; }
 .passport-page-content { position: relative; z-index: 1; padding: clamp(2rem, 5vw, 4.25rem); }
 .passport-ticket { width: 9.6rem; color: #b172b8; }
