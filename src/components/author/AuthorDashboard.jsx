@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { AlertTriangle, Camera, Copy, Download, Eye, KeyRound, Printer, Save, Send } from 'lucide-react'
+import { AlertTriangle, Copy, Download, Eye, KeyRound, Printer, Save, Send } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { appPath } from '../../lib/paths'
 import { optimizePassportPhoto } from '../../utils/optimizeImage'

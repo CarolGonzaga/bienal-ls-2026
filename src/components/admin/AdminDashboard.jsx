@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
-  BookOpen, Building2, CalendarDays, Check, ChevronDown, ChevronUp,
+  BookOpen, Building2, CalendarDays, Check, ChevronUp,
   Activity, ClipboardList, LayoutDashboard, LogOut, Pencil, Plus, RefreshCw,
-  Save, Trash2, Users, X
+  Save, Trash2, Users
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { appPath } from '../../lib/paths'
@@ -17,6 +17,7 @@ const TABS = [
   ['books', 'Livros', BookOpen],
   ['events', 'Programação', CalendarDays],
   ['authors', 'Autoras', Users],
+  ['audit', 'Auditoria', ClipboardList],
   ['health', 'Saúde', Activity]
 ]
 const TYPE_LABEL = { sapphic_book: 'Livro sáfico', autograph_session: 'Sessão de autógrafo', exhibitor: 'Estande/Editora', correction: 'Correção' }
@@ -287,27 +288,61 @@ const JsonEditor = ({ value, onSave, onCancel }) => {
   )
 }
 
+const ReviewResolution = ({ item, books, events, exhibitors, onApprove, onReject, busy }) => {
+  const [resolution, setResolution] = useState('create')
+  const [targetId, setTargetId] = useState('')
+  const [notes, setNotes] = useState('')
+  const candidates = item.contribution_type === 'sapphic_book'
+    ? books.map(book => ({ id: book.id, label: `${book.title} · ${book.author_name}` }))
+    : item.contribution_type === 'autograph_session'
+      ? events.map(event => ({ id: event.id, label: `${event.event_date || 'sem data'} · ${event.start_time?.slice(0, 5) || 'sem horário'} · ${event.author_name}` }))
+      : item.contribution_type === 'exhibitor'
+        ? exhibitors.map(exhibitor => ({ id: exhibitor.id, label: `${exhibitor.stand_code} · ${exhibitor.name}` }))
+        : []
+  const requiresTarget = resolution === 'link' || resolution === 'update'
+  const isCorrection = item.contribution_type === 'correction'
+  return (
+    <div className="mt-4 rounded-2xl border border-[#efb4d0] bg-[#fff8fb] p-4 dark:bg-white/5">
+      <h3 className="text-sm font-black">Decisão editorial</h3>
+      <p className="mt-1 text-xs opacity-70">A aprovação só acontece depois que você define o destino. Nenhum expositor é escolhido automaticamente pelo código do estande.</p>
+      {isCorrection ? <p className="mt-3 rounded-lg bg-amber-100 p-3 text-xs font-bold text-amber-900">Correções estruturadas serão incluídas na próxima etapa. Por enquanto, registre a alteração diretamente no conteúdo e rejeite esta sugestão com uma observação.</p> : <>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          {[['create', 'Criar novo'], ['link', 'Vincular existente'], ['update', 'Atualizar existente']].map(([value, label]) => <button key={value} type="button" onClick={() => { setResolution(value); if (value === 'create') setTargetId('') }} className={`rounded-xl border px-3 py-2 text-xs font-black ${resolution === value ? 'border-[#d43276] bg-[#d43276] text-white' : 'admin-secondary'}`}>{label}</button>)}
+        </div>
+        {requiresTarget && <label className="mt-3 block text-xs font-bold">Registro de destino<select value={targetId} onChange={event => setTargetId(event.target.value)} className="admin-input mt-1 w-full rounded-xl border px-3 py-2 text-xs"><option value="">— selecionar —</option>{candidates.map(candidate => <option key={candidate.id} value={candidate.id}>{candidate.label}</option>)}</select></label>}
+      </>}
+      <label className="mt-3 block text-xs font-bold">Observação da revisão (opcional)<textarea value={notes} onChange={event => setNotes(event.target.value)} className="admin-input mt-1 min-h-20 w-full rounded-xl border p-3 text-xs" /></label>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {!isCorrection && <button disabled={busy || (requiresTarget && !targetId)} onClick={() => onApprove({ resolution, targetId, notes })} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-black text-white disabled:opacity-50">{busy ? 'Registrando…' : 'Confirmar aprovação'}</button>}
+        <button disabled={busy} onClick={() => onReject(notes)} className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-black text-white disabled:opacity-50">Rejeitar</button>
+      </div>
+    </div>
+  )
+}
+
 /* ── Main Dashboard ─────────────────────────────────────── */
 export default function AdminDashboard() {
   const mapTheme = useMapStore(state => state.mapTheme)
   const [authorized, setAuthorized] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
-  const [data, setData] = useState({ contributions: [], exhibitors: [], books: [], events: [], authors: [], passportProfiles: [], authorRequests: [], health: null, budget: null })
+  const [data, setData] = useState({ contributions: [], exhibitors: [], books: [], events: [], authors: [], passportProfiles: [], authorRequests: [], auditLogs: [], health: null, budget: null })
   const [editing, setEditing] = useState(null)
   const [creating, setCreating] = useState(false)
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
+  const [reviewing, setReviewing] = useState('')
 
   const load = async () => {
     setLoading(true)
-    const [contributions, exhibitors, books, events, authors, passportProfiles, authorRequests, health, budget] = await Promise.all([
-      supabase.from('community_contributions').select('id,user_id,client_submission_id,contribution_type,contributor_role,payload,submitter_name,submitter_contact,status,admin_notes,reviewed_at,created_at,updated_at').order('created_at', { ascending: false }),
+    const [contributions, exhibitors, books, events, authors, passportProfiles, authorRequests, auditLogs, health, budget] = await Promise.all([
+      supabase.from('community_contributions').select('id,user_id,client_submission_id,contribution_type,contributor_role,payload,submitter_name,submitter_contact,status,admin_notes,reviewed_at,review_resolution,review_target_type,review_target_id,review_payload,review_version,created_at,updated_at').is('deleted_at', null).order('created_at', { ascending: false }),
       supabase.from('exhibitors').select('id,logo,name,description,reason_to_visit,stand_code,active,relevance_level,relevance_reasons,categories,featured,created_at,updated_at,deleted_at').is('deleted_at', null).order('name'),
       supabase.from('books').select('id,title,author_name,publisher,stand_code,exhibitor_id,notes,tags,active,source_contribution_id,created_at,updated_at,deleted_at').is('deleted_at', null).order('created_at', { ascending: false }),
       supabase.from('events').select('id,event_type,author_name,books,event_date,start_time,end_time,stand_code,exhibitor_id,location_text,official_link,notes,tags,active,source_contribution_id,created_at,updated_at,deleted_at').is('deleted_at', null).order('event_date', { ascending: true }).order('start_time', { ascending: true }),
       supabase.from('authors').select('id,slug,name,first_name,bio,message,active,published,created_at,updated_at,deleted_at').is('deleted_at', null).order('name'),
       supabase.from('passport_profiles').select('author_id,photo_path,bio,message,books,presences,autograph_sessions,sale_locations,status,consent_version,consent_accepted_at,submitted_at,reviewed_at,updated_at,deleted_at'),
       supabase.from('author_change_requests').select('id,author_id,submitted_by,request_type,urgent_type,affected_date,payload,status,admin_notes,submitted_at,reviewed_at,created_at,updated_at').order('affected_date', { ascending: true, nullsFirst: false }),
+      supabase.from('audit_log').select('id,actor_user_id,actor_role,action,entity_type,entity_id,source_contribution_id,created_at').order('created_at', { ascending: false }).limit(100),
       supabase.rpc('get_system_health'),
       supabase.from('system_budget_config').select('database_budget_bytes,storage_budget_bytes,warning_thresholds,updated_at').maybeSingle()
     ])
@@ -319,6 +354,7 @@ export default function AdminDashboard() {
       authors: authors.data || [],
       passportProfiles: passportProfiles.data || [],
       authorRequests: authorRequests.data || [],
+      auditLogs: auditLogs.data || [],
       health: health.data || null,
       budget: budget.data || null
     })
@@ -344,24 +380,34 @@ export default function AdminDashboard() {
   const notify = text => { setMessage(text); window.setTimeout(() => setMessage(''), 4000) }
 
   const saveContribution = async (item, payload) => {
-    const { error } = await supabase.from('community_contributions').update({ payload, updated_at: new Date().toISOString() }).eq('id', item.id)
+    const { error } = await supabase.rpc('update_contribution_for_review', { p_contribution_id: item.id, p_payload: payload, p_expected_updated_at: item.updated_at })
     if (error) return notify(error.message)
     setEditing(null); notify('Alterações registradas.'); void load()
   }
 
-  const approve = async id => {
-    const { error } = await supabase.rpc('approve_community_contribution', { contribution_id: id })
+  const approve = async (item, { resolution, targetId, notes }) => {
+    setReviewing(item.id)
+    const { error } = await supabase.rpc('review_community_contribution', { p_contribution_id: item.id, p_decision: 'approved', p_resolution: resolution, p_reviewed_payload: item.payload, p_target_entity_id: targetId || null, p_expected_updated_at: item.updated_at, p_admin_notes: notes || null })
+    setReviewing('')
     if (error) return notify(error.message)
     notify('Contribuição aprovada e publicada.'); void load()
   }
 
-  const reject = async id => {
-    const { error } = await supabase.from('community_contributions').update({ status: 'rejected', reviewed_at: new Date().toISOString() }).eq('id', id)
+  const reject = async (item, notes = '') => {
+    setReviewing(item.id)
+    const { error } = await supabase.rpc('review_community_contribution', { p_contribution_id: item.id, p_decision: 'rejected', p_resolution: 'none', p_reviewed_payload: item.payload, p_target_entity_id: null, p_expected_updated_at: item.updated_at, p_admin_notes: notes || null })
+    setReviewing('')
     if (error) return notify(error.message)
     notify('Contribuição rejeitada.'); void load()
   }
 
   const remove = async (table, id) => {
+    if (table === 'community_contributions') {
+      if (!window.confirm('Arquivar esta contribuição? Ela permanecerá disponível na auditoria.')) return
+      const { error } = await supabase.rpc('archive_community_contribution', { p_contribution_id: id })
+      if (error) return notify(error.message)
+      notify('Contribuição arquivada.'); void load(); return
+    }
     const softDelete = ['exhibitors', 'books', 'events'].includes(table)
     if (!window.confirm(softDelete ? 'Arquivar este registro? Ele poderá ser recuperado diretamente no banco.' : 'Excluir este registro permanentemente?')) return
     const operation = softDelete
@@ -509,18 +555,20 @@ export default function AdminDashboard() {
                             ))}
                         </dl>
                       )}
-                    {item.status === 'pending' && editing !== item.id && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <button onClick={() => setEditing(item.id)} className="admin-secondary flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-black"><Pencil className="h-4 w-4" />Editar</button>
-                        <button onClick={() => approve(item.id)} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-black text-white">Aprovar e publicar</button>
-                        <button onClick={() => reject(item.id)} className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-black text-white">Rejeitar</button>
-                      </div>
-                    )}
+                    {item.status === 'pending' && editing !== item.id && <ReviewResolution item={item} books={data.books} events={data.events} exhibitors={data.exhibitors} busy={reviewing === item.id} onApprove={details => approve(item, details)} onReject={notes => reject(item, notes)} />}
                   </article>
                 ))}
                 {!data.contributions.length && <p className="admin-card rounded-2xl border p-8 text-center text-sm opacity-60">Nenhuma contribuição recebida.</p>}
               </div>
             </>
+          )}
+
+          {activeTab === 'audit' && (
+            <section>
+              <h2 className="text-2xl font-black">Auditoria</h2>
+              <p className="mt-1 text-sm opacity-65">Últimas 100 ações administrativas registradas no banco.</p>
+              <div className="mt-5 grid gap-2">{data.auditLogs.map(log => <article key={log.id} className="admin-card flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-xs"><div><strong>{log.action}</strong> · {log.entity_type}{log.entity_id ? ` · ${log.entity_id}` : ''}</div><span className="opacity-60">{new Date(log.created_at).toLocaleString('pt-BR')}</span></article>)}{!data.auditLogs.length && <p className="admin-card rounded-xl border p-6 text-center text-sm opacity-60">Nenhuma ação registrada ainda.</p>}</div>
+            </section>
           )}
 
           {/* EVENTS / PROGRAMAÇÃO */}
