@@ -6,6 +6,7 @@ import { useUserStore } from '../../stores/useUserStore'
 import { QrScannerModal } from './QrScannerModal'
 import { PassportPaper, PassportSeal, PassportTicket } from './PassportArt'
 import { supabase } from '../../lib/supabase'
+import { LOCAL_PASSPORT_READER_AUTHORS, LOCAL_PASSPORT_READER_BOOKS } from '../../data/localPassportReaderDemo'
 
 type Page = 'profile' | 'agenda' | 'books' | 'stamp'
 type Filter = 'all' | 'found' | 'missing'
@@ -14,6 +15,7 @@ const dateLabel = (v?: string) => v ? new Date(`${v}T12:00:00`).toLocaleDateStri
 const timeLabel = (start?: string, end?: string) => start ? `${String(start).slice(0, 5)}${end ? ` – ${String(end).slice(0, 5)}` : ''}` : 'Horário a confirmar'
 
 export const SapphicPassport: React.FC = () => {
+  const localDemo = import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
   const user = useUserStore(s => s.user)
   const { authors, profiles, stamps, redeemPassportCode } = usePassportStore()
   const allBooks = useContentStore(s => s.books)
@@ -27,7 +29,7 @@ export const SapphicPassport: React.FC = () => {
   const [scanner, setScanner] = useState(false)
   const [redeemOpen, setRedeemOpen] = useState(false)
 
-  const authorList = useMemo(() => authors.filter(author => author.active && author.published), [authors])
+  const authorList = useMemo(() => localDemo ? LOCAL_PASSPORT_READER_AUTHORS : authors.filter(author => author.active && author.published), [authors, localDemo])
   const selected = authorList.find(author => author.id === authorId)
   const profile = profiles.find(item => item.author_id === authorId)
   const stamped = Boolean(authorId && stamps.some(stamp => stamp.authorId === authorId))
@@ -38,7 +40,7 @@ export const SapphicPassport: React.FC = () => {
     return author.name.toLowerCase().includes(query.toLowerCase()) && (filter === 'all' || (filter === 'found' ? found : !found))
   })
   const agenda = useMemo(() => events.filter(event => event.active && selected && (event.authorSourceId === selected.id || normalize(event.speakers[0]) === normalize(selected.name))).sort((a, b) => `${a.date}${a.startTime}`.localeCompare(`${b.date}${b.startTime}`)), [events, selected])
-  const books = useMemo(() => allBooks.filter(book => selected && normalize(book.authorName) === normalize(selected.name)).slice(0, 9), [allBooks, selected])
+  const books = useMemo(() => (localDemo ? LOCAL_PASSPORT_READER_BOOKS : allBooks).filter(book => selected && normalize(book.authorName) === normalize(selected.name)).slice(0, 3), [allBooks, localDemo, selected])
   const agendaPages = Math.max(1, Math.ceil(agenda.length / 4))
   const [agendaPage, setAgendaPage] = useState(0)
 

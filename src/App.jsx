@@ -88,11 +88,16 @@ export default function App() {
   const online = useOfflineStore(s => s.online)
   const offlineReadiness = useOfflineStore(s => s.readiness)
   const refreshOfflineStatus = useOfflineStore(s => s.refreshStatus)
-  const passportEnabled = usePassportStore(s => s.enabled)
+  const passportEnabled = usePassportStore(s => s.enabled) || (import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1')
   const loadPassport = usePassportStore(s => s.load)
+  const localPassportDemo = import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
 
   const currentPath =
     window.location.pathname.replace(/^\/mapasaficobienal/, '') || '/'
+
+  useEffect(() => {
+    if (import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1') setActiveTabMode('passport')
+  }, [setActiveTabMode])
 
   const isPublicLanding =
     currentPath === '/' || currentPath === ''
@@ -263,11 +268,11 @@ export default function App() {
     return <div className={`brand-shell site-theme theme-${mapTheme} flex min-h-[100dvh] items-center justify-center`}><div className="flex flex-col items-center gap-3"><img src={appPath('/logo-icon.png')} alt="Mapa Sáfico" className="h-20 w-20 object-contain" /><span className="text-sm font-bold text-[#9b376c]">Carregando seu acesso...</span></div></div>
   }
 
-  if (!user && isPublicLanding) {
+  if (!user && isPublicLanding && !localPassportDemo) {
     return <PublicMapLanding />
   }
 
-  if (!user) {
+  if (!user && !localPassportDemo) {
     return <div className={`brand-shell site-theme theme-${mapTheme} min-h-[100dvh]`}><AuthModal isOpen isGate onLoginSuccess={handleLoginSuccess} /></div>
   }
 

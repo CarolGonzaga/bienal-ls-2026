@@ -31,7 +31,7 @@ const fetchManifest = async (): Promise<ContentManifest> => {
 
 const downloadSection = async (section: OfflineDatasetKey) => {
   if (section === 'exhibitors') return supabase.from('exhibitors').select('id,logo,name,description,reason_to_visit,stand_code,active,relevance_level,relevance_reasons,categories,featured,updated_at,deleted_at').order('name')
-  if (section === 'books') return supabase.from('books').select('id,title,author_name,publisher,stand_code,exhibitor_id,notes,tags,active,updated_at,deleted_at').order('updated_at')
+  if (section === 'books') return supabase.from('books').select('id,title,author_name,publisher,stand_code,exhibitor_id,cover_url,genre,autograph_available,notes,tags,active,updated_at,deleted_at').order('updated_at')
   if (section === 'schedule') return supabase.from('events').select('id,event_type,author_name,author_source_id,books,event_date,start_time,end_time,stand_code,exhibitor_id,location_text,official_link,notes,tags,active,updated_at,deleted_at').order('event_date').order('start_time')
   if (section === 'authors') return supabase.from('authors').select('id,slug,name,first_name,bio,message,active,published,updated_at,deleted_at').eq('published', true).order('name')
   if (section === 'passport') return supabase.from('passport_public_profiles').select('author_id,photo_path,photo_width,photo_height,photo_mime,photo_size,bio,message,books,presences,autograph_sessions,sale_locations,status,updated_at,deleted_at')
