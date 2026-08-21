@@ -309,32 +309,50 @@ export const SapphicPassport: React.FC = () => {
               )}
 
               {indexTab === 'como' && (
-                <div className="passport-grid-wrap">
-                  <h2 className="passport-como-title">Como funciona o Passaporte?</h2>
-                  <div className="passport-steps-list mt-6">
+                <div className="passport-card mx-4 my-2">
+                  <div className="passport-corner-row">
+                    <div className="passport-corner-stamp-left">
+                      <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
+                    </div>
+                    <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
+                  </div>
+
+                  <div className="text-center my-4">
+                    <h2 className="passport-como-title flex items-center justify-center gap-2">
+                      <span>COMO FUNCIONA O PASSAPORTE?</span>
+                      <Heart className="passport-heart-icon" />
+                    </h2>
+                  </div>
+
+                  <div className="passport-steps-list my-6">
                     <div className="passport-step-row">
                       <div className="passport-step-icon">
                         <MapPin size={20} />
                       </div>
-                      <p>Visite os estandes das autoras sáficas participantes na Bienal do Livro 2026.</p>
+                      <p>Vá até a estande da autora</p>
                     </div>
                     <div className="passport-step-row">
                       <div className="passport-step-icon">
-                        <QrCode size={20} />
+                        <MessageCircle size={20} />
                       </div>
-                      <p>Peça o código exclusivo ou escaneie o QR Code no balcão da autora.</p>
+                      <p>Peça o código da autora</p>
                     </div>
                     <div className="passport-step-row">
                       <div className="passport-step-icon">
                         <Stamp size={20} />
                       </div>
-                      <p>Colecione os carimbos oficiais e guarde recordações eternas da sua visita!</p>
+                      <p>Resgate seu carimbo</p>
+                    </div>
+                    <div className="passport-step-row">
+                      <div className="passport-step-icon">
+                        <BookOpen size={20} />
+                      </div>
+                      <p>Colecione memórias!</p>
                     </div>
                   </div>
 
-                  <div className="passport-bridge-foot">
-                    <img src="/passaporte/saopaulo.png" alt="São Paulo - Bienal do Livro" />
-                  </div>
+                  <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
+                  <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
                 </div>
               )}
             </div>
@@ -363,57 +381,89 @@ export const SapphicPassport: React.FC = () => {
                         <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
                       </div>
                       <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
-                      <img src="/passaporte/ondas.png" alt="" className="passport-wavy-decor" />
                     </div>
 
-                    <h2 className="passport-script-name">
-                      {selected.name}
-                    </h2>
-                    <div className="passport-meta-line">
-                      <span>Autora Sáfica</span>
-                      <span className="dot">•</span>
-                      <span>Bienal do Livro SP 2026</span>
+                    <div className="passport-header-title-block">
+                      <h2 className="passport-script-name">
+                        {selected.name}
+                        <Heart className="passport-heart-icon" />
+                      </h2>
+                      <div className="passport-meta-line">
+                        <span>Autora sáfica</span>
+                        <span className="dot">•</span>
+                        <span>Bienal do Livro SP 2026</span>
+                      </div>
                     </div>
 
-                    <div className="passport-photo-wrap">
-                      {photo ? (
-                        <img src={photo} alt={selected.name} />
+                    <div className="passport-profile-layout">
+                      <div className="passport-photo-square">
+                        {photo ? (
+                          <img src={photo} alt={selected.name} />
+                        ) : (
+                          <span className="init">{selected.name[0]}</span>
+                        )}
+                      </div>
+
+                      <div className="passport-profile-texts">
+                        <div className="passport-text-section">
+                          <h4>
+                            <BookOpen size={15} />
+                            <span>Sobre a Autora</span>
+                          </h4>
+                          <p className="whitespace-pre-line">
+                            {profile?.bio || selected.bio || 'Lívia escreve histórias sobre amor, descobertas e coragem. Seus romances sáficos celebram personagens reais em jornadas reais.'}
+                          </p>
+                        </div>
+
+                        <div className="passport-text-section quote-section">
+                          <h4>
+                            <Heart size={15} className="text-[#b3306a]" />
+                            <span>Mensagem para você</span>
+                          </h4>
+                          <p>
+                            {profile?.message ? `"${profile.message}"` : 'Obrigada por ler e por existir. Nos vemos na Bienal! 💜'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* LIVROS EM DESTAQUE NA PÁGINA DA AUTORA */}
+                    <div className="passport-section-divider-title">
+                      <BookOpen size={16} />
+                      <span>Livros em Destaque</span>
+                    </div>
+
+                    <div className="passport-books-grid">
+                      {books.length > 0 ? (
+                        books.map((book, idx) => (
+                          <div key={book.id} className="passport-book-3d-card">
+                            <div className={`passport-book-spine-cover palette-${(idx % 3) + 1}`}>
+                              <span>{book.title}</span>
+                            </div>
+                            <div className="passport-book-details">
+                              <span className="title">{book.title}</span>
+                              <span className="genre">{book.genre || 'Romance'}</span>
+                              <div className="passport-book-tags-list">
+                                <span className="passport-tag-pill green">
+                                  <Check size={9} strokeWidth={3} /> À venda
+                                </span>
+                                <span className="passport-tag-pill purple">
+                                  <Check size={9} strokeWidth={3} /> Autógrafos
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))
                       ) : (
-                        <span className="init">{selected.name[0]}</span>
+                        <p className="col-span-3 text-center text-xs text-[#76586b] py-2">
+                          Livros em preparação para a Bienal.
+                        </p>
                       )}
                     </div>
 
-                    <div className="passport-info-box">
-                      <div className="passport-info-eyebrow">
-                        <BookOpen size={16} />
-                        <span>Sobre a Autora</span>
-                      </div>
-                      <p className="whitespace-pre-line">
-                        {profile?.bio || selected.bio || 'Biografia em preparação pela autora.'}
-                      </p>
-                    </div>
-
-                    {profile?.message && (
-                      <div className="passport-info-box quote">
-                        <div className="passport-info-eyebrow">
-                          <MessageCircle size={16} />
-                          <span>Mensagem para você</span>
-                        </div>
-                        <p>"{profile.message}"</p>
-                      </div>
-                    )}
-
-                    <div className="mt-5 flex gap-2">
-                      <button
-                        onClick={() => setDetailPage('stamp')}
-                        className="passport-btn-primary"
-                      >
-                        <Stamp size={17} />
-                        {isStamped ? 'Ver Meu Carimbo' : 'Resgatar Carimbo'}
-                      </button>
-                    </div>
-
+                    {/* SÃO PAULO FOOTER & SELO 2 NO RODAPÉ */}
                     <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
+                    <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
                   </div>
                 )}
 
@@ -421,57 +471,72 @@ export const SapphicPassport: React.FC = () => {
                 {detailPage === 'agenda' && (
                   <div className="passport-card">
                     <div className="passport-corner-row">
-                      <div className="passport-corner-stamp-left">
-                        <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
+                      <div className="passport-schedule-header-group">
+                        <h3>
+                          <MapPin size={16} />
+                          <span>Onde encontrar a autora</span>
+                        </h3>
+                        <p>
+                          {selected.name} estará na Bienal do Livro de São Paulo entre os dias 4 e 13 de setembro de 2026.
+                        </p>
                       </div>
                       <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
-                      <img src="/passaporte/ondas.png" alt="" className="passport-wavy-decor" />
                     </div>
 
-                    <h2 className="passport-script-name">Agenda na Bienal</h2>
-                    <p className="passport-meta-line mb-4">Onde e quando encontrar a autora</p>
-
-                    {agenda.length > 0 ? (
-                      agenda.map(event => (
-                        <div key={event.id} className="passport-sched-card">
-                          <div className="passport-sched-day">
-                            <Calendar size={18} />
-                          </div>
-                          <div className="passport-sched-body">
-                            <div className="passport-sched-top">
-                              <span className="passport-sched-date">{dateLabel(event.date)}</span>
-                              <span className={`passport-badge-custom ${event.eventType === 'presence' ? 'green' : 'purple'}`}>
-                                {event.eventType === 'presence' ? 'Presença' : 'Autógrafos'}
+                    <div className="passport-agenda-box-frame">
+                      {agenda.length > 0 ? (
+                        agenda.map(event => (
+                          <div key={event.id} className="passport-sched-row">
+                            <div className="passport-sched-left">
+                              <Calendar size={17} />
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="passport-sched-day-name">{dateLabel(event.date)}</span>
+                                  <span className={`passport-badge-custom ${event.eventType === 'presence' ? 'green' : 'purple'}`}>
+                                    {event.eventType === 'presence' ? 'Presença confirmada' : 'Sessão de autógrafos'}
+                                  </span>
+                                </div>
+                                <div className="passport-sched-hours">
+                                  {timeLabel(event.startTime, event.endTime)}
+                                </div>
+                                {event.bookTitle && (
+                                  <div className="passport-sched-book-name">
+                                    Livro: {event.bookTitle}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="passport-sched-right">
+                              <span className="passport-stand-bubble">
+                                Estande {event.standCode || 'G40'}
+                              </span>
+                              <span className="passport-stand-publisher">
+                                {event.locationName || 'Editora parceira'}
                               </span>
                             </div>
-                            <div className="passport-sched-time">
-                              {timeLabel(event.startTime, event.endTime)}
-                            </div>
-                            {event.bookTitle && (
-                              <div className="passport-sched-book">
-                                Livro: {event.bookTitle}
-                              </div>
-                            )}
                           </div>
-                          <div className="passport-sched-place">
-                            <b>Estande {event.standCode || 'A confirmar'}</b>
-                            <span>{event.locationName}</span>
-                          </div>
+                        ))
+                      ) : (
+                        <div className="py-4 text-center text-xs text-[#76586b]">
+                          A programação oficial desta autora será divulgada em breve.
                         </div>
-                      ))
-                    ) : (
-                      <div className="passport-info-box text-center py-6">
-                        <p>A programação oficial desta autora será divulgada em breve.</p>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
-                    <div className="passport-info-box mt-5">
-                      <p className="text-xs text-[#5B4E6B]">
-                        💡 <strong>Dica:</strong> Fique atenta a eventuais alterações de horário nos estandes durante a Bienal.
+                    {/* ATUALIZAÇÕES DE ÚLTIMA HORA */}
+                    <div className="passport-meaning-box mt-2">
+                      <h4>
+                        <MessageCircle size={15} />
+                        <span>Atualizações de última hora</span>
+                      </h4>
+                      <p>Fique de olho! Atualizações podem acontecer até o dia do evento.</p>
+                      <p className="font-bold text-[#4A1B6D]">
+                        Confirmado autógrafo e presença nos estandes principais! 💜
                       </p>
                     </div>
 
                     <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
+                    <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
                   </div>
                 )}
 
@@ -483,38 +548,55 @@ export const SapphicPassport: React.FC = () => {
                         <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
                       </div>
                       <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
-                      <img src="/passaporte/ondas.png" alt="" className="passport-wavy-decor" />
                     </div>
 
-                    <h2 className="passport-script-name">Livros</h2>
-                    <p className="passport-meta-line mb-4">Obras em destaque da autora</p>
+                    <div className="passport-header-title-block">
+                      <h2 className="passport-script-name">
+                        {selected.name}
+                        <Heart className="passport-heart-icon" />
+                      </h2>
+                      <div className="passport-meta-line">
+                        <span>Autora sáfica</span>
+                        <span className="dot">•</span>
+                        <span>Bienal do Livro SP 2026</span>
+                      </div>
+                    </div>
 
-                    {books.length > 0 ? (
-                      <div className="passport-books-grid">
-                        {books.map(book => (
-                          <div key={book.id} className="flex flex-col items-center">
-                            <div className="passport-book-cover-art w-full">
+                    <div className="passport-section-divider-title">
+                      <BookOpen size={16} />
+                      <span>Livros em Destaque</span>
+                    </div>
+
+                    <div className="passport-books-grid">
+                      {books.length > 0 ? (
+                        books.map((book, idx) => (
+                          <div key={book.id} className="passport-book-3d-card">
+                            <div className={`passport-book-spine-cover palette-${(idx % 3) + 1}`}>
                               <span>{book.title}</span>
                             </div>
-                            <div className="passport-book-meta">
-                              <span className="t">{book.title}</span>
-                              {book.publisher && <span className="g block">{book.publisher}</span>}
-                              <div className="checks">
-                                <span className="passport-check-tag">
-                                  <Check size={11} /> Disponível
+                            <div className="passport-book-details">
+                              <span className="title">{book.title}</span>
+                              <span className="genre">{book.genre || 'Romance'}</span>
+                              <div className="passport-book-tags-list">
+                                <span className="passport-tag-pill green">
+                                  <Check size={9} strokeWidth={3} /> À venda
+                                </span>
+                                <span className="passport-tag-pill purple">
+                                  <Check size={9} strokeWidth={3} /> Autógrafos
                                 </span>
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="passport-info-box text-center py-6">
-                        <p>Os livros cadastrados desta autora serão exibidos aqui.</p>
-                      </div>
-                    )}
+                        ))
+                      ) : (
+                        <p className="col-span-3 text-center text-xs text-[#76586b] py-6">
+                          Os livros cadastrados desta autora serão exibidos aqui.
+                        </p>
+                      )}
+                    </div>
 
                     <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
+                    <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
                   </div>
                 )}
 
@@ -528,39 +610,53 @@ export const SapphicPassport: React.FC = () => {
                       <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
                     </div>
 
-                    <div className="passport-stamp-stage">
-                      <div className={`passport-ring-wrap ${!isStamped ? 'locked' : ''} ${stampAnimating ? 'stamping' : ''}`}>
-                        <img
-                          src="/passaporte/selo2.png"
-                          alt="Carimbo da Autora"
-                        />
-                      </div>
-                      <div className="passport-stamp-caption">
-                        <div className="place">Bienal do Livro de São Paulo</div>
-                        <div className="status">
-                          {isStamped ? '✓ Carimbo oficial desbloqueado' : '○ Carimbo ainda bloqueado'}
-                        </div>
-                      </div>
+                    {/* CARIMBO OFICIAL CENTRAL */}
+                    <div className={`passport-stamp-main-circle ${!isStamped ? 'locked' : ''} ${stampAnimating ? 'stamping' : ''}`}>
+                      <img
+                        src="/passaporte/selo2.png"
+                        alt="Carimbo da Autora"
+                      />
+                    </div>
+
+                    <div className="passport-stamp-caption-title">
+                      Estande {agenda[0]?.standCode || 'G40'} — Bienal SP 2026
+                    </div>
+                    <div className="passport-stamp-caption-sub">
+                      Presença confirmada
                     </div>
 
                     {isStamped ? (
-                      <div className="passport-sync-box">
-                        <div className="tick">
-                          <Check size={16} strokeWidth={3} />
+                      <>
+                        <div className="passport-status-pill-green">
+                          <div className="check-round">
+                            <Check size={14} strokeWidth={3} />
+                          </div>
+                          <div>
+                            <b className="text-xs text-[#1e8e4f] block">Carimbo confirmado</b>
+                            <span className="text-[11px] text-[#2e6e48]">
+                              Sincronizado em {stampData?.redeemedAtLocal ? new Date(stampData.redeemedAtLocal).toLocaleString('pt-BR') : 'Bienal 2026'}
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <b>Carimbo Registrado com Sucesso!</b>
-                          <span>
-                            {stampData?.redeemedAtLocal
-                              ? `Coletado em ${new Date(stampData.redeemedAtLocal).toLocaleString('pt-BR')}`
-                              : 'Registrado em sua conta'}
-                          </span>
+
+                        <div className="passport-meaning-box">
+                          <h4>
+                            <BookOpen size={15} />
+                            <span>O que significa esse carimbo?</span>
+                          </h4>
+                          <p>
+                            Este carimbo confirma que {selected.name} esteve presente na Bienal do Livro de São Paulo.
+                            Ele representa momentos, conexões e histórias que fazem parte da sua jornada literária.
+                          </p>
+                          <p className="cursive-quote">
+                            Colecione memórias, celebre encontros e continue escrevendo sua história. 💜
+                          </p>
                         </div>
-                      </div>
+                      </>
                     ) : (
                       <div className="passport-redeem-container">
                         <p className="hint">
-                          Recebeu a chave da autora no estande? Digite abaixo para carimbar sua página:
+                          Recebeu a chave de {selected.name} no estande? Digite abaixo para validar seu carimbo:
                         </p>
                         <input
                           type="text"
@@ -569,15 +665,13 @@ export const SapphicPassport: React.FC = () => {
                           value={code}
                           onChange={e => setCode(e.target.value)}
                         />
-                        <div className="flex gap-2">
-                          <button
-                            className="passport-btn-primary"
-                            onClick={() => void handleRedeem()}
-                            disabled={!code.trim()}
-                          >
-                            <Stamp size={17} /> Validar Carimbo
-                          </button>
-                        </div>
+                        <button
+                          className="passport-btn-primary"
+                          onClick={() => void handleRedeem()}
+                          disabled={!code.trim()}
+                        >
+                          <Stamp size={17} /> Validar Carimbo
+                        </button>
 
                         <div className="mt-3 flex justify-center gap-4">
                           <button
