@@ -46,7 +46,7 @@ export default function AuthorDashboard() {
     setAccount({ user: auth.user, authorId: link.author_id })
     const [{ data: authorData }, { data: profileData }, { data: draftRequest }, { data: codeData }] = await Promise.all([
       supabase.from('authors').select('id,name,first_name,bio,message').eq('id', link.author_id).maybeSingle(),
-      supabase.from('passport_profiles').select('author_id,photo_path,photo_width,photo_height,photo_mime,photo_size,bio,message,status,participation_status,consent_version,consent_accepted_at').eq('author_id', link.author_id).maybeSingle(),
+      supabase.from('passport_profiles').select('author_id,photo_path,photo_width,photo_height,photo_mime,photo_size,bio,message,status,participation_status,consent_version,consent_accepted_at,updated_at').eq('author_id', link.author_id).maybeSingle(),
       supabase.from('author_change_requests').select('id,payload,status').eq('author_id', link.author_id).eq('request_type', 'profile').in('status', ['draft', 'pending']).order('updated_at', { ascending: false }).limit(1).maybeSingle(),
       supabase.rpc('get_my_passport_code')
     ])
@@ -84,13 +84,19 @@ export default function AuthorDashboard() {
     setParticipationSaving(true)
     const accepted = decision === 'participating'
     const timestamp = accepted ? new Date().toISOString() : null
-    const value = { ...profile, author_id: account.authorId, status: profile.status || 'draft', participation_status: decision, consent_version: accepted ? CONSENT_VERSION : null, consent_accepted_at: timestamp, consent_accepted_by_user_id: accepted ? account.user.id : null, updated_at: new Date().toISOString() }
-    const { error } = await supabase.from('passport_profiles').upsert(value)
+    const payload = { ...profile, participation_status: decision, consent_version: accepted ? CONSENT_VERSION : null, consent_accepted_at: timestamp, consent_accepted_by_user_id: accepted ? account.user.id : null }
+    delete payload.change_request_id; delete payload.published_status; delete payload.status; delete payload.author_id; delete payload.updated_at
+    const published = profile.published_status === 'published' || profile.status === 'published'
+    const request = { author_id: account.authorId, submitted_by: account.user.id, request_type: 'profile', payload, status: 'pending', submitted_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+    const operation = published
+      ? (profile.change_request_id ? supabase.from('author_change_requests').update(request).eq('id', profile.change_request_id) : supabase.from('author_change_requests').insert(request).select('id').single())
+      : supabase.from('passport_profiles').upsert({ ...payload, author_id: account.authorId, status: profile.status || 'draft', updated_at: new Date().toISOString() })
+    const { data, error } = await operation
     setParticipationSaving(false)
     if (error) return setNotice(error.message)
-    setProfile(current => ({ ...current, ...value }))
+    setProfile(current => ({ ...current, ...payload, change_request_id: published ? data?.id || current.change_request_id : current.change_request_id, status: published ? 'pending' : current.status }))
     setParticipationModalOpen(false)
-    setNotice(accepted ? 'Participação confirmada. Agora preencha seu perfil e envie-o para revisão.' : 'Tudo bem — você poderá cadastrar sua agenda sem participar do Passaporte.')
+    setNotice(published ? 'Sua alteração foi enviada para revisão.' : accepted ? 'Participação confirmada. Agora preencha seu perfil e envie-o para revisão.' : 'Tudo bem — você poderá cadastrar sua agenda sem participar do Passaporte.')
   }
 
   const save = async submit => {
@@ -133,7 +139,7 @@ export default function AuthorDashboard() {
   const photo = profile.photo_path ? supabase.storage.from('passport-photos').getPublicUrl(profile.photo_path).data.publicUrl : ''
   return <div className="site-theme min-h-[100dvh] bg-[#fff8fb] p-4 text-[#56132f] sm:p-8"><main className="mx-auto max-w-5xl">
     <a href={appPath('/')} className="text-sm font-bold text-[#d43276]">← Voltar ao mapa</a>
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-3xl font-black">Painel da autora</h1><p className="mt-1 text-sm text-[#805269]">{author?.name}</p></div>{participating ? <button onClick={() => setPreview(true)} className="route-soft-button flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-black"><Eye className="h-4 w-4"/>Pré-visualizar meu Passaporte</button> : <button onClick={() => setParticipationModalOpen(true)} className="route-primary-button rounded-xl px-4 py-3 text-sm font-black">Participar do Passaporte</button>}</div>
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-3xl font-black">Painel da autora</h1><p className="mt-1 text-sm text-[#805269]">{author?.name}</p></div>{participating ? <div className="flex flex-wrap gap-2"><button onClick={() => setParticipationModalOpen(true)} className="route-soft-button rounded-xl border px-4 py-3 text-sm font-black">Gerenciar participação</button><button onClick={() => setPreview(true)} className="route-soft-button flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-black"><Eye className="h-4 w-4"/>Pré-visualizar meu Passaporte</button></div> : <button onClick={() => setParticipationModalOpen(true)} className="route-primary-button rounded-xl px-4 py-3 text-sm font-black">Participar do Passaporte</button>}</div>
     {localScenario && <p className="mt-4 rounded-xl border border-dashed border-[#8750a0] bg-[#f7eefb] p-3 text-xs font-bold text-[#5e2674]">Modo de teste local — nenhum dado é enviado ao Supabase. Cenário: {localScenarioKey}.</p>}
     {notice && <p role="status" className="mt-4 rounded-xl bg-[#fff0f6] p-3 text-sm font-bold">{notice}</p>}
 
@@ -141,7 +147,7 @@ export default function AuthorDashboard() {
       <div className="space-y-5"><section className="auth-card rounded-3xl border p-5"><h2 className="flex items-center gap-2 text-lg font-black"><KeyRound className="h-5 w-5"/>Minha chave do Passaporte</h2><p className="mt-2 text-xs opacity-70">Compartilhe a chave ou o QR Code somente com leitoras presentes. Elas poderão apresentar o código na tela do celular, usar um cartão de visita ou escanear o QR Code.</p>{code ? <><p className="mt-4 rounded-xl bg-[#fff0f6] p-3 text-center font-mono text-xl font-black">{code}</p><div className="mt-3 flex flex-wrap gap-2"><button onClick={() => navigator.clipboard.writeText(code)} className="route-soft-button flex items-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold"><Copy className="h-4 w-4"/>Copiar código</button><button onClick={() => qrVisible ? setQrVisible(false) : void showQr()} className="route-soft-button flex items-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold"><QrCode className="h-4 w-4"/>{qrVisible ? 'Ocultar QR Code' : 'Mostrar QR Code'}</button><button onClick={() => void downloadQr()} className="route-soft-button flex items-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold"><Download className="h-4 w-4"/>Baixar QR</button><button onClick={() => { void showQr(); window.setTimeout(() => window.print(), 100) }} className="route-soft-button flex items-center gap-1 rounded-xl border px-3 py-2 text-xs font-bold"><Printer className="h-4 w-4"/>Imprimir</button></div>{qrVisible && qr && <div className="mt-4 text-center"><img src={qr} alt="QR Code do Passaporte" className="mx-auto w-56"/><p className="mt-2 font-black">Peça meu carimbo no Passaporte Sáfico</p></div>}</> : <p className="mt-3 text-sm">A chave será gerada pela administração após a aprovação.</p>}</section>
         <UrgentForm urgentType={urgentType} setUrgentType={setUrgentType} urgentDate={urgentDate} setUrgentDate={setUrgentDate} urgentText={urgentText} setUrgentText={setUrgentText} onSend={sendUrgent}/></div></section>}
     {!participating && <div className="mt-5"><UrgentForm urgentType={urgentType} setUrgentType={setUrgentType} urgentDate={urgentDate} setUrgentDate={setUrgentDate} urgentText={urgentText} setUrgentText={setUrgentText} onSend={sendUrgent}/></div>}
-    <AuthorContentRequests authorId={account.authorId} notice={setNotice} agendaOnly={!participating} localScenario={localScenario}/>
+    <AuthorContentRequests authorId={account.authorId} notice={setNotice} agendaOnly={!participating} localScenario={localScenario} passportRequestStatus={profile.change_request_id ? profile.status : (profile.status === 'draft' || profile.status === 'pending' ? profile.status : '')} passportRequestUpdatedAt={profile.updated_at || ''}/>
     {preview && <AuthorPassportPreview author={author} profile={profile} photoUrl={photo} events={localScenario?.existingRequests || []} onClose={() => setPreview(false)}/>} 
     {participationModalOpen && <ParticipationModal saving={participationSaving} onChoose={chooseParticipation}/>}</main></div>
 }

@@ -44,7 +44,14 @@ export default function AuthorsAdminPanel({ authors, profiles, requests, books =
   const generateCode = author => run(`code-${author.id}`, () => supabase.rpc('generate_passport_code', { target_author_id: author.id }), 'Código do passaporte gerado com segurança.')
   const approveProfile = author => run(`approve-${author.id}`, () => supabase.rpc('approve_passport_profile', { target_author_id: author.id }), 'Perfil publicado no passaporte.')
   const reviewRequest = (request, decision) => run(`request-${request.id}`, () => supabase.rpc('review_author_change_request', { target_request_id: request.id, decision, notes: null }), decision === 'approved' ? 'Solicitação aprovada.' : 'Solicitação rejeitada.')
-  const reviewContentRequest = (request, decision) => run(`content-${request.id}`, () => supabase.rpc('review_author_content_request', { p_request_id: request.id, p_decision: decision, p_payload: request.payload, p_target_id: requestTarget[request.id] || null, p_notes: null }), decision === 'approved' ? 'Informação aprovada e publicada.' : 'Solicitação rejeitada.')
+  const reviewContentRequest = (request, decision) => {
+    const approvedMessage = request.request_type === 'book'
+      ? 'Livro aprovado. Publique o perfil da autora quando os requisitos do Passaporte estiverem completos.'
+      : request.request_type === 'presence'
+        ? 'Presença aprovada. Publique o perfil da autora quando os requisitos do Passaporte estiverem completos.'
+        : 'Informação aprovada e publicada.'
+    return run(`content-${request.id}`, () => supabase.rpc('review_author_content_request', { p_request_id: request.id, p_decision: decision, p_payload: request.payload, p_target_id: requestTarget[request.id] || null, p_notes: null }), decision === 'approved' ? approvedMessage : 'Solicitação rejeitada.')
+  }
   const rejectInitialProfile = author => run(`reject-${author.id}`, () => supabase.from('passport_profiles').update({ status: 'rejected', reviewed_at: new Date().toISOString() }).eq('author_id', author.id), 'Perfil rejeitado e devolvido para revisão.')
   const softDelete = author => {
     if (!window.confirm(`Arquivar ${author.name}? O registro poderá ser recuperado no banco.`)) return
