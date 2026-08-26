@@ -13,7 +13,9 @@ import {
   Plus,
   ShieldCheck,
   Download,
-  UserRoundCheck
+  UserRoundCheck,
+  Menu,
+  X
 } from 'lucide-react'
 import { useExhibitorStore } from './stores/useExhibitorStore'
 import { useMapStore } from './stores/useMapStore'
@@ -76,6 +78,7 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false)
   const [isMobileMapSettingsOpen, setIsMobileMapSettingsOpen] = useState(false)
+  const [isMobileHeaderMenuOpen, setIsMobileHeaderMenuOpen] = useState(false)
   const [remoteUserReady, setRemoteUserReady] = useState(false)
   const [authInitializing, setAuthInitializing] = useState(isSupabaseConfigured)
   const [isTutorialOpen, setIsTutorialOpen] = useState(false)
@@ -341,7 +344,7 @@ export default function App() {
           </nav>
 
           {/* Right Action Icons */}
-          <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-2 md:flex">
             <button onClick={startTutorial} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4" /></button>
             <button onClick={() => setIsOfflinePanelOpen(true)} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Preparar para uso offline" aria-label="Preparar para uso offline"><Download className="h-4 w-4" /></button>
             {isAdmin && <button onClick={() => window.open(appPath('/admin'), '_blank', 'noopener,noreferrer')} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Painel administrativo" aria-label="Painel administrativo"><ShieldCheck className="h-4 w-4" /></button>}
@@ -365,6 +368,27 @@ export default function App() {
                 <LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sair</span>
               </button>
             </div>
+          </div>
+
+          <div className="relative md:hidden">
+            <button
+              type="button"
+              onClick={() => setIsMobileHeaderMenuOpen(open => !open)}
+              className="site-header-action flex h-10 w-10 items-center justify-center rounded-xl border"
+              aria-label={isMobileHeaderMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={isMobileHeaderMenuOpen}
+            >
+              {isMobileHeaderMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            {isMobileHeaderMenuOpen && <div className="site-mobile-header-menu absolute right-0 top-[calc(100%+8px)] z-50 w-52 rounded-2xl border p-2 shadow-xl">
+              <button onClick={() => { startTutorial(); setIsMobileHeaderMenuOpen(false) }}><CircleHelp className="h-4 w-4" /> Tutorial</button>
+              <button onClick={() => { setIsOfflinePanelOpen(true); setIsMobileHeaderMenuOpen(false) }}><Download className="h-4 w-4" /> Uso offline</button>
+              <button onClick={() => { setIsAccessibilityOpen(true); setIsMobileHeaderMenuOpen(false) }}><Eye className="h-4 w-4" /> Acessibilidade</button>
+              {isAdmin && <button onClick={() => window.open(appPath('/admin'), '_blank', 'noopener,noreferrer')}><ShieldCheck className="h-4 w-4" /> Administração</button>}
+              {isAuthor && <button onClick={() => window.open(appPath('/autora'), '_blank', 'noopener,noreferrer')}><UserRoundCheck className="h-4 w-4" /> Painel da autora</button>}
+              <button onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')}><span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#b94185] text-[10px] text-white">{(user?.user_metadata?.name || user?.email || 'L')[0].toUpperCase()}</span> Perfil</button>
+              <button onClick={handleLogout}><LogOut className="h-4 w-4" /> Sair</button>
+            </div>}
           </div>
         </div>
 
