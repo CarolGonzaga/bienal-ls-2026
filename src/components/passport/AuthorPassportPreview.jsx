@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { BookOpen, CalendarDays, Heart, MapPin, X } from 'lucide-react'
 import { PassportTicket } from './PassportArt'
 import { appPath } from '../../lib/paths'
@@ -9,12 +10,24 @@ const passportAsset = name => appPath(`/passaporte/${name}`)
 
 export default function AuthorPassportPreview({ author, profile, photoUrl, events = [], onClose }) {
   const agenda = events.filter(item => item.status !== 'rejected').slice(0, 4)
+  const safeProfile = profile || {}
 
-  return <div className="author-passport-preview fixed inset-0 z-[80] overflow-y-auto bg-[#160d1d]/95 p-3 sm:p-8">
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    const closeOnEscape = event => { if (event.key === 'Escape') onClose() }
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [onClose])
+
+  return createPortal(<div role="dialog" aria-modal="true" aria-labelledby="author-passport-preview-title" className="author-passport-preview fixed inset-0 z-[100] overflow-y-auto bg-[#160d1d]/95 p-3 sm:p-8">
     <div className="mx-auto max-w-[1180px]">
       <header className="mb-4 flex items-center justify-between gap-3 text-white">
-        <div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#efb9d9]">Visualização da autora</p><h2 className="text-lg font-black">Como sua página final aparecerá</h2></div>
-        <button onClick={onClose} className="rounded-xl border border-white/40 px-3 py-2 text-sm font-bold"><X className="inline h-4 w-4"/> Fechar</button>
+        <div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#efb9d9]">Visualização da autora</p><h2 id="author-passport-preview-title" className="text-lg font-black">Como sua página final aparecerá</h2></div>
+        <button type="button" onClick={onClose} autoFocus className="rounded-xl border border-white/40 px-3 py-2 text-sm font-bold"><X className="inline h-4 w-4"/> Fechar</button>
       </header>
 
       <div className="passport-preview-book">
@@ -25,7 +38,7 @@ export default function AuthorPassportPreview({ author, profile, photoUrl, event
           <p className="passport-preview-meta">Autora sáfica <span>•</span> Bienal do Livro SP 2026</p>
           <div className="passport-preview-profile">
             {photoUrl ? <img src={photoUrl} alt={author?.name} className="passport-preview-photo"/> : <div className="passport-preview-photo passport-preview-photo--placeholder">{author?.name?.[0] || 'A'}</div>}
-            <div><div className="passport-preview-copy"><p className="passport-preview-kicker"><BookOpen size={16}/>Sobre a autora</p><p>{profile.bio || 'Sua bio aparecerá aqui quando for preenchida.'}</p></div><div className="mt-4"><p className="passport-preview-kicker"><Heart size={16}/>Mensagem para você</p><p className="passport-preview-message">{profile.message || 'Sua mensagem para as leitoras aparecerá aqui.'}</p></div></div>
+            <div><div className="passport-preview-copy"><p className="passport-preview-kicker"><BookOpen size={16}/>Sobre a autora</p><p>{safeProfile.bio || 'Sua bio aparecerá aqui quando for preenchida.'}</p></div><div className="mt-4"><p className="passport-preview-kicker"><Heart size={16}/>Mensagem para você</p><p className="passport-preview-message">{safeProfile.message || 'Sua mensagem para as leitoras aparecerá aqui.'}</p></div></div>
           </div>
           <div className="passport-preview-books-hint"><p className="passport-preview-kicker"><BookOpen size={16}/>Livros em destaque</p><p>Os livros aprovados aparecerão aqui.</p></div>
           <img src={passportAsset('saopaulo.png')} alt="" className="passport-preview-skyline"/><img src={passportAsset('selo2.png')} alt="" className="passport-preview-footer-seal"/>
@@ -39,5 +52,5 @@ export default function AuthorPassportPreview({ author, profile, photoUrl, event
         </section>
       </div>
     </div>
-  </div>
+  </div>, document.body)
 }

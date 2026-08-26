@@ -55,7 +55,7 @@ html[data-theme='dark'] body {
   -webkit-font-smoothing: antialiased;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 900px) {
   .passport-outer-container {
     padding: 24px 16px;
   }
@@ -70,10 +70,10 @@ html[data-theme='dark'] body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04);
+  box-shadow: none;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 900px) {
   .passport-shell {
     min-height: 840px;
     border-radius: 40px;
@@ -1088,6 +1088,7 @@ html[data-theme='dark'] body {
 
 .author-passport-preview { font-family: 'Nunito', sans-serif; color: var(--pass-ink); }
 .passport-preview-book {
+  position: relative;
   width: min(1120px, 100%);
   margin: 0 auto;
   display: grid;
@@ -1373,7 +1374,9 @@ html[data-theme='dark'] body {
   .passport-redeem-container { padding: 11px; }
 }
 
-@media (min-width: 900px) {
+/* A composição compacta abaixo fica preservada apenas como histórico; a versão
+   ativa volta a usar as proporções mais altas e a lombada larga do caderno. */
+@media (min-width: 900px) and (max-width: 899.98px) {
   .passport-chip-row { gap: 8px; padding: 8px 0 12px; flex-wrap: wrap; }
   .passport-chip { width: 34px; height: 34px; min-width: 34px; justify-content: center; padding: 0; border-radius: 50%; }
   .passport-chip .num { width: 100%; height: 100%; background: transparent; font-size: 12px; }
@@ -1451,6 +1454,49 @@ html[data-theme='dark'] body {
   .passport-desktop-how-list { margin: 0 34px; }
   .passport-desktop-how-list li { padding: 16px 0 16px 47px; font-size: 15px; }
   .passport-desktop-how-list li::before { top: 10px; width: 29px; height: 29px; border-radius: 8px; }
+}
+
+@media (min-width: 900px) {
+  .passport-desktop-stamp .passport-presence-stamp {
+    width: 270px;
+    height: 270px;
+    max-width: 74%;
+    margin: 40px auto 18px;
+  }
+  .passport-desktop-redeem {
+    position: relative;
+    z-index: 7;
+    width: min(340px, 100%);
+    margin: 16px auto;
+  }
+  .passport-desktop-redeem input {
+    width: 100%;
+    border: 1px solid var(--pass-edge);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,.72);
+    font-size: 12px;
+  }
+  .passport-desktop-redeem > button {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+    border: 0;
+    border-radius: 10px;
+    padding: 10px;
+    background: var(--pass-purple);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .passport-desktop-redeem > button:disabled { opacity: .45; }
+  .passport-desktop-redeem > div { display: flex; justify-content: center; gap: 14px; margin-top: 9px; }
+  .passport-desktop-redeem > div button { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--pass-purple); font-size: 11px; font-weight: 800; }
+  .passport-desktop-redeem small { display: block; margin-top: 8px; color: var(--pass-rose-soft-text); font-size: 11px; }
+  .passport-desktop-empty { padding: 108px 0; text-align: center; font-size: 13px; }
 }
 
 .list-page {
