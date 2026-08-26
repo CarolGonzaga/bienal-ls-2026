@@ -357,7 +357,7 @@ export default function App() {
             <div className="relative flex items-center gap-2">
               <button data-tutorial="profile" onClick={() => window.open(appPath('/perfil'), '_blank', 'noopener,noreferrer')} className="site-user-chip flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full border-0 p-1 sm:w-auto sm:rounded-xl sm:border sm:px-2" title="Abrir perfil em nova aba">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-[#b94185] to-[#d43276] text-xs font-bold text-white">
-                  {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover" /> : (user.user_metadata?.name || user.email)[0].toUpperCase()}
+                  {user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" className="h-full w-full rounded-full object-cover" /> : (user?.user_metadata?.name || user?.email || 'L')[0].toUpperCase()}
                 </div>
                 <span className="hidden text-xs font-semibold sm:inline">Perfil</span>
               </button>

@@ -1,14 +1,43 @@
 import React from 'react'
-import { BookOpen, CalendarDays, MapPin, X } from 'lucide-react'
-import { PassportPaper, PassportSeal, PassportTicket } from './PassportArt'
+import { BookOpen, CalendarDays, Heart, MapPin, X } from 'lucide-react'
+import { PassportTicket } from './PassportArt'
+import { appPath } from '../../lib/paths'
+
+const formatDate = value => value ? new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Data a confirmar'
+const formatTime = (start, end) => start ? `${String(start).slice(0, 5)}${end ? ` – ${String(end).slice(0, 5)}` : ''}` : 'Horário a confirmar'
+const passportAsset = name => appPath(`/passaporte/${name}`)
 
 export default function AuthorPassportPreview({ author, profile, photoUrl, events = [], onClose }) {
   const agenda = events.filter(item => item.status !== 'rejected').slice(0, 4)
-  return <div className="author-passport-preview fixed inset-0 z-[80] overflow-y-auto bg-[#160d1d]/90 p-3 sm:p-8">
-    <div className="mx-auto max-w-[1180px]"><div className="mb-3 flex items-center justify-between gap-3 text-white"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#efb9d9]">Visualização da autora</p><h2 className="text-lg font-black">Como sua página final aparecerá</h2></div><button onClick={onClose} className="rounded-xl border border-white/40 px-3 py-2 text-sm font-bold"><X className="inline h-4 w-4"/> Fechar</button></div>
-      <div className="passport-book">
-        <PassportPaper className="passport-desktop-visible passport-mobile-active"><div className="passport-page-content"><div className="flex items-start justify-between gap-3"><PassportTicket className="passport-ticket"/><PassportSeal className="passport-seal"/></div><h3 className="passport-script passport-title mt-3 text-center">{author?.name}</h3><p className="mt-3 text-center text-sm">Autora sáfica <span className="mx-2 text-[#bd62a8]">•</span> Bienal do Livro 2026</p><div className="passport-profile-grid mt-7"><div>{photoUrl ? <img src={photoUrl} alt={author?.name} className="passport-photo"/> : <div className="passport-photo-placeholder">{author?.name?.[0] || 'A'}</div>}</div><div><div className="passport-note"><p className="passport-kicker flex items-center gap-2"><BookOpen className="h-5 w-5"/>Sobre a autora</p><p className="mt-3 whitespace-pre-line text-sm leading-6">{profile.bio || 'Sua bio aparecerá aqui quando for preenchida.'}</p></div><div className="mt-5"><p className="passport-kicker">Mensagem para você</p><p className="passport-script mt-3 text-lg leading-7">{profile.message || 'Sua mensagem para as leitoras aparecerá aqui.'}</p></div></div></div><div className="mt-7"><p className="passport-kicker flex items-center gap-2"><BookOpen className="h-5 w-5"/>Livros em destaque</p><p className="mt-3 text-sm text-[#795769]">Os livros aprovados e vinculados ao seu perfil aparecerão nesta seção.</p></div></div></PassportPaper>
-        <PassportPaper className="passport-desktop-visible passport-mobile-active"><div className="passport-page-content"><div className="flex items-start justify-between"><div><p className="passport-kicker flex items-center gap-2"><MapPin className="h-5 w-5"/>Onde encontrar a autora</p><h3 className="passport-title mt-3 text-3xl">Agenda na Bienal</h3><p className="mt-3 text-sm">Presenças e sessões aprovadas pela equipe.</p></div><PassportSeal className="passport-seal"/></div><div className="passport-note mt-7 passport-agenda">{agenda.map((item, index) => <div key={item.id || index} className="passport-agenda-item"><div><p className="font-black"><CalendarDays className="mr-2 inline h-4 w-4"/>{item.payload?.event_date || item.payload?.presence_date || item.date || 'Data a confirmar'}</p><p className="mt-3 text-base">{item.payload?.start_time || item.start_time || 'Horário a confirmar'}</p></div><div><span className={`passport-badge ${item.request_type === 'presence' ? 'passport-badge--presence' : 'passport-badge--autograph'}`}>{item.request_type === 'presence' ? 'Presença confirmada' : 'Sessão de autógrafos'}</span><p className="mt-3"><span className="passport-stand">Estande {item.payload?.stand_code || item.stand_code || 'a confirmar'}</span></p></div></div>)}{!agenda.length && <p className="p-4 text-center text-sm">Sua agenda aprovada aparecerá aqui. Você ainda não tem eventos vinculados.</p>}</div><div className="passport-note mt-6"><p className="passport-kicker">Atualizações de última hora</p><p className="mt-3 text-sm">Informações aprovadas poderão ser incluídas nesta área até o evento.</p></div></div></PassportPaper>
-      </div></div>
+
+  return <div className="author-passport-preview fixed inset-0 z-[80] overflow-y-auto bg-[#160d1d]/95 p-3 sm:p-8">
+    <div className="mx-auto max-w-[1180px]">
+      <header className="mb-4 flex items-center justify-between gap-3 text-white">
+        <div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#efb9d9]">Visualização da autora</p><h2 className="text-lg font-black">Como sua página final aparecerá</h2></div>
+        <button onClick={onClose} className="rounded-xl border border-white/40 px-3 py-2 text-sm font-bold"><X className="inline h-4 w-4"/> Fechar</button>
+      </header>
+
+      <div className="passport-preview-book">
+        <section className="passport-preview-page passport-preview-page--left">
+          <div className="passport-preview-page-border"/>
+          <div className="flex items-start justify-between gap-3"><PassportTicket className="passport-preview-ticket"/><img src={passportAsset('selo3.png')} alt="" className="passport-preview-corner-seal"/></div>
+          <h3 className="passport-preview-name">{author?.name || 'Sua autora'}</h3>
+          <p className="passport-preview-meta">Autora sáfica <span>•</span> Bienal do Livro SP 2026</p>
+          <div className="passport-preview-profile">
+            {photoUrl ? <img src={photoUrl} alt={author?.name} className="passport-preview-photo"/> : <div className="passport-preview-photo passport-preview-photo--placeholder">{author?.name?.[0] || 'A'}</div>}
+            <div><div className="passport-preview-copy"><p className="passport-preview-kicker"><BookOpen size={16}/>Sobre a autora</p><p>{profile.bio || 'Sua bio aparecerá aqui quando for preenchida.'}</p></div><div className="mt-4"><p className="passport-preview-kicker"><Heart size={16}/>Mensagem para você</p><p className="passport-preview-message">{profile.message || 'Sua mensagem para as leitoras aparecerá aqui.'}</p></div></div>
+          </div>
+          <div className="passport-preview-books-hint"><p className="passport-preview-kicker"><BookOpen size={16}/>Livros em destaque</p><p>Os livros aprovados aparecerão aqui.</p></div>
+          <img src={passportAsset('saopaulo.png')} alt="" className="passport-preview-skyline"/><img src={passportAsset('selo2.png')} alt="" className="passport-preview-footer-seal"/>
+        </section>
+        <section className="passport-preview-page passport-preview-page--right">
+          <div className="passport-preview-page-border"/>
+          <div className="flex items-start justify-between gap-3"><div><p className="passport-preview-kicker"><MapPin size={16}/>Onde encontrar a autora</p><p className="mt-3 text-sm leading-6">Sua agenda aprovada aparecerá nesta página.</p></div><img src={passportAsset('selo3.png')} alt="" className="passport-preview-corner-seal"/></div>
+          <div className="passport-preview-agenda">{agenda.length ? agenda.map((item, index) => <article key={item.id || index}><div><strong><CalendarDays size={15}/>{formatDate(item.payload?.event_date || item.payload?.presence_date || item.date)}</strong><p>{formatTime(item.payload?.start_time || item.start_time, item.payload?.end_time || item.end_time)}</p></div><div><span>{item.request_type === 'presence' ? 'Presença confirmada' : 'Sessão de autógrafos'}</span><p>Estande {item.payload?.stand_code || item.stand_code || 'a confirmar'}</p></div></article>) : <p className="py-8 text-center text-sm">Cadastre sua presença ou sessão de autógrafos para vê-la aqui.</p>}</div>
+          <div className="passport-preview-update"><p className="passport-preview-kicker">Atualizações de última hora</p><p>Informações aprovadas pela equipe aparecerão aqui.</p></div>
+          <img src={passportAsset('saopaulo.png')} alt="" className="passport-preview-skyline"/><img src={passportAsset('ondas.png')} alt="" className="passport-preview-waves"/>
+        </section>
+      </div>
+    </div>
   </div>
 }

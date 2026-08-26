@@ -24,6 +24,7 @@ import { useContentStore } from '../../stores/useContentStore'
 import { useUserStore } from '../../stores/useUserStore'
 import { QrScannerModal } from './QrScannerModal'
 import { supabase } from '../../lib/supabase'
+import { appPath } from '../../lib/paths'
 import { LOCAL_PASSPORT_READER_AUTHORS, LOCAL_PASSPORT_READER_BOOKS } from '../../data/localPassportReaderDemo'
 
 type TabIndex = 'indice' | 'carimbos' | 'como'
@@ -32,6 +33,7 @@ type DetailPage = 'profile' | 'agenda' | 'books' | 'stamp'
 const normalize = (v = '') => v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/gi, '').toLowerCase()
 const dateLabel = (v?: string) => v ? new Date(`${v}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }) : 'A confirmar'
 const timeLabel = (start?: string, end?: string) => start ? `${String(start).slice(0, 5)}${end ? ` – ${String(end).slice(0, 5)}` : ''}` : 'A confirmar'
+const passportAsset = (name: string) => appPath(`/passaporte/${name}`)
 
 export const SapphicPassport: React.FC = () => {
   const localDemo = import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
@@ -312,9 +314,9 @@ export const SapphicPassport: React.FC = () => {
                 <div className="passport-card mx-4 my-2">
                   <div className="passport-corner-row">
                     <div className="passport-corner-stamp-left">
-                      <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
+                      <img src={passportAsset('selo1.png')} alt="Passaporte Sáfico Bienal 2026" />
                     </div>
-                    <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
+                    <img src={passportAsset('selo3.png')} alt="" className="passport-anchor-stamp-img" />
                   </div>
 
                   <div className="text-center my-4">
@@ -351,8 +353,8 @@ export const SapphicPassport: React.FC = () => {
                     </div>
                   </div>
 
-                  <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
-                  <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
+                  <img src={passportAsset('saopaulo.png')} alt="" className="passport-page-foot-skyline" />
+                  <img src={passportAsset('selo2.png')} alt="" className="passport-foot-postmark-stamp" />
                 </div>
               )}
             </div>
@@ -372,15 +374,17 @@ export const SapphicPassport: React.FC = () => {
                 ))}
               </div>
 
-              <div className="passport-page-container">
+              <DesktopPassportBook page={detailPage} author={selected} profile={profile} photo={photo} books={books} agenda={agenda} stamped={isStamped} />
+
+              <div className="passport-page-container passport-mobile-details">
                 {/* 1. ABA PERFIL DA AUTORA */}
                 {detailPage === 'profile' && (
                   <div className="passport-card">
                     <div className="passport-corner-row">
                       <div className="passport-corner-stamp-left">
-                        <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
+                        <img src={passportAsset('selo1.png')} alt="Passaporte Sáfico Bienal 2026" />
                       </div>
-                      <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
+                      <img src={passportAsset('selo3.png')} alt="" className="passport-anchor-stamp-img" />
                     </div>
 
                     <div className="passport-header-title-block">
@@ -462,8 +466,8 @@ export const SapphicPassport: React.FC = () => {
                     </div>
 
                     {/* SÃO PAULO FOOTER & SELO 2 NO RODAPÉ */}
-                    <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
-                    <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
+                    <img src={passportAsset('saopaulo.png')} alt="" className="passport-page-foot-skyline" />
+                    <img src={passportAsset('selo2.png')} alt="" className="passport-foot-postmark-stamp" />
                   </div>
                 )}
 
@@ -480,7 +484,7 @@ export const SapphicPassport: React.FC = () => {
                           {selected.name} estará na Bienal do Livro de São Paulo entre os dias 4 e 13 de setembro de 2026.
                         </p>
                       </div>
-                      <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
+                      <img src={passportAsset('selo3.png')} alt="" className="passport-anchor-stamp-img" />
                     </div>
 
                     <div className="passport-agenda-box-frame">
@@ -535,8 +539,8 @@ export const SapphicPassport: React.FC = () => {
                       </p>
                     </div>
 
-                    <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
-                    <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
+                    <img src={passportAsset('saopaulo.png')} alt="" className="passport-page-foot-skyline" />
+                    <img src={passportAsset('selo2.png')} alt="" className="passport-foot-postmark-stamp" />
                   </div>
                 )}
 
@@ -545,9 +549,9 @@ export const SapphicPassport: React.FC = () => {
                   <div className="passport-card">
                     <div className="passport-corner-row">
                       <div className="passport-corner-stamp-left">
-                        <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
+                        <img src={passportAsset('selo1.png')} alt="Passaporte Sáfico Bienal 2026" />
                       </div>
-                      <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
+                      <img src={passportAsset('selo3.png')} alt="" className="passport-anchor-stamp-img" />
                     </div>
 
                     <div className="passport-header-title-block">
@@ -595,8 +599,8 @@ export const SapphicPassport: React.FC = () => {
                       )}
                     </div>
 
-                    <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
-                    <img src="/passaporte/selo2.png" alt="" className="passport-foot-postmark-stamp" />
+                    <img src={passportAsset('saopaulo.png')} alt="" className="passport-page-foot-skyline" />
+                    <img src={passportAsset('selo2.png')} alt="" className="passport-foot-postmark-stamp" />
                   </div>
                 )}
 
@@ -605,15 +609,15 @@ export const SapphicPassport: React.FC = () => {
                   <div className="passport-card">
                     <div className="passport-corner-row">
                       <div className="passport-corner-stamp-left">
-                        <img src="/passaporte/selo1.png" alt="Passaporte Sáfico Bienal 2026" />
+                        <img src={passportAsset('selo1.png')} alt="Passaporte Sáfico Bienal 2026" />
                       </div>
-                      <img src="/passaporte/selo3.png" alt="" className="passport-anchor-stamp-img" />
+                      <img src={passportAsset('selo3.png')} alt="" className="passport-anchor-stamp-img" />
                     </div>
 
                     {/* CARIMBO OFICIAL CENTRAL */}
                     <div className={`passport-stamp-main-circle ${!isStamped ? 'locked' : ''} ${stampAnimating ? 'stamping' : ''}`}>
                       <img
-                        src="/passaporte/selo2.png"
+                        src={passportAsset('selo2.png')}
                         alt="Carimbo da Autora"
                       />
                     </div>
@@ -696,7 +700,7 @@ export const SapphicPassport: React.FC = () => {
                       </div>
                     )}
 
-                    <img src="/passaporte/saopaulo.png" alt="" className="passport-page-foot-skyline" />
+                    <img src={passportAsset('saopaulo.png')} alt="" className="passport-page-foot-skyline" />
                   </div>
                 )}
               </div>
@@ -724,3 +728,15 @@ export const SapphicPassport: React.FC = () => {
   )
 }
 
+function DesktopPassportBook({ page, author, profile, photo, books, agenda, stamped }: { page: DetailPage; author: any; profile: any; photo: string; books: any[]; agenda: any[]; stamped: boolean }) {
+  const profilePage = <section className="passport-desktop-page passport-desktop-page--left"><div className="passport-desktop-page-border"/><div className="flex items-start justify-between"><img src={passportAsset('selo1.png')} alt="" className="passport-desktop-ticket"/><img src={passportAsset('selo3.png')} alt="" className="passport-desktop-corner-seal"/></div><h2 className="passport-desktop-name">{author.name}<Heart/></h2><p className="passport-desktop-meta">Autora sáfica <span>•</span> Bienal do Livro SP 2026</p><div className="passport-desktop-profile"><div className="passport-desktop-photo">{photo ? <img src={photo} alt={author.name}/> : author.name[0]}</div><div><p className="passport-desktop-kicker"><BookOpen size={16}/>Sobre a autora</p><p className="passport-desktop-copy">{profile?.bio || author.bio || 'Perfil em preparação para a Bienal.'}</p><p className="passport-desktop-kicker mt-4"><Heart size={16}/>Mensagem para você</p><p className="passport-desktop-message">{profile?.message || 'Nos vemos na Bienal!'}</p></div></div><p className="passport-desktop-kicker mt-5"><BookOpen size={16}/>Livros em destaque</p><DesktopBooks books={books}/><img src={passportAsset('saopaulo.png')} alt="" className="passport-desktop-skyline"/><img src={passportAsset('selo2.png')} alt="" className="passport-desktop-footer-seal"/></section>
+  const agendaPage = <section className="passport-desktop-page passport-desktop-page--right"><div className="passport-desktop-page-border"/><div className="flex items-start justify-between"><div><p className="passport-desktop-kicker"><MapPin size={16}/>Onde encontrar a autora</p><p className="passport-desktop-copy mt-3">{author.name} estará na Bienal do Livro de São Paulo entre os dias 4 e 13 de setembro de 2026.</p></div><img src={passportAsset('selo3.png')} alt="" className="passport-desktop-corner-seal"/></div><div className="passport-desktop-agenda">{agenda.length ? agenda.slice(0, 4).map(event => <article key={event.id}><div><strong><Calendar size={15}/>{dateLabel(event.date)}</strong><p>{timeLabel(event.startTime, event.endTime)}</p>{event.bookTitle && <p>Livro: {event.bookTitle}</p>}</div><div><span className={event.eventType === 'presence' ? 'is-presence' : ''}>{event.eventType === 'presence' ? 'Presença confirmada' : 'Sessão de autógrafos'}</span><p>Estande {event.standCode || 'a confirmar'}</p><small>{event.locationName || ''}</small></div></article>) : <p className="py-12 text-center text-sm">A agenda desta autora será publicada em breve.</p>}</div><div className="passport-desktop-update"><p className="passport-desktop-kicker"><MessageCircle size={16}/>Atualizações de última hora</p><p>Fique de olho: atualizações aprovadas pela equipe aparecerão aqui.</p></div><img src={passportAsset('saopaulo.png')} alt="" className="passport-desktop-skyline"/><img src={passportAsset('ondas.png')} alt="" className="passport-desktop-waves"/></section>
+  const booksPage = <section className="passport-desktop-page passport-desktop-page--left"><div className="passport-desktop-page-border"/><div className="flex items-start justify-between"><img src={passportAsset('selo1.png')} alt="" className="passport-desktop-ticket"/><img src={passportAsset('selo3.png')} alt="" className="passport-desktop-corner-seal"/></div><h2 className="passport-desktop-name">{author.name}</h2><p className="passport-desktop-meta">Livros em destaque</p><DesktopBooks books={books} expanded/><img src={passportAsset('saopaulo.png')} alt="" className="passport-desktop-skyline"/></section>
+  const stampPage = <section className="passport-desktop-page passport-desktop-page--left passport-desktop-stamp"><div className="passport-desktop-page-border"/><img src={passportAsset('selo1.png')} alt="" className="passport-desktop-ticket"/><img src={passportAsset('selo2.png')} alt="Carimbo do Passaporte" className={stamped ? 'passport-desktop-stamp-art is-unlocked' : 'passport-desktop-stamp-art'}/><h2>{stamped ? 'Carimbo confirmado' : 'Carimbo bloqueado'}</h2><p>{stamped ? 'Esta memória já faz parte da sua jornada.' : 'Encontre a autora e resgate seu carimbo presencialmente.'}</p><img src={passportAsset('saopaulo.png')} alt="" className="passport-desktop-skyline"/></section>
+  const howPage = <section className="passport-desktop-page passport-desktop-page--right"><div className="passport-desktop-page-border"/><img src={passportAsset('selo3.png')} alt="" className="passport-desktop-corner-seal"/><h2 className="passport-desktop-how-title">Como funciona o Passaporte?</h2><ol className="passport-desktop-how-list"><li>Vá até o estande da autora.</li><li>Peça o código ou escaneie o QR Code.</li><li>Resgate seu carimbo.</li><li>Colecione memórias!</li></ol><img src={passportAsset('saopaulo.png')} alt="" className="passport-desktop-skyline"/><img src={passportAsset('ondas.png')} alt="" className="passport-desktop-waves"/></section>
+  return <div className="passport-desktop-book">{page === 'books' ? <>{booksPage}{agendaPage}</> : page === 'stamp' ? <>{stampPage}{howPage}</> : <>{profilePage}{agendaPage}</>}</div>
+}
+
+function DesktopBooks({ books, expanded = false }: { books: any[]; expanded?: boolean }) {
+  return <div className={`passport-desktop-books${expanded ? ' is-expanded' : ''}`}>{books.length ? books.map((book, index) => <article key={book.id}><div className={`passport-desktop-cover palette-${(index % 3) + 1}`}>{book.coverUrl ? <img src={book.coverUrl} alt={`Capa de ${book.title}`}/> : <span>{book.title}</span>}</div><strong>{book.title}</strong><small>{book.genre || 'Romance'}</small><em>{book.autographAvailable ? '✓ Autógrafos' : '✓ À venda'}</em></article>) : <p className="col-span-3 text-center text-sm">Livros em preparação para a Bienal.</p>}</div>
+}
