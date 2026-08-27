@@ -150,12 +150,19 @@ export default function AuthorDashboard() {
     setPreview(true)
   }
 
+  const handleGoBack = (e) => {
+    if (window.opener && !window.opener.closed) {
+      e?.preventDefault()
+      window.close()
+    }
+  }
+
   if (accessState === 'loading') return <div className="site-theme flex min-h-[100dvh] items-center justify-center text-sm font-bold">Verificando acesso...</div>
-  if (!account) return <div className="site-theme flex min-h-[100dvh] items-center justify-center p-5"><div className="auth-card rounded-3xl border p-8 text-center"><h1 className="auth-title text-2xl font-black">Painel de autoras</h1><p className="auth-muted mt-3 text-sm">{accessState === 'signed-out' ? 'Entre na sua conta para acessar este painel.' : 'Sua conta ainda não foi vinculada a uma autora verificada.'}</p><a href={appPath(accessState === 'signed-out' ? '/login' : '/')} className="auth-link mt-4 inline-block font-bold">Voltar</a></div></div>
+  if (!account) return <div className="site-theme flex min-h-[100dvh] items-center justify-center p-5"><div className="auth-card rounded-3xl border p-8 text-center"><h1 className="auth-title text-2xl font-black">Painel de autoras</h1><p className="auth-muted mt-3 text-sm">{accessState === 'signed-out' ? 'Entre na sua conta para acessar este painel.' : 'Sua conta ainda não foi vinculada a uma autora verificada.'}</p><a href={appPath(accessState === 'signed-out' ? '/login' : '/')} onClick={handleGoBack} className="auth-link mt-4 inline-block font-bold">Voltar</a></div></div>
 
   const photo = profile.photo_path ? supabase.storage.from('passport-photos').getPublicUrl(profile.photo_path).data.publicUrl : ''
   return <div className="site-theme min-h-[100dvh] bg-[#fff8fb] p-4 text-[#56132f] sm:p-8"><main className="mx-auto max-w-5xl">
-    <a href={appPath('/')} className="text-sm font-bold text-[#d43276]">← Voltar ao mapa</a>
+    <a href={appPath('/')} onClick={handleGoBack} className="text-sm font-bold text-[#d43276] hover:underline inline-flex items-center gap-1">← Voltar ao mapa</a>
     <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-3xl font-black">Painel da autora</h1><p className="mt-1 text-sm text-[#805269]">{author?.name}</p></div>{participating ? <div className="flex flex-wrap gap-2"><button onClick={() => setParticipationModalOpen(true)} className="route-soft-button rounded-xl border px-4 py-3 text-sm font-black">Gerenciar participação</button><button onClick={() => void openPreview()} className="route-soft-button flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-black"><Eye className="h-4 w-4"/>Pré-visualizar meu Passaporte</button></div> : <button onClick={() => setParticipationModalOpen(true)} className="route-primary-button rounded-xl px-4 py-3 text-sm font-black">Participar do Passaporte</button>}</div>
     {localScenario && <p className="mt-4 rounded-xl border border-dashed border-[#8750a0] bg-[#f7eefb] p-3 text-xs font-bold text-[#5e2674]">Modo de teste local — nenhum dado é enviado ao Supabase. Cenário: {localScenarioKey}.</p>}
     {notice && <p role="status" className="mt-4 rounded-xl bg-[#fff0f6] p-3 text-sm font-bold">{notice}</p>}

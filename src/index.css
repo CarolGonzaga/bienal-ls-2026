@@ -145,11 +145,13 @@ html[data-theme='dark'] body {
 }
 
 .passport-auth-name {
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
   color: var(--pass-purple);
+  letter-spacing: -0.01em;
 }
 
 .passport-auth-sub {
@@ -258,9 +260,10 @@ html[data-theme='dark'] body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 26px;
   color: #fff;
   position: relative;
   overflow: hidden;
@@ -336,7 +339,8 @@ html[data-theme='dark'] body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
   color: #fff;
   font-size: 20px;
@@ -543,9 +547,10 @@ html[data-theme='dark'] body {
 }
 
 .passport-script-name {
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
-  font-size: 38px;
+  font-size: 36px;
   color: var(--pass-purple);
   margin: 0;
   display: inline-flex;
@@ -553,6 +558,7 @@ html[data-theme='dark'] body {
   justify-content: center;
   gap: 10px;
   line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .passport-heart-icon {
@@ -601,7 +607,8 @@ html[data-theme='dark'] body {
   object-fit: cover;
 }
 .passport-photo-square .init {
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
   color: #fff;
   font-size: 46px;
@@ -637,7 +644,8 @@ html[data-theme='dark'] body {
 }
 
 .passport-text-section.quote-section p {
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
   font-size: 18px;
   color: var(--pass-purple);
@@ -672,15 +680,20 @@ html[data-theme='dark'] body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  perspective: 600px;
 }
 
 .passport-book-spine-cover {
   width: 100%;
   aspect-ratio: 1/1.45;
-  border-radius: 4px 8px 8px 4px;
+  border-radius: 2px 8px 8px 2px;
   position: relative;
   overflow: hidden;
-  box-shadow: -4px 4px 10px rgba(0, 0, 0, .25), inset 4px 0 6px rgba(0, 0, 0, .2);
+  box-shadow: 
+    -4px 6px 14px rgba(0, 0, 0, .32),
+    0 2px 5px rgba(0, 0, 0, .14),
+    inset 3px 0 4px rgba(255, 255, 255, .25),
+    inset -2px 0 4px rgba(0, 0, 0, .2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -688,6 +701,23 @@ html[data-theme='dark'] body {
   text-align: center;
   background: linear-gradient(135deg, #2a163e 0%, #5d326f 50%, #9e4b78 100%);
   color: #fff;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.passport-book-spine-cover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 13px;
+  background: linear-gradient(90deg, 
+    rgba(0, 0, 0, .32) 0%, 
+    rgba(255, 255, 255, .24) 28%, 
+    rgba(0, 0, 0, .16) 60%, 
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 3;
 }
 .passport-book-spine-cover.palette-1 {
   background: linear-gradient(135deg, #2b2a63 0%, #474f88 50%, #6e8499 100%);
@@ -708,8 +738,8 @@ html[data-theme='dark'] body {
 .passport-book-spine-cover img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: rgba(255,255,255,.16);
+  object-fit: cover;
+  display: block;
 }
 
 .passport-book-details {
@@ -932,7 +962,8 @@ html[data-theme='dark'] body {
   margin: 0 0 8px 0;
 }
 .passport-meaning-box .cursive-quote {
-  font-family: 'Caveat', cursive;
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-weight: 700;
   font-size: 18px;
   color: #b3306a;
@@ -1128,15 +1159,15 @@ html[data-theme='dark'] body {
 .passport-desktop-page-border { position: absolute; inset: 13px; border: 1px dashed rgba(165,85,122,.34); border-radius: 18px; pointer-events: none; }
 .passport-preview-ticket { width: 115px; color: #b44b82; }
 .passport-preview-corner-seal { width: 72px; height: 72px; object-fit: contain; opacity: .62; mix-blend-mode: multiply; }
-.passport-preview-name { margin: 6px 0 0; text-align: center; font: 700 clamp(34px, 5vw, 55px)/1.05 'Caveat', cursive; color: var(--pass-purple); }
+.passport-preview-name { margin: 6px 0 0; text-align: center; font: italic 700 clamp(34px, 5vw, 55px)/1.05 'Playfair Display', 'Cormorant Garamond', Georgia, serif; color: var(--pass-purple); }
 .passport-preview-meta { margin: 4px 0 20px; text-align: center; font-size: 13px; font-weight: 700; color: var(--pass-ink-soft); }
 .passport-preview-meta span { color: #bd62a8; padding: 0 6px; }
 .passport-preview-profile { display: grid; grid-template-columns: 145px 1fr; gap: 18px; align-items: start; }
 .passport-preview-photo { width: 100%; aspect-ratio: .76; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 18px rgba(35,17,42,.23); }
-.passport-preview-photo--placeholder { display: grid; place-items: center; background: linear-gradient(135deg,#5f3576,#d94e86); color: white; font: 700 52px 'Caveat',cursive; }
+.passport-preview-photo--placeholder { display: grid; place-items: center; background: linear-gradient(135deg,#5f3576,#d94e86); color: white; font: italic 700 52px 'Playfair Display', 'Cormorant Garamond', Georgia, serif; }
 .passport-preview-kicker, .passport-desktop-kicker { display: flex; align-items: center; gap: 7px; margin: 0; font: 800 12px/1.2 'Baloo 2', sans-serif; text-transform: uppercase; letter-spacing: .45px; color: var(--pass-purple); }
 .passport-preview-copy > p:last-child { margin: 8px 0 0; font-size: 13px; line-height: 1.55; }
-.passport-preview-message { margin: 7px 0 0; font: 700 20px/1.25 'Caveat',cursive; color: var(--pass-purple); }
+.passport-preview-message { margin: 7px 0 0; font: italic 700 20px/1.25 'Playfair Display', 'Cormorant Garamond', Georgia, serif; color: var(--pass-purple); }
 .passport-preview-books-hint { margin-top: 22px; font-size: 12px; color: var(--pass-ink-soft); }
 .passport-preview-books-hint > p:last-child { margin: 5px 0; }
 .passport-preview-skyline, .passport-desktop-skyline { position: absolute; z-index: 0; left: 4%; bottom: 9px; width: 74%; height: auto; opacity: .35; mix-blend-mode: multiply; pointer-events: none; }
@@ -1176,18 +1207,18 @@ html[data-theme='dark'] body {
   .passport-desktop-page--right { border-radius: 0 17px 17px 0; transform: perspective(1500px) rotateY(-1.1deg); transform-origin: left center; }
   .passport-desktop-ticket { width: 125px; transform: rotate(-5deg); opacity: .87; mix-blend-mode: multiply; }
   .passport-desktop-corner-seal { width: 86px; height: 86px; object-fit: contain; opacity: .48; mix-blend-mode: multiply; }
-  .passport-desktop-name { display: flex; justify-content: center; align-items: center; gap: 9px; margin: 4px 0 0; color: var(--pass-purple); text-align: center; font: 700 52px/1 'Caveat',cursive; }
+  .passport-desktop-name { display: flex; justify-content: center; align-items: center; gap: 9px; margin: 4px 0 0; color: var(--pass-purple); text-align: center; font: italic 700 46px/1 'Playfair Display', 'Cormorant Garamond', Georgia, serif; }
   .passport-desktop-name svg { width: 24px; color: #ce75a0; }
   .passport-desktop-meta { margin: 3px 0 22px; text-align: center; font-size: 14px; font-weight: 700; }
   .passport-desktop-meta span { color: #bd62a8; padding: 0 7px; }
   .passport-desktop-profile { display: grid; grid-template-columns: 174px 1fr; gap: 20px; }
-  .passport-desktop-photo { width: 100%; aspect-ratio: .75; overflow: hidden; border-radius: 15px; background: linear-gradient(135deg,#603576,#df6892); color: white; display: grid; place-items: center; font: 700 64px 'Caveat',cursive; box-shadow: 0 9px 22px rgba(43,27,61,.26); }
+  .passport-desktop-photo { width: 100%; aspect-ratio: .75; overflow: hidden; border-radius: 15px; background: linear-gradient(135deg,#603576,#df6892); color: white; display: grid; place-items: center; font: italic 700 54px 'Playfair Display', 'Cormorant Garamond', Georgia, serif; box-shadow: 0 9px 22px rgba(43,27,61,.26); }
   .passport-desktop-photo img { width: 100%; height: 100%; object-fit: cover; }
   .passport-desktop-copy { margin: 8px 0 0; font-size: 13px; line-height: 1.6; }
-  .passport-desktop-message { margin: 7px 0; color: var(--pass-purple); font: 700 21px/1.25 'Caveat',cursive; }
+  .passport-desktop-message { margin: 7px 0; color: var(--pass-purple); font: italic 700 20px/1.25 'Playfair Display', 'Cormorant Garamond', Georgia, serif; }
   .passport-desktop-books { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 13px; }
   .passport-desktop-books article { min-width: 0; text-align: center; }
-  .passport-desktop-cover { aspect-ratio: .66; display: grid; place-items: center; overflow: hidden; padding: 10px; border-radius: 4px 8px 8px 4px; color: white; box-shadow: -5px 5px 10px rgba(0,0,0,.3), inset 5px 0 7px rgba(0,0,0,.23); font: 700 18px/1.14 'Caveat',cursive; }
+  .passport-desktop-cover { aspect-ratio: .66; display: grid; place-items: center; overflow: hidden; padding: 10px; border-radius: 4px 8px 8px 4px; color: white; box-shadow: -5px 5px 10px rgba(0,0,0,.3), inset 5px 0 7px rgba(0,0,0,.23); font: 700 13px/1.2 'Baloo 2', sans-serif; }
   .passport-desktop-cover img { width: 100%; height: 100%; object-fit: cover; }
   .passport-desktop-cover.palette-1 { background: linear-gradient(135deg,#283364,#4a558c,#8f9db6); }
   .passport-desktop-cover.palette-2 { background: linear-gradient(135deg,#78455c,#bf7088,#e3aaa5); }
@@ -1347,7 +1378,7 @@ html[data-theme='dark'] body {
 .passport-presence-stamp.is-unlocked { filter: drop-shadow(0 3px 6px rgba(207,94,141,.18)); opacity: .94; }
 .passport-stamp-arc { fill: currentColor; font: 900 22px 'Baloo 2', sans-serif; letter-spacing: 2.2px; }
 .passport-stamp-arc--bottom { font-size: 19px; letter-spacing: 1.7px; }
-.passport-stamp-name { fill: currentColor; font: 700 39px 'Caveat', cursive; }
+.passport-stamp-name { fill: currentColor; font: italic 700 38px 'Playfair Display', 'Cormorant Garamond', Georgia, serif; letter-spacing: -0.5px; }
 .passport-stamp-stars { fill: currentColor; font: 700 15px 'Baloo 2', sans-serif; letter-spacing: 8px; }
 .passport-stamp-main-circle.locked .passport-presence-stamp { opacity: .28; filter: grayscale(1); }
 
@@ -1419,14 +1450,25 @@ html[data-theme='dark'] body {
   .passport-chip { width: 34px; height: 34px; min-width: 34px; justify-content: center; padding: 0; border-radius: 50%; }
   .passport-chip .num { width: 100%; height: 100%; background: transparent; font-size: 12px; }
   .passport-chip.active .num { background: transparent; }
+
+  /* 3. Lombada (vinco central) com 3 camadas & 7. Bordas da capa */
   .passport-desktop-book {
+    position: relative;
+    display: flex;
     width: min(1110px, calc(100vw - 56px));
     height: 700px;
     min-height: 700px;
     border-radius: 20px 24px 24px 20px;
     background: #d5c6b3;
-    box-shadow: 0 28px 56px rgba(0,0,0,.52), -8px 0 0 #b9ab98, 8px 0 0 #d8cebf, 0 0 0 1px rgba(255,255,255,.35);
+    box-shadow: 
+      0 30px 60px rgba(0,0,0,.5),
+      -10px 0 0 #b9ab98,
+      10px 0 0 #d8cebf,
+      inset 0 0 40px rgba(0,0,0,.06);
+    outline: 10px solid #6B4E8C;
+    outline-offset: -2px;
   }
+
   .passport-desktop-book::before {
     content: '';
     position: absolute;
@@ -1434,38 +1476,137 @@ html[data-theme='dark'] body {
     top: -3px;
     bottom: -3px;
     left: 50%;
-    width: 62px;
+    width: 90px;
     transform: translateX(-50%);
     border-radius: 50%;
-    background: linear-gradient(90deg, transparent 0, rgba(49,29,27,.16) 22%, rgba(48,27,25,.44) 43%, rgba(255,255,255,.7) 50%, rgba(66,40,35,.32) 58%, rgba(255,255,255,.18) 76%, transparent 100%);
-    filter: blur(1.2px);
+    background: linear-gradient(90deg, 
+      transparent 0%,
+      rgba(49,29,27,.10) 15%,
+      rgba(48,27,25,.35) 38%,
+      rgba(255,255,255,.65) 50%,
+      rgba(66,40,35,.28) 62%,
+      rgba(255,255,255,.12) 78%,
+      transparent 100%
+    );
+    filter: blur(2px);
     pointer-events: none;
   }
+
   .passport-desktop-book::after {
+    content: '';
+    position: absolute;
     z-index: 6;
+    top: 0;
+    bottom: 0;
+    left: 50%;
     width: 3px;
+    transform: translateX(-50%);
     background: linear-gradient(90deg, rgba(48,27,25,.58), rgba(255,255,255,.74), rgba(48,27,25,.45));
     box-shadow: -10px 0 18px rgba(45,25,23,.24), 10px 0 18px rgba(45,25,23,.2);
+    pointer-events: none;
   }
-  .passport-desktop-page { height: 700px; min-height: 700px; padding: 22px 27px 76px; }
-  .passport-desktop-page--left { border-radius: 20px 3px 3px 20px; transform: perspective(1700px) rotateY(.8deg); transform-origin: right center; box-shadow: inset -18px 0 24px -24px rgba(46,27,24,.8); }
-  .passport-desktop-page--right { border-radius: 3px 20px 20px 3px; transform: perspective(1700px) rotateY(-.8deg); transform-origin: left center; box-shadow: inset 18px 0 24px -24px rgba(46,27,24,.8); }
+
+  /* 5. Textura de papel & 8. Sombra de página virada */
+  .passport-desktop-page {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 700px;
+    min-height: 700px;
+    padding: 24px 32px 76px;
+    background-color: var(--pass-paper);
+    background-image: 
+      linear-gradient(135deg, rgba(0,0,0,.03) 0%, transparent 12%),
+      radial-gradient(circle at 20% 30%, rgba(180,140,90,.04), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(180,140,90,.03), transparent 45%);
+    overflow: hidden;
+  }
+
+  /* 6. Cantos arredondados irregulares */
+  .passport-desktop-page--left {
+    border-radius: 20px 3px 4px 21px;
+    transform: perspective(1700px) rotateY(.8deg);
+    transform-origin: right center;
+    box-shadow: inset -18px 0 24px -24px rgba(46,27,24,.8);
+  }
+  .passport-desktop-page--right {
+    border-radius: 3px 19px 22px 3px;
+    transform: perspective(1700px) rotateY(-.8deg);
+    transform-origin: left center;
+    box-shadow: inset 18px 0 24px -24px rgba(46,27,24,.8);
+  }
+
+  /* 4. Curvatura das páginas perto da lombada */
+  .passport-desktop-page--left::after,
+  .passport-desktop-page--right::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .passport-desktop-page--left::after {
+    right: 0;
+    background: linear-gradient(90deg, transparent, rgba(40,20,20,.12));
+  }
+  .passport-desktop-page--right::after {
+    left: 0;
+    background: linear-gradient(270deg, transparent, rgba(40,20,20,.12));
+  }
+
   .passport-desktop-page-border { inset: 11px; border-radius: 14px; }
   .passport-desktop-ticket { width: 108px; }
   .passport-desktop-corner-seal { width: 70px; height: 70px; }
-  .passport-desktop-name { margin-top: 0; font-size: 43px; }
-  .passport-desktop-name svg { width: 20px; }
-  .passport-desktop-meta { margin: 2px 0 15px; font-size: 12px; }
+
+  /* 1. Tipografia dos nomes elegante */
+  .passport-desktop-name {
+    margin-top: 0;
+    font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 43px;
+    letter-spacing: -0.02em;
+    color: var(--pass-purple);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .passport-desktop-name svg { width: 20px; color: var(--pass-rose); }
+  .passport-desktop-meta { margin: 2px 0 15px; font-size: 12px; font-weight: 700; color: var(--pass-ink-soft); }
   .passport-desktop-profile { grid-template-columns: 128px minmax(0, 1fr); gap: 14px; }
   .passport-desktop-photo { border-radius: 12px; font-size: 54px; }
-  .passport-desktop-kicker { font-size: 10px; }
+  .passport-desktop-kicker { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--pass-purple); }
   .passport-desktop-copy { max-height: 102px; overflow: auto; margin-top: 6px; font-size: 11px; line-height: 1.42; scrollbar-width: thin; }
-  .passport-desktop-message { max-height: 58px; overflow: auto; margin: 5px 0; font-size: 17px; scrollbar-width: thin; }
-  .passport-desktop-books { gap: 11px; margin-top: 8px; }
-  .passport-desktop-cover { max-height: 118px; padding: 6px; font-size: 14px; }
-  .passport-desktop-books strong { margin-top: 5px; font-size: 10px; }
-  .passport-desktop-books small { margin-top: 1px; font-size: 9px; }
-  .passport-desktop-books em { margin-top: 2px; font-size: 8px; }
+  .passport-desktop-message { max-height: 58px; overflow: auto; margin: 5px 0; font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 18px; line-height: 1.3; color: var(--pass-purple); scrollbar-width: thin; }
+
+  /* 2. Cards de livros realistas com efeito 3D */
+  .passport-desktop-books { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-top: 8px; }
+  .passport-desktop-books article { min-width: 0; text-align: center; }
+  .passport-desktop-cover {
+    max-height: 118px;
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 2px 7px 7px 2px;
+    box-shadow: -4px 6px 14px rgba(0,0,0,.28), 0 2px 5px rgba(0,0,0,.14), inset 3px 0 4px rgba(255,255,255,.25), inset -2px 0 3px rgba(0,0,0,.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .passport-desktop-cover::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 12px;
+    background: linear-gradient(90deg, rgba(0,0,0,.32) 0%, rgba(255,255,255,.24) 28%, rgba(0,0,0,.16) 60%, transparent 100%);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .passport-desktop-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .passport-desktop-books strong { margin-top: 5px; font-size: 10px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .passport-desktop-books small { margin-top: 1px; font-size: 9px; display: block; color: var(--pass-ink-soft); }
+  .passport-desktop-books em { margin-top: 2px; font-size: 8px; display: block; color: #386e43; font-style: normal; }
+
   .passport-desktop-agenda { max-height: 322px; margin-top: 12px; padding: 0 13px; overflow: auto; border-radius: 13px; scrollbar-width: thin; }
   .passport-desktop-agenda article { gap: 10px; padding: 10px 0; font-size: 10px; }
   .passport-desktop-agenda p { margin-top: 3px; }
@@ -1492,49 +1633,7 @@ html[data-theme='dark'] body {
   .passport-desktop-how .passport-how-steps { margin: 0 34px; }
   .passport-desktop-how .passport-step-row { padding: 12px 0; }
   .passport-desktop-how .passport-step-row p { font-size: 14px; }
-}
 
-@media (min-width: 900px) {
-  .passport-desktop-stamp .passport-presence-stamp {
-    width: 205px;
-    height: 205px;
-    max-width: 74%;
-    margin: 48px auto 4px;
-  }
-  .passport-desktop-redeem {
-    position: relative;
-    z-index: 7;
-    width: min(320px, 100%);
-    margin: 9px auto;
-  }
-  .passport-desktop-redeem input {
-    width: 100%;
-    border: 1px solid var(--pass-edge);
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: rgba(255,255,255,.72);
-    font-size: 12px;
-  }
-  .passport-desktop-redeem > button {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 8px;
-    border: 0;
-    border-radius: 10px;
-    padding: 10px;
-    background: var(--pass-purple);
-    color: white;
-    font-size: 12px;
-    font-weight: 800;
-  }
-  .passport-desktop-redeem > button:disabled { opacity: .45; }
-  .passport-desktop-redeem > div { display: flex; justify-content: center; gap: 14px; margin-top: 9px; }
-  .passport-desktop-redeem > div button { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--pass-purple); font-size: 11px; font-weight: 800; }
-  .passport-desktop-redeem small { display: block; margin-top: 8px; color: var(--pass-rose-soft-text); font-size: 11px; }
-  .passport-desktop-empty { padding: 108px 0; text-align: center; font-size: 13px; }
   .passport-desktop-status { position: relative; z-index: 7; display: flex; width: min(320px,100%); align-items: center; gap: 10px; margin: 12px auto; border: 1px solid rgba(30,142,79,.28); border-radius: 12px; padding: 10px 12px; background: rgba(223,243,228,.7); color: #1e8e4f; text-align: left; }
   .passport-desktop-status strong, .passport-desktop-status span { display: block; }
   .passport-desktop-status strong { font-size: 11px; }
@@ -1542,6 +1641,7 @@ html[data-theme='dark'] body {
   .passport-desktop-meaning { position: relative; z-index: 7; width: min(320px,100%); margin: 8px auto 0; padding: 9px 11px; text-align: left; }
   .passport-desktop-meaning h4 { font-size: 10px; }
   .passport-desktop-meaning p { margin: 0; font-size: 9px; line-height: 1.35; }
+
   .passport-index-screen { width: min(1120px, 100%); min-height: 700px; margin: 0 auto 30px; overflow: hidden; border-radius: 24px; padding: 0 26px; background: var(--pass-cream); box-shadow: 0 26px 54px rgba(0,0,0,.3); color: var(--pass-ink); }
   .passport-index-screen .passport-pill-tabs { justify-content: center; border-color: var(--pass-edge); }
   .passport-index-screen .passport-pill-tabs button { color: var(--pass-ink-soft); }
@@ -1553,48 +1653,13 @@ html[data-theme='dark'] body {
   .passport-index-screen .passport-author-card .name { font-size: 13px; }
   .passport-index-screen .passport-avatar { border-radius: 14px; }
   .passport-index-screen input[type='search'], .passport-index-screen input[type='text'] { width: min(320px,100%); border: 1px solid var(--pass-edge); border-radius: 12px; padding: 9px 12px; background: rgba(255,255,255,.72); color: var(--pass-ink); }
-  .passport-desktop-profile-page .passport-desktop-name { margin-top: 12px; font-size: 50px; }
-  .passport-desktop-profile-page .passport-desktop-meta { margin-bottom: 32px; font-size: 13px; }
-  .passport-desktop-profile-page .passport-desktop-profile { grid-template-columns: 188px minmax(0,1fr); gap: 24px; align-items: center; }
-  .passport-desktop-profile-page .passport-desktop-photo { aspect-ratio: .76; }
-  .passport-desktop-profile-page .passport-desktop-kicker { font-size: 11px; }
-  .passport-desktop-profile-page .passport-desktop-copy { max-height: 150px; font-size: 12.5px; line-height: 1.55; }
-  .passport-desktop-profile-page .passport-desktop-message { max-height: 86px; font-size: 21px; line-height: 1.3; }
-  .passport-desktop-books-page .passport-desktop-books { gap: 22px; margin-top: 52px; }
-  .passport-desktop-books-page .passport-desktop-cover { max-height: 184px; padding: 8px; }
-  .passport-desktop-books-page .passport-desktop-books strong { margin-top: 10px; font-size: 12px; }
-  .passport-desktop-books-page .passport-desktop-books small { font-size: 10px; }
-  .passport-desktop-books-page .passport-desktop-books em { font-size: 9px; }
-  .passport-desktop-books-page .passport-desktop-books:has(> :nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0,150px)); justify-content: center; }
-  .passport-desktop-books-page .passport-desktop-books:has(> :first-child:last-child) { grid-template-columns: minmax(0,150px); justify-content: center; }
-  .passport-desktop-agenda-notes .passport-desktop-update { margin: 96px 34px 0; padding: 18px; font-size: 12px; }
-  .passport-desktop-notes-message { width: 72%; margin: 58px auto 0; color: var(--pass-purple); text-align: center; font: 700 27px/1.3 'Caveat', cursive; opacity: .72; }
-}
 
-/* Páginas do caderno: composição fiel ao passaporte de referência. */
-.passport-profile-books { margin-top: 18px; }
-
-@media (max-width: 899px) {
-  .passport-profile-page {
-    height: auto;
-    min-height: 800px;
-    padding-bottom: 90px;
-  }
-  .passport-profile-page .passport-profile-books { margin-top: 22px; }
-}
-
-@media (min-width: 900px) {
-  .passport-desktop-book {
-    min-height: 716px;
-    border-radius: 26px 30px 30px 26px;
-    background: linear-gradient(90deg, #d5cab8, #f2eadc 49%, #d2c5b2 50%, #eee5d6);
-  }
-  .passport-desktop-page { padding: 27px 34px 84px; }
+  /* Spread-specific overrides */
   .passport-spread-corners { position: relative; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; min-height: 78px; }
   .passport-spread-corners .passport-desktop-ticket { margin: 0; }
   .passport-spread-corners .passport-desktop-corner-seal { margin-top: -5px; }
   .passport-spread-profile .passport-desktop-name,
-  .passport-spread-books-page .passport-desktop-name { margin-top: -2px; font-size: 49px; }
+  .passport-spread-books-page .passport-desktop-name { margin-top: -2px; font-size: 44px; }
   .passport-spread-profile .passport-desktop-meta,
   .passport-spread-books-page .passport-desktop-meta { margin-bottom: 19px; font-size: 13px; }
   .passport-spread-profile-content { position: relative; z-index: 2; display: grid; grid-template-columns: 182px minmax(0, 1fr); gap: 22px; align-items: center; }
@@ -1603,7 +1668,7 @@ html[data-theme='dark'] body {
   .passport-spread-copy-box { border: 1px dashed rgba(165,85,122,.36); border-radius: 15px; padding: 18px 16px; background: rgba(255,255,255,.24); }
   .passport-spread-copy-box > p:last-child { margin: 9px 0 0; font-size: 12px; line-height: 1.58; }
   .passport-spread-message { padding: 14px 4px 0; }
-  .passport-spread-message > p:last-child { margin: 6px 0 0; color: var(--pass-purple); font: 700 21px/1.22 'Caveat', cursive; }
+  .passport-spread-message > p:last-child { margin: 6px 0 0; color: var(--pass-purple); font: italic 700 20px/1.22 'Playfair Display', 'Cormorant Garamond', Georgia, serif; }
   .passport-spread-books-title { position: relative; z-index: 2; display: flex; align-items: center; gap: 7px; margin-top: 23px; color: var(--pass-purple); font: 800 13px 'Baloo 2', sans-serif; letter-spacing: .4px; text-transform: uppercase; }
   .passport-spread-profile .passport-desktop-books { position: relative; z-index: 2; gap: 17px; margin-top: 15px; }
   .passport-spread-profile .passport-desktop-cover { max-height: 119px; padding: 5px; }
@@ -1618,7 +1683,7 @@ html[data-theme='dark'] body {
   .passport-spread-agenda .passport-desktop-agenda p { margin-top: 4px; }
   .passport-spread-stand { margin-top: 7px !important; color: var(--pass-ink); font-weight: 800; }
   .passport-spread-agenda .passport-desktop-update { position: relative; z-index: 2; margin: 14px 0 0; padding: 12px 14px; }
-  .passport-spread-update-note { margin: 8px 0 0 !important; color: var(--pass-purple); font: 700 17px/1.2 'Caveat', cursive; }
+  .passport-spread-update-note { margin: 8px 0 0 !important; color: var(--pass-purple); font: italic 700 16px/1.2 'Playfair Display', 'Cormorant Garamond', Georgia, serif; }
   .passport-spread-books-page .passport-spread-books-title { justify-content: flex-start; margin-top: 35px; font-size: 17px; }
   .passport-spread-books-page .passport-desktop-books { position: relative; z-index: 2; gap: 23px; margin-top: 55px; }
   .passport-spread-books-page .passport-desktop-cover { max-height: 195px; padding: 8px; }
