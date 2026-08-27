@@ -380,7 +380,7 @@ export const SapphicPassport: React.FC = () => {
                 ))}
               </div>
 
-              <DesktopPassportBook page={detailPage} author={selected} profile={profile} photo={photo} books={highlightedBooks} agenda={pagedAgenda} stamped={isStamped} code={code} setCode={setCode} notice={notice} onRedeem={() => void handleRedeem()} onScan={() => setScanner(true)} onPaste={() => void pasteCode()} />
+              <PassportBookSpread page={detailPage} author={selected} profile={profile} photo={photo} books={highlightedBooks} agenda={pagedAgenda} stamped={isStamped} code={code} setCode={setCode} notice={notice} onRedeem={() => void handleRedeem()} onScan={() => setScanner(true)} onPaste={() => void pasteCode()} />
 
               <div className="passport-page-container passport-mobile-details">
                 {/* 1. ABA PERFIL DA AUTORA */}
@@ -434,6 +434,30 @@ export const SapphicPassport: React.FC = () => {
                             {profile?.message ? `"${profile.message}"` : 'Obrigada por ler e por existir. Nos vemos na Bienal! 💜'}
                           </p>
                         </div>
+                      </div>
+                    </div>
+
+                    <div className="passport-profile-books">
+                      <div className="passport-section-divider-title">
+                        <BookOpen size={16} />
+                        <span>Livros em destaque</span>
+                      </div>
+                      <div className="passport-books-grid">
+                        {highlightedBooks.length > 0 ? highlightedBooks.map((book, idx) => (
+                          <div key={book.id} className="passport-book-3d-card">
+                            <div className={`passport-book-spine-cover palette-${(idx % 3) + 1}`}>
+                              {book.coverUrl ? <img src={book.coverUrl} alt={`Capa de ${book.title}`} /> : <span>{book.title}</span>}
+                            </div>
+                            <div className="passport-book-details">
+                              <span className="title">{book.title}</span>
+                              <span className="genre">{book.genre || 'Romance'}</span>
+                              <div className="passport-book-tags-list">
+                                <span className="passport-tag-pill green"><Check size={9} strokeWidth={3} /> À venda</span>
+                                <span className="passport-tag-pill purple"><Check size={9} strokeWidth={3} /> Autógrafos</span>
+                              </div>
+                            </div>
+                          </div>
+                        )) : <p className="col-span-3 text-center text-xs text-[#76586b]">Os livros desta autora aparecerão aqui.</p>}
                       </div>
                     </div>
 
@@ -751,6 +775,89 @@ function PresenceStamp({ authorName, unlocked }: { authorName: string; unlocked:
       <text x="180" y="124" textAnchor="middle" className="passport-stamp-stars">✦  ♥  ✦</text>
     </g>
   </svg>
+}
+
+function PassportBookSpread({ page, author, profile, photo, books, agenda, stamped, code, setCode, notice, onRedeem, onScan, onPaste }: { page: DetailPage; author: any; profile: any; photo: string; books: any[]; agenda: any[]; stamped: boolean; code: string; setCode: React.Dispatch<React.SetStateAction<string>>; notice: string; onRedeem: () => void; onScan: () => void; onPaste: () => void }) {
+  const Frame = ({ children, side, className = '' }: { children: React.ReactNode; side: 'left' | 'right'; className?: string }) => (
+    <section className={`passport-desktop-page passport-desktop-page--${side} ${className}`}>
+      <div className="passport-desktop-page-border" />
+      {children}
+      <img src={passportAsset('saopaulo.png')} alt="" className="passport-desktop-skyline" />
+    </section>
+  )
+
+  const Ticket = () => <img src={passportAsset('selo1.png')} alt="Passaporte Sáfico Bienal 2026" className="passport-desktop-ticket" />
+  const Seal = () => <img src={passportAsset('selo3.png')} alt="" className="passport-desktop-corner-seal" />
+
+  const profilePage = (
+    <Frame side="left" className="passport-spread-profile">
+      <div className="passport-spread-corners"><Ticket /><Seal /></div>
+      <h2 className="passport-desktop-name">{author.name}<Heart /></h2>
+      <p className="passport-desktop-meta">34 anos <span>•</span> São Paulo / SP <span>•</span> Autora sáfica</p>
+      <div className="passport-spread-profile-content">
+        <div className="passport-desktop-photo">{photo ? <img src={photo} alt={author.name} /> : author.name[0]}</div>
+        <div className="passport-spread-profile-copy">
+          <div className="passport-spread-copy-box"><p className="passport-desktop-kicker"><BookOpen size={15} />Sobre a autora</p><p>{profile?.bio || author.bio || 'Lívia escreve histórias sobre amor, descobertas e coragem. Seus romances sáficos celebram personagens reais em jornadas reais.'}</p></div>
+          <div className="passport-spread-message"><p className="passport-desktop-kicker"><Heart size={15} />Mensagem para você</p><p>{profile?.message || 'Obrigada por ler e por existir. Nos vemos na Bienal!'}</p></div>
+        </div>
+      </div>
+      <div className="passport-spread-books-title"><BookOpen size={16} />Livros em destaque</div>
+      <DesktopBooks books={books} />
+      <img src={passportAsset('selo2.png')} alt="" className="passport-desktop-footer-seal" />
+    </Frame>
+  )
+
+  const agendaPage = (
+    <Frame side="right" className="passport-spread-agenda">
+      <div className="passport-spread-corners"><div><p className="passport-desktop-kicker"><MapPin size={15} />Onde encontrar a autora</p><p className="passport-spread-intro">{author.name} estará na Bienal do Livro de São Paulo entre os dias 4 e 13 de setembro de 2026.</p></div><Seal /></div>
+      <div className="passport-desktop-agenda">
+        {agenda.length ? agenda.map(event => <article key={event.id}>
+          <div><strong><Calendar size={14} />{dateLabel(event.date)}</strong><p>{timeLabel(event.startTime, event.endTime)}</p>{event.bookTitle && <p>Livro: {event.bookTitle}</p>}</div>
+          <div><span className={event.eventType === 'presence' ? 'is-presence' : ''}>{event.eventType === 'presence' ? 'Presença confirmada' : 'Sessão de autógrafos'}</span><p className="passport-spread-stand">Estande {event.standCode || 'a confirmar'}</p><small>{event.locationName || ''}</small></div>
+        </article>) : <p className="passport-desktop-empty">A agenda desta autora será publicada em breve.</p>}
+      </div>
+      <div className="passport-desktop-update"><p className="passport-desktop-kicker"><MessageCircle size={15} />Atualizações de última hora</p><p>Fique de olho! Atualizações podem acontecer até o dia do evento.</p><p className="passport-spread-update-note">Informações confirmadas aparecerão aqui.</p></div>
+      <img src={passportAsset('selo2.png')} alt="" className="passport-desktop-footer-seal" />
+    </Frame>
+  )
+
+  const booksPage = (
+    <Frame side="left" className="passport-spread-books-page">
+      <div className="passport-spread-corners"><Ticket /><Seal /></div>
+      <h2 className="passport-desktop-name">{author.name}<Heart /></h2>
+      <p className="passport-desktop-meta">34 anos <span>•</span> São Paulo / SP <span>•</span> Autora sáfica</p>
+      <div className="passport-spread-books-title"><BookOpen size={18} />Livros em destaque</div>
+      <DesktopBooks books={books} expanded />
+      <img src={passportAsset('selo2.png')} alt="" className="passport-desktop-footer-seal" />
+    </Frame>
+  )
+
+  const stampPage = (
+    <Frame side="right" className="passport-spread-stamp">
+      <div className="passport-spread-corners"><Ticket /><Seal /></div>
+      <div className="passport-spread-stamp-art"><PresenceStamp authorName={author.name} unlocked={stamped} /></div>
+      <h2>{stamped ? `Estande ${agenda[0]?.standCode || 'G40'} — Bienal SP 2026` : 'Resgate seu carimbo'}</h2>
+      <p>{stamped ? 'Presença confirmada' : 'Digite ou escaneie o código entregue pela autora.'}</p>
+      {stamped ? <><div className="passport-desktop-status"><Check size={16} /><div><strong>Carimbo confirmado</strong><span>Sincronizado no seu Passaporte</span></div></div><div className="passport-meaning-box passport-desktop-meaning"><h4><BookOpen size={14} />O que significa esse carimbo?</h4><p>Este carimbo confirma o encontro com {author.name} e guarda essa memória da sua jornada literária.</p></div></> : <div className="passport-desktop-redeem"><input aria-label="Código do carimbo" value={code} onChange={event => setCode(event.target.value)} placeholder="EX.: AUTORA-K7MV-4QTX" /><button onClick={onRedeem} disabled={!code.trim()}><Stamp size={15} />Validar carimbo</button><div><button type="button" onClick={onScan}><ScanLine size={14} />Escanear QR</button><button type="button" onClick={onPaste}><Clipboard size={14} />Colar código</button></div>{notice && <small>{notice}</small>}</div>}
+    </Frame>
+  )
+
+  const howPage = (
+    <Frame side="right" className="passport-spread-how">
+      <div className="passport-spread-corners"><Ticket /><Seal /></div>
+      <h2 className="passport-desktop-how-title">Como funciona<br />o passaporte?</h2>
+      <div className="passport-how-steps">
+        <div className="passport-step-row"><div className="passport-step-icon"><Compass size={20} /></div><p>Vá até o estande da autora</p></div>
+        <div className="passport-step-row"><div className="passport-step-icon"><MessageCircle size={20} /></div><p>Peça o código da autora</p></div>
+        <div className="passport-step-row"><div className="passport-step-icon"><Stamp size={20} /></div><p>Resgate seu carimbo</p></div>
+        <div className="passport-step-row"><div className="passport-step-icon"><BookOpen size={20} /></div><p>Colecione memórias!</p></div>
+      </div>
+      <img src={passportAsset('selo2.png')} alt="" className="passport-desktop-footer-seal" />
+    </Frame>
+  )
+
+  const spread = page === 'profile' || page === 'agenda' ? <>{profilePage}{agendaPage}</> : page === 'books' ? <>{booksPage}{stampPage}</> : <>{stampPage}{howPage}</>
+  return <div className="passport-desktop-book">{spread}</div>
 }
 
 function DesktopPassportBook({ page, author, profile, photo, books, agenda, stamped, code, setCode, notice, onRedeem, onScan, onPaste }: { page: DetailPage; author: any; profile: any; photo: string; books: any[]; agenda: any[]; stamped: boolean; code: string; setCode: React.Dispatch<React.SetStateAction<string>>; notice: string; onRedeem: () => void; onScan: () => void; onPaste: () => void }) {

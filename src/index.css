@@ -1571,6 +1571,75 @@ html[data-theme='dark'] body {
   .passport-desktop-notes-message { width: 72%; margin: 58px auto 0; color: var(--pass-purple); text-align: center; font: 700 27px/1.3 'Caveat', cursive; opacity: .72; }
 }
 
+/* Páginas do caderno: composição fiel ao passaporte de referência. */
+.passport-profile-books { margin-top: 18px; }
+
+@media (max-width: 899px) {
+  .passport-profile-page {
+    height: auto;
+    min-height: 800px;
+    padding-bottom: 90px;
+  }
+  .passport-profile-page .passport-profile-books { margin-top: 22px; }
+}
+
+@media (min-width: 900px) {
+  .passport-desktop-book {
+    min-height: 716px;
+    border-radius: 26px 30px 30px 26px;
+    background: linear-gradient(90deg, #d5cab8, #f2eadc 49%, #d2c5b2 50%, #eee5d6);
+  }
+  .passport-desktop-page { padding: 27px 34px 84px; }
+  .passport-spread-corners { position: relative; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; min-height: 78px; }
+  .passport-spread-corners .passport-desktop-ticket { margin: 0; }
+  .passport-spread-corners .passport-desktop-corner-seal { margin-top: -5px; }
+  .passport-spread-profile .passport-desktop-name,
+  .passport-spread-books-page .passport-desktop-name { margin-top: -2px; font-size: 49px; }
+  .passport-spread-profile .passport-desktop-meta,
+  .passport-spread-books-page .passport-desktop-meta { margin-bottom: 19px; font-size: 13px; }
+  .passport-spread-profile-content { position: relative; z-index: 2; display: grid; grid-template-columns: 182px minmax(0, 1fr); gap: 22px; align-items: center; }
+  .passport-spread-profile-content .passport-desktop-photo { aspect-ratio: .75; }
+  .passport-spread-profile-copy { min-width: 0; }
+  .passport-spread-copy-box { border: 1px dashed rgba(165,85,122,.36); border-radius: 15px; padding: 18px 16px; background: rgba(255,255,255,.24); }
+  .passport-spread-copy-box > p:last-child { margin: 9px 0 0; font-size: 12px; line-height: 1.58; }
+  .passport-spread-message { padding: 14px 4px 0; }
+  .passport-spread-message > p:last-child { margin: 6px 0 0; color: var(--pass-purple); font: 700 21px/1.22 'Caveat', cursive; }
+  .passport-spread-books-title { position: relative; z-index: 2; display: flex; align-items: center; gap: 7px; margin-top: 23px; color: var(--pass-purple); font: 800 13px 'Baloo 2', sans-serif; letter-spacing: .4px; text-transform: uppercase; }
+  .passport-spread-profile .passport-desktop-books { position: relative; z-index: 2; gap: 17px; margin-top: 15px; }
+  .passport-spread-profile .passport-desktop-cover { max-height: 119px; padding: 5px; }
+  .passport-spread-profile .passport-desktop-books strong { margin-top: 5px; font-size: 10px; white-space: normal; line-height: 1.12; }
+  .passport-spread-profile .passport-desktop-books small { margin-top: 2px; font-size: 9px; }
+  .passport-spread-profile .passport-desktop-books em { margin-top: 3px; font-size: 8.5px; }
+  .passport-spread-agenda .passport-desktop-kicker { font-size: 13px; }
+  .passport-spread-intro { max-width: 345px; margin: 8px 0 0; font-size: 12px; line-height: 1.5; }
+  .passport-spread-agenda .passport-desktop-agenda { position: relative; z-index: 2; margin-top: 10px; padding: 0 14px; }
+  .passport-spread-agenda .passport-desktop-agenda article { grid-template-columns: minmax(0, 1fr) 135px; gap: 14px; padding: 12px 0; font-size: 11px; }
+  .passport-spread-agenda .passport-desktop-agenda strong { font-size: 11px; }
+  .passport-spread-agenda .passport-desktop-agenda p { margin-top: 4px; }
+  .passport-spread-stand { margin-top: 7px !important; color: var(--pass-ink); font-weight: 800; }
+  .passport-spread-agenda .passport-desktop-update { position: relative; z-index: 2; margin: 14px 0 0; padding: 12px 14px; }
+  .passport-spread-update-note { margin: 8px 0 0 !important; color: var(--pass-purple); font: 700 17px/1.2 'Caveat', cursive; }
+  .passport-spread-books-page .passport-spread-books-title { justify-content: flex-start; margin-top: 35px; font-size: 17px; }
+  .passport-spread-books-page .passport-desktop-books { position: relative; z-index: 2; gap: 23px; margin-top: 55px; }
+  .passport-spread-books-page .passport-desktop-cover { max-height: 195px; padding: 8px; }
+  .passport-spread-books-page .passport-desktop-books strong { margin-top: 10px; font-size: 13px; white-space: normal; }
+  .passport-spread-books-page .passport-desktop-books small { font-size: 10px; }
+  .passport-spread-books-page .passport-desktop-books em { font-size: 9px; }
+  .passport-spread-stamp { text-align: center; }
+  .passport-spread-stamp .passport-spread-corners { text-align: left; }
+  .passport-spread-stamp-art { width: 268px; height: 268px; margin: 8px auto 4px; }
+  .passport-spread-stamp h2 { position: relative; z-index: 2; margin: 0; font: 800 23px 'Baloo 2', sans-serif; }
+  .passport-spread-stamp > p { position: relative; z-index: 2; margin: 5px 0; font-size: 14px; }
+  .passport-spread-stamp .passport-desktop-status,
+  .passport-spread-stamp .passport-desktop-meaning,
+  .passport-spread-stamp .passport-desktop-redeem { margin-top: 11px; }
+  .passport-spread-how .passport-desktop-how-title { margin: 68px 0 44px; font-size: 36px; }
+  .passport-spread-how .passport-how-steps { position: relative; z-index: 2; margin: 0 42px; }
+  .passport-spread-how .passport-step-row { padding: 17px 0; }
+  .passport-spread-how .passport-step-icon { width: 48px; height: 48px; }
+  .passport-spread-how .passport-step-row p { padding-top: 11px; font-size: 16px; }
+}
+
 .list-page {
   min-height: 100%;
   background:
