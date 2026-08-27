@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Search, Stamp as StampIcon, QrCode, Sparkles, Check, Heart, BookOpen, Users } from 'lucide-react'
+import { ArrowLeft, Search, Stamp as StampIcon, Sparkles, Check, Heart, BookOpen, Users } from 'lucide-react'
 import { usePassportStore } from '../../stores/usePassportStore'
 import { useContentStore } from '../../stores/useContentStore'
 import { useUserStore } from '../../stores/useUserStore'
-import { isSupabaseConfigured, supabase } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import { appPath } from '../../lib/paths'
 import { LOCAL_PASSPORT_READER_AUTHORS, LOCAL_PASSPORT_READER_BOOKS } from '../../data/localPassportReaderDemo'
 
@@ -17,9 +17,15 @@ import StampPage from './StampPage'
 import { StampFilter } from './Decor'
 import { QrScannerModal } from './QrScannerModal'
 
+const normalize = (value = '') => value
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]/gi, '')
+  .toLowerCase()
+
 export function SapphicPassport() {
   const user = useUserStore((s) => s.user)
-  const { authors, profiles, stamps, redeemPassportCode, loadPassportData } = usePassportStore()
+  const { authors, profiles, stamps, redeemPassportCode, loaded } = usePassportStore()
   const allBooks = useContentStore((s) => s.books)
   const events = useContentStore((s) => s.events)
 
@@ -32,11 +38,7 @@ export function SapphicPassport() {
   const [toastMessage, setToastMessage] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
 
-  const localDemo = !isSupabaseConfigured()
-
-  useEffect(() => {
-    loadPassportData(user?.id)
-  }, [loadPassportData, user?.id])
+  const localDemo = import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
 
   const showToast = (msg: string) => {
     setToastMessage(msg)
@@ -47,8 +49,7 @@ export function SapphicPassport() {
   // Lista de autoras disponíveis
   const authorList = useMemo(() => {
     if (localDemo) return LOCAL_PASSPORT_READER_AUTHORS
-    const active = authors.filter((a) => a.active && a.published)
-    return active.length ? active : LOCAL_PASSPORT_READER_AUTHORS
+    return authors.filter((a) => a.active && a.published)
   }, [authors, localDemo])
 
   // Autora atualmente selecionada (padrão primeira autora)
@@ -76,19 +77,19 @@ export function SapphicPassport() {
   const authorBooks = useMemo(() => {
     const sourceBooks = localDemo ? LOCAL_PASSPORT_READER_BOOKS : allBooks
     if (!currentAuthor) return []
-    const authorNorm = currentAuthor.name.toLowerCase().trim()
-    const matches = sourceBooks.filter((b) => b.authorName?.toLowerCase().trim() === authorNorm)
+    const authorNorm = normalize(currentAuthor.name)
+    const matches = sourceBooks.filter((b) => normalize(b.authorName) === authorNorm)
     return matches.length ? matches : (localDemo ? LOCAL_PASSPORT_READER_BOOKS.slice(0, 3) : [])
   }, [allBooks, currentAuthor, localDemo])
 
   // Agenda da autora
   const authorAppearances = useMemo(() => {
     if (!currentAuthor) return []
-    const authorNorm = currentAuthor.name.toLowerCase().trim()
+    const authorNorm = normalize(currentAuthor.name)
     const foundEvents = events.filter(
       (e) =>
         e.active &&
-        (e.authorSourceId === currentAuthor.id || e.speakers?.[0]?.toLowerCase().trim() === authorNorm)
+        (e.authorSourceId === currentAuthor.id || normalize(e.speakers?.[0]) === authorNorm)
     )
 
     if (foundEvents.length) {
@@ -224,6 +225,18 @@ export function SapphicPassport() {
   const filteredAuthors = useMemo(() => {
     return authorList.filter((a) => a.name.toLowerCase().includes(authorSearch.toLowerCase()))
   }, [authorList, authorSearch])
+
+  if (!currentAuthor) {
+    return (
+      <div className="min-h-full w-full bg-gradient-to-b from-[#4A1228] via-[#3A0E20] to-[#260814] px-4 py-12 text-center text-pink-100">
+        <BookOpen className="mx-auto h-8 w-8 text-pink-300" />
+        <h1 className="mt-4 text-lg font-black">Passaporte Sáfico</h1>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-pink-100/80">
+          {loaded ? 'Ainda não há páginas publicadas no Passaporte.' : 'Carregando as páginas do Passaporte…'}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#4A1228] via-[#3A0E20] to-[#260814] py-4 sm:py-10 px-2 sm:px-4 text-slate-100 font-sans">
@@ -380,9 +393,11 @@ export function SapphicPassport() {
       </div>
 
       {/* Modal Leitor de QR Code */}
-      {scannerOpen && (
-        <QrScannerModal onClose={() => setScannerOpen(false)} onScan={handleScanSuccess} />
-      )}
+      <QrScannerModal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onCode={value => void handleScanSuccess(value)}
+      />
 
       {/* Toast Feedback */}
       {toastVisible && (

@@ -21,10 +21,10 @@ const VERSION_FIELD: Record<OfflineDatasetKey, keyof ContentManifest> = {
 
 let activeSync: Promise<ContentManifest | null> | null = null
 
-const fetchManifest = async (): Promise<ContentManifest> => {
+const fetchManifest = async (): Promise<ContentManifest | null> => {
   const { data, error } = await supabase.from('content_manifest')
     .select('global_version,map_version,exhibitors_version,books_version,schedule_version,authors_version,passport_version,passport_codes_version,updated_at')
-    .eq('id', true).single()
+    .eq('id', true).maybeSingle()
   if (error) throw error
   return data
 }
@@ -43,6 +43,7 @@ export const syncPublicContent = async ({ force = false, sections }: { force?: b
   if (activeSync && !force) return activeSync
   activeSync = (async () => {
     const remote = await fetchManifest()
+    if (!remote) return null
     const requested = sections || (Object.keys(VERSION_FIELD) as OfflineDatasetKey[])
     for (const section of requested) {
       const local = await getOfflineDataset(section)
