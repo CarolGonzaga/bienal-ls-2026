@@ -1,20 +1,19 @@
 import React, { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { BookOpen, CalendarDays, Heart, MapPin, X } from 'lucide-react'
-import { PassportTicket } from './PassportArt'
-import { appPath } from '../../lib/paths'
-
-const formatDate = value => value ? new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Data a confirmar'
-const formatTime = (start, end) => start ? `${String(start).slice(0, 5)}${end ? ` – ${String(end).slice(0, 5)}` : ''}` : 'Horário a confirmar'
-const passportAsset = name => appPath(`/passaporte/${name}`)
+import { X, Eye } from 'lucide-react'
+import BookShell from './BookShell'
+import ProfilePage from './ProfilePage'
+import SchedulePage from './SchedulePage'
+import { StampFilter } from './Decor'
 
 export default function AuthorPassportPreview({ author, profile, photoUrl, events = [], onClose }) {
-  const agenda = events.filter(item => item.status !== 'rejected').slice(0, 4)
   const safeProfile = profile || {}
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
-    const closeOnEscape = event => { if (event.key === 'Escape') onClose() }
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') onClose()
+    }
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', closeOnEscape)
     return () => {
@@ -23,34 +22,139 @@ export default function AuthorPassportPreview({ author, profile, photoUrl, event
     }
   }, [onClose])
 
-  return createPortal(<div role="dialog" aria-modal="true" aria-labelledby="author-passport-preview-title" className="author-passport-preview fixed inset-0 z-[100] overflow-y-auto bg-[#160d1d]/95 p-3 sm:p-8">
-    <div className="mx-auto max-w-[1180px]">
-      <header className="mb-4 flex items-center justify-between gap-3 text-white">
-        <div><p className="text-xs font-bold uppercase tracking-[.16em] text-[#efb9d9]">Visualização da autora</p><h2 id="author-passport-preview-title" className="text-lg font-black">Como sua página final aparecerá</h2></div>
-        <button type="button" onClick={onClose} autoFocus className="rounded-xl border border-white/40 px-3 py-2 text-sm font-bold"><X className="inline h-4 w-4"/> Fechar</button>
-      </header>
+  const authorData = {
+    id: author?.id || 'preview-author',
+    name: author?.name || 'Sua Autora',
+    photo_url: photoUrl,
+    age: '34',
+    city: 'São Paulo / SP',
+    tagline: 'Autora sáfica',
+    about: safeProfile.bio || 'Sua biografia completa aparecerá aqui quando for preenchida no painel.',
+    message: safeProfile.message || 'Sua mensagem especial para as leitoras aparecerá aqui.',
+    event_name: 'Bienal do Livro de São Paulo 2026',
+    event_period: '4 e 13 de setembro',
+  }
 
-      <div className="passport-preview-book">
-        <section className="passport-preview-page passport-preview-page--left">
-          <div className="passport-preview-page-border"/>
-          <div className="flex items-start justify-between gap-3"><PassportTicket className="passport-preview-ticket"/><img src={passportAsset('selo3.png')} alt="" className="passport-preview-corner-seal"/></div>
-          <h3 className="passport-preview-name">{author?.name || 'Sua autora'}</h3>
-          <p className="passport-preview-meta">Autora sáfica <span>•</span> Bienal do Livro SP 2026</p>
-          <div className="passport-preview-profile">
-            {photoUrl ? <img src={photoUrl} alt={author?.name} className="passport-preview-photo"/> : <div className="passport-preview-photo passport-preview-photo--placeholder">{author?.name?.[0] || 'A'}</div>}
-            <div><div className="passport-preview-copy"><p className="passport-preview-kicker"><BookOpen size={16}/>Sobre a autora</p><p>{safeProfile.bio || 'Sua bio aparecerá aqui quando for preenchida.'}</p></div><div className="mt-4"><p className="passport-preview-kicker"><Heart size={16}/>Mensagem para você</p><p className="passport-preview-message">{safeProfile.message || 'Sua mensagem para as leitoras aparecerá aqui.'}</p></div></div>
+  const authorBooks = [
+    {
+      id: 'preview-book-1',
+      title: 'Seu Livro Principal',
+      genre: 'Romance Sáfico',
+      on_sale: true,
+      autographs: true,
+      cover_from: '#832860',
+      cover_to: '#db3e84',
+    },
+    {
+      id: 'preview-book-2',
+      title: 'Segundo Livro',
+      genre: 'Fantasia',
+      on_sale: true,
+      autographs: false,
+      cover_from: '#4a2366',
+      cover_to: '#8a4ca8',
+    },
+    {
+      id: 'preview-book-3',
+      title: 'Mais Uma História',
+      genre: 'Contos',
+      on_sale: true,
+      autographs: true,
+      cover_from: '#1e3c54',
+      cover_to: '#3e7696',
+    },
+  ]
+
+  const appearances = events.length
+    ? events.map((item, index) => ({
+        id: item.id || `app-${index}`,
+        kind: item.request_type === 'autograph' ? 'autografos' : 'presenca',
+        day_label: item.payload?.event_date || item.payload?.presence_date
+          ? new Date(`${item.payload?.event_date || item.payload?.presence_date}T12:00:00`).toLocaleDateString('pt-BR', {
+              weekday: 'long',
+              day: '2-digit',
+              month: '2-digit',
+            })
+          : 'Data a confirmar',
+        time_range: item.payload?.start_time
+          ? `${String(item.payload.start_time).slice(0, 5)}${
+              item.payload?.end_time ? ` – ${String(item.payload.end_time).slice(0, 5)}` : ''
+            }`
+          : 'Horário a confirmar',
+        stand: item.payload?.stand_code ? `Estande ${item.payload.stand_code}` : 'Estande a confirmar',
+        book_note: item.payload?.books?.join(', ') || '',
+        partners: [],
+      }))
+    : [
+        {
+          id: 'prev-1',
+          kind: 'presenca',
+          day_label: 'Sábado, 05 de setembro',
+          time_range: '14:00 – 16:00',
+          stand: 'Estande a confirmar',
+          book_note: 'Seu Livro Principal',
+          partners: ['Editora'],
+        },
+      ]
+
+  const updates = [
+    {
+      id: 'up-1',
+      text: 'Informações aprovadas pela equipe da Bienal aparecerão aqui.',
+      posted_at: 'Prévia',
+    },
+  ]
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="author-passport-preview-title"
+      className="author-passport-preview fixed inset-0 z-[100] overflow-y-auto bg-[#160d1d]/95 p-3 sm:p-8"
+    >
+      <StampFilter />
+      <div className="mx-auto max-w-[1120px]">
+        <header className="mb-4 flex items-center justify-between gap-3 text-white">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-pink-300 flex items-center gap-1.5">
+              <Eye className="w-3.5 h-3.5" /> Pré-visualização da autora
+            </p>
+            <h2 id="author-passport-preview-title" className="text-lg font-black">
+              Como sua página final aparecerá no Passaporte Sáfico
+            </h2>
           </div>
-          <div className="passport-preview-books-hint"><p className="passport-preview-kicker"><BookOpen size={16}/>Livros em destaque</p><p>Os livros aprovados aparecerão aqui.</p></div>
-          <img src={passportAsset('saopaulo.png')} alt="" className="passport-preview-skyline"/><img src={passportAsset('selo2.png')} alt="" className="passport-preview-footer-seal"/>
-        </section>
-        <section className="passport-preview-page passport-preview-page--right">
-          <div className="passport-preview-page-border"/>
-          <div className="flex items-start justify-between gap-3"><div><p className="passport-preview-kicker"><MapPin size={16}/>Onde encontrar a autora</p><p className="mt-3 text-sm leading-6">Sua agenda aprovada aparecerá nesta página.</p></div><img src={passportAsset('selo3.png')} alt="" className="passport-preview-corner-seal"/></div>
-          <div className="passport-preview-agenda">{agenda.length ? agenda.map((item, index) => <article key={item.id || index}><div><strong><CalendarDays size={15}/>{formatDate(item.payload?.event_date || item.payload?.presence_date || item.date)}</strong><p>{formatTime(item.payload?.start_time || item.start_time, item.payload?.end_time || item.end_time)}</p></div><div><span>{item.request_type === 'presence' ? 'Presença confirmada' : 'Sessão de autógrafos'}</span><p>Estande {item.payload?.stand_code || item.stand_code || 'a confirmar'}</p></div></article>) : <p className="py-8 text-center text-sm">Cadastre sua presença ou sessão de autógrafos para vê-la aqui.</p>}</div>
-          <div className="passport-preview-update"><p className="passport-preview-kicker">Atualizações de última hora</p><p>Informações aprovadas pela equipe aparecerão aqui.</p></div>
-          <img src={passportAsset('saopaulo.png')} alt="" className="passport-preview-skyline"/><img src={passportAsset('ondas.png')} alt="" className="passport-preview-waves"/>
-        </section>
+          <button
+            type="button"
+            onClick={onClose}
+            autoFocus
+            className="rounded-xl border border-white/40 px-3.5 py-2 text-xs font-bold hover:bg-white/10 transition flex items-center gap-1"
+          >
+            <X className="w-4 h-4" /> Fechar prévia
+          </button>
+        </header>
+
+        {/* Desktop / Tablet: Passaporte aberto */}
+        <BookShell>
+          <div className="grid grid-cols-1 lg:grid-cols-2 relative min-h-[640px] lg:h-[820px]">
+            <div className="border-b lg:border-b-0 lg:border-r border-pink-300/40 overflow-hidden h-full flex flex-col">
+              <ProfilePage author={authorData} books={authorBooks} />
+            </div>
+            <div className="overflow-hidden h-full flex flex-col">
+              <SchedulePage author={authorData} appearances={appearances} updates={updates} />
+            </div>
+
+            {/* Sombra central */}
+            <div
+              className="hidden lg:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-16 pointer-events-none z-10"
+              style={{
+                background:
+                  'linear-gradient(90deg, rgba(190,24,93,0) 0%, rgba(190,24,93,0.16) 45%, rgba(190,24,93,0.16) 55%, rgba(190,24,93,0) 100%)',
+              }}
+            />
+          </div>
+        </BookShell>
       </div>
-    </div>
-  </div>, document.body)
+    </div>,
+    document.body
+  )
 }

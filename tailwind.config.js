@@ -8,6 +8,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        heading: ['"Nunito Sans"', '"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Dancing Script"', '"Playfair Display"', '"Alex Brush"', 'cursive'],
       },
       colors: {
         brand: {
