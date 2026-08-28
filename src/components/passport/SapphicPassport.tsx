@@ -45,8 +45,10 @@ export function SapphicPassport() {
     if (!currentAuthor) return []
     const source = localDemo ? LOCAL_PASSPORT_READER_BOOKS : books
     const selected = source.filter(book => normalize(book.authorName) === normalize(currentAuthor.name))
-    return selected.length ? selected : (localDemo ? LOCAL_PASSPORT_READER_BOOKS.slice(0, 3) : [])
-  }, [books, currentAuthor, localDemo])
+    const saleBookIds = new Set((profile?.sale_locations || []).filter(item => item.available_for_sale !== false).map(item => item.book_id))
+    const decorated = selected.map(book => ({ ...book, on_sale: localDemo ? true : saleBookIds.has(book.id) }))
+    return decorated.length ? decorated : (localDemo ? LOCAL_PASSPORT_READER_BOOKS.slice(0, 3).map(book => ({ ...book, on_sale: true })) : [])
+  }, [books, currentAuthor, localDemo, profile?.sale_locations])
   const appearances = useMemo(() => {
     if (!currentAuthor) return []
     return events.filter(event => event.active && (event.authorSourceId === currentAuthor.id || normalize(event.speakers?.[0]) === normalize(currentAuthor.name))).sort((a, b) => `${a.date}${a.startTime}`.localeCompare(`${b.date}${b.startTime}`)).map(event => ({ id: event.id, kind: event.eventType === 'autograph' ? 'autografos' : 'presenca', day_label: event.date ? new Date(`${event.date}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Data a confirmar', time_range: event.startTime ? `${event.startTime}${event.endTime ? ` – ${event.endTime}` : ''}` : 'Horário a confirmar', stand: event.standCode ? `Estande ${event.standCode}` : 'Estande a confirmar', book_note: event.bookTitle || '', partners: event.locationName ? [event.locationName] : [] }))
