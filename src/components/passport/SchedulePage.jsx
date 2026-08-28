@@ -5,7 +5,7 @@ import SectionTitle from './SectionTitle'
 import AppearanceRow from './AppearanceRow'
 import { RoundStamp, Skyline, Waves } from './Decor'
 
-export default function SchedulePage({ author, appearances = [], updates = [] }) {
+export default function SchedulePage({ author, appearances = [], updates = [], decorationVariant = 0 }) {
   const firstName = author?.name ? author.name.split(' ')[0] : 'A autora'
   const eventName = author?.event_name || 'Bienal do Livro de São Paulo'
   const eventPeriod = author?.event_period || '4 e 13 de setembro de 2026'
@@ -20,7 +20,7 @@ export default function SchedulePage({ author, appearances = [], updates = [] })
               {firstName} estará na {eventName} entre os dias {eventPeriod}.
             </p>
           </div>
-          <RoundStamp src="selo2" className="shrink-0 hidden sm:block" />
+          {decorationVariant % 2 === 0 && <RoundStamp src="selo3" className="shrink-0 hidden sm:block" />}
         </div>
 
         <div className="mt-4 sm:mt-6 rounded-2xl border border-pink-200/70 bg-white/40 overflow-hidden">
@@ -60,7 +60,7 @@ export default function SchedulePage({ author, appearances = [], updates = [] })
           <Skyline className="max-w-[170px] sm:max-w-[220px]" />
           <div className="flex items-end gap-2">
             <Waves className="hidden sm:block" />
-            <RoundStamp src="selo2" className="shrink-0" />
+            {decorationVariant % 2 === 0 ? <RoundStamp src="selo2" className="shrink-0" /> : <RoundStamp src="selo3" className="shrink-0" />}
           </div>
         </div>
       </div>

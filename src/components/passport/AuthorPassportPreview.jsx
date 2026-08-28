@@ -24,10 +24,10 @@ export default function AuthorPassportPreview({ author, profile, photoUrl, event
 
   const authorData = {
     id: author?.id || 'preview-author',
-    name: author?.name || 'Sua Autora',
+    name: safeProfile.passport_display_name?.trim() || author?.name || 'Sua Autora',
     photo_url: photoUrl,
-    age: '34',
-    city: 'São Paulo / SP',
+    age: safeProfile.passport_age ? String(safeProfile.passport_age) : '',
+    city: safeProfile.passport_city?.trim() || '',
     tagline: 'Autora sáfica',
     about: safeProfile.bio || 'Sua biografia completa aparecerá aqui quando for preenchida no painel.',
     message: safeProfile.message || 'Sua mensagem especial para as leitoras aparecerá aqui.',

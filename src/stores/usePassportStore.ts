@@ -5,7 +5,7 @@ import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { codeIsValidAt, extractPassportCode, sha256Hex } from '../lib/passportCode'
 
 export type PassportAuthor = { id: string; slug: string; name: string; first_name: string; bio: string; message: string; active: boolean; published: boolean }
-export type PassportProfile = { author_id: string; photo_path?: string; bio: string; message: string; books: any[]; presences: any[]; autograph_sessions: any[]; sale_locations: any[] }
+export type PassportProfile = { author_id: string; photo_path?: string; bio: string; message: string; passport_display_name?: string; passport_age?: number | string; passport_city?: string; books: any[]; presences: any[]; autograph_sessions: any[]; sale_locations: any[] }
 export type PassportCodeHash = { author_id: string; code_hash: string; valid_from: string; valid_until: string; version: number }
 export type LocalPassportStamp = { authorId: string; authorName?: string; authorSlug?: string; redeemedAtLocal: string; status: 'pending_sync' | 'confirmed'; source: 'manual' | 'qr'; syncAttempts: number; lastSyncError?: string }
 

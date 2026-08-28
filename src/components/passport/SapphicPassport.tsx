@@ -52,12 +52,12 @@ export function SapphicPassport() {
     return events.filter(event => event.active && (event.authorSourceId === currentAuthor.id || normalize(event.speakers?.[0]) === normalize(currentAuthor.name))).sort((a, b) => `${a.date}${a.startTime}`.localeCompare(`${b.date}${b.startTime}`)).map(event => ({ id: event.id, kind: event.eventType === 'autograph' ? 'autografos' : 'presenca', day_label: event.date ? new Date(`${event.date}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Data a confirmar', time_range: event.startTime ? `${event.startTime}${event.endTime ? ` – ${event.endTime}` : ''}` : 'Horário a confirmar', stand: event.standCode ? `Estande ${event.standCode}` : 'Estande a confirmar', book_note: event.bookTitle || '', partners: event.locationName ? [event.locationName] : [] }))
   }, [currentAuthor, events])
   const schedulePages = useMemo(() => Array.from({ length: Math.max(1, Math.ceil(appearances.length / chunkSize)) }, (_, index) => appearances.slice(index * chunkSize, (index + 1) * chunkSize)), [appearances])
-  const authorData = useMemo(() => currentAuthor ? ({ id: currentAuthor.id, name: currentAuthor.name, photo_url: photo, age: '34', city: 'São Paulo / SP', tagline: 'Autora sáfica', about: profile?.bio || currentAuthor.bio || 'Autora de romances sáficos e histórias sobre encontros, descobertas e coragem.', message: profile?.message || 'Obrigada por ler e por existir. Nos vemos na Bienal!', event_name: 'Bienal do Livro de São Paulo 2026', event_period: '4 e 13 de setembro' }) : null, [currentAuthor, photo, profile])
+  const authorData = useMemo(() => currentAuthor ? ({ id: currentAuthor.id, name: profile?.passport_display_name?.trim() || currentAuthor.name, photo_url: photo, age: profile?.passport_age ? String(profile.passport_age) : '', city: profile?.passport_city?.trim() || '', tagline: 'Autora sáfica', about: profile?.bio || currentAuthor.bio || 'Autora de romances sáficos e histórias sobre encontros, descobertas e coragem.', message: profile?.message || 'Obrigada por ler e por existir. Nos vemos na Bienal!', event_name: 'Bienal do Livro de São Paulo 2026', event_period: '4 e 13 de setembro' }) : null, [currentAuthor, photo, profile])
   const stampData = useMemo(() => {
     if (!currentAuthor) return null
     const stamp = stamps.find(item => item.authorId === currentAuthor.id)
-    return { author_name: currentAuthor.name, event_label: 'BIENAL DO LIVRO SP 2026', stand: appearances[0]?.stand || 'Estande G40', date_label: appearances[0]?.day_label || 'Data da presença', is_unlocked: Boolean(stamp), synced_at: stamp?.redeemedAtLocal ? new Date(stamp.redeemedAtLocal).toLocaleString('pt-BR') : '' }
-  }, [appearances, currentAuthor, stamps])
+    return { author_name: authorData?.name || currentAuthor.name, event_label: 'BIENAL DO LIVRO SP 2026', stand: appearances[0]?.stand || 'Estande G40', date_label: appearances[0]?.day_label || 'Data da presença', is_unlocked: Boolean(stamp), synced_at: stamp?.redeemedAtLocal ? new Date(stamp.redeemedAtLocal).toLocaleString('pt-BR') : '' }
+  }, [appearances, authorData?.name, currentAuthor, stamps])
   const showToast = (message: string) => { setToastMessage(message); window.setTimeout(() => setToastMessage(''), 3200) }
   const openAuthor = (id: string) => { setSelectedAuthorId(id); setPage(0); setSpread(0) }
   const handleRedeem = async (code: string, source: 'manual' | 'qr' = 'manual') => {
@@ -73,7 +73,7 @@ export function SapphicPassport() {
     return [
       { label: 'Perfil', node: <ProfilePage author={authorData} /> },
       { label: 'Livros', node: <BooksListPage books={authorBooks} authorName={authorData.name} /> },
-      ...schedulePages.map((items, index) => ({ label: schedulePages.length > 1 ? `Programação ${index + 1}` : 'Programação', node: <SchedulePage author={authorData} appearances={items} updates={index === schedulePages.length - 1 ? [{ id: 'event-updates', posted_at: 'Aviso', text: 'Fique de olho! Atualizações podem acontecer até o dia do evento.' }] : []} /> })),
+       ...schedulePages.map((items, index) => ({ label: schedulePages.length > 1 ? `Programação ${index + 1}` : 'Programação', node: <SchedulePage author={authorData} appearances={items} decorationVariant={index} updates={index === schedulePages.length - 1 ? [{ id: 'event-updates', posted_at: 'Aviso', text: 'Fique de olho! Atualizações podem acontecer até o dia do evento.' }] : []} /> })),
       { label: 'Carimbo', node: <StampPage stamp={stampData} onRedeemCode={handleRedeem} onScanQr={() => setScannerOpen(true)} /> },
       { label: 'Como funciona', node: <HowItWorksPage /> },
     ]

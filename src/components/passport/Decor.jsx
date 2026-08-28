@@ -1,9 +1,9 @@
 import React from 'react'
 import { appPath } from '../../lib/paths'
 
-// Removes the black background of the stamp PNGs while keeping the pink ink
-// fully opaque. Uses a luma threshold so dark pink stays vivid (no patchy wear)
-// and only near-black becomes transparent.
+// The supplied passport art has a dark matte background. The SVG filter only
+// makes the near-black matte transparent; the pink line work remains from the
+// original PNG, preserving the supplied artwork and its proportions.
 export function StampFilter() {
   return (
     <svg width="0" height="0" aria-hidden="true" style={{ position: 'absolute', pointerEvents: 'none' }}>

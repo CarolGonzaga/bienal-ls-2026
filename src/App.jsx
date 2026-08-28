@@ -305,7 +305,7 @@ export default function App() {
           </button>
 
           {/* Search Bar in Header for larger screens */}
-          <div className="hidden lg:block flex-1 max-w-md">
+          <div className="hidden min-[1254px]:block flex-1 max-w-md">
             <SearchBar />
           </div>
 
@@ -344,7 +344,7 @@ export default function App() {
           </nav>
 
           {/* Right Action Icons */}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2 min-[1254px]:flex">
             <button onClick={startTutorial} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Ver tutorial do mapa" aria-label="Ver tutorial do mapa"><CircleHelp className="h-4 w-4" /></button>
             <button onClick={() => setIsOfflinePanelOpen(true)} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Preparar para uso offline" aria-label="Preparar para uso offline"><Download className="h-4 w-4" /></button>
             {isAdmin && <button onClick={() => window.open(appPath('/admin'), '_blank', 'noopener,noreferrer')} className="site-header-action flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border p-0 transition-colors" title="Painel administrativo" aria-label="Painel administrativo"><ShieldCheck className="h-4 w-4" /></button>}
@@ -370,7 +370,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="relative md:hidden">
+          <div className="relative min-[1254px]:hidden">
             <button
               type="button"
               onClick={() => setIsMobileHeaderMenuOpen(open => !open)}

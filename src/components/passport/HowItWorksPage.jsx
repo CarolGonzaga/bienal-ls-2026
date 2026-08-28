@@ -1,7 +1,7 @@
 import React from 'react'
 import { Store, MessageSquare, Stamp as StampIcon, BookHeart } from 'lucide-react'
 import PaperPage from './PaperPage'
-import { PassportStamp, RoundStamp, Skyline } from './Decor'
+import { PassportStamp, RoundStamp, Skyline, Waves } from './Decor'
 
 const steps = [
   { icon: Store, text: 'Vá até o estande da autora' },
@@ -14,9 +14,8 @@ export default function HowItWorksPage() {
   return (
     <PaperPage className="h-full">
       <div className="px-5 sm:px-9 pt-6 sm:pt-8 pb-5 sm:pb-6 flex flex-col h-full">
-        <div className="flex items-start justify-between">
-          <PassportStamp />
-          <RoundStamp src="selo3" />
+        <div className="flex items-start justify-end">
+          <PassportStamp className="rotate-6" />
         </div>
 
         <h2 className="mt-5 sm:mt-8 text-center text-[23px] sm:text-[30px] font-extrabold tracking-tight text-pink-900 font-heading leading-tight">
@@ -41,7 +40,7 @@ export default function HowItWorksPage() {
 
         <div className="mt-auto pt-6 sm:pt-10 flex items-end justify-between">
           <Skyline className="max-w-[170px] sm:max-w-[220px]" />
-          <RoundStamp src="selo2" className="shrink-0" />
+          <div className="flex items-end gap-2"><Waves className="hidden sm:block" /><RoundStamp src="selo3" className="shrink-0" /></div>
         </div>
       </div>
     </PaperPage>
