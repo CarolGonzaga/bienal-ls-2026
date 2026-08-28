@@ -2,10 +2,9 @@ import React from 'react'
 import { BookOpen, Heart } from 'lucide-react'
 import PaperPage from './PaperPage'
 import SectionTitle from './SectionTitle'
-import BookCard from './BookCard'
 import { PassportStamp, RoundStamp, Skyline } from './Decor'
 
-export default function ProfilePage({ author, books = [] }) {
+export default function ProfilePage({ author }) {
   const authorName = author?.name || 'Autora Sáfica'
   const authorPhoto = author?.photo_url || author?.photo || author?.photoUrl
   const authorAge = author?.age || '34'
@@ -58,21 +57,6 @@ export default function ProfilePage({ author, books = [] }) {
                 {authorMessage} <span className="text-pink-400 font-normal">♡</span>
               </p>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-6 sm:mt-8">
-          <SectionTitle icon={BookOpen}>Livros em destaque</SectionTitle>
-          <div className="mt-3.5 sm:mt-5 grid grid-cols-3 gap-2 sm:gap-6">
-            {books.length ? (
-              books.slice(0, 3).map((b) => (
-                <BookCard key={b.id} book={b} authorName={authorName} />
-              ))
-            ) : (
-              <p className="col-span-3 text-center text-xs text-slate-500 py-4">
-                Livros em preparação para a Bienal.
-              </p>
-            )}
           </div>
         </div>
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Check, Sparkles, Stamp as StampIcon, QrCode, Clipboard } from 'lucide-react'
+import React, { useId, useState } from 'react'
+import { Check, Stamp as StampIcon, QrCode, Clipboard } from 'lucide-react'
 import { PassportStamp, RoundStamp, Skyline, Waves } from './Decor'
 
 export default function StampPage({ stamp, onRedeemCode, onScanQr }) {
@@ -42,23 +42,7 @@ export default function StampPage({ stamp, onRedeemCode, onScanQr }) {
           <RoundStamp src="selo2" />
         </div>
 
-        {/* Círculo do Carimbo fluido e responsivo */}
-        <div
-          className={`mt-4 sm:mt-6 mx-auto w-[68vw] max-w-[250px] sm:max-w-[260px] aspect-square rounded-full border-[3px] flex items-center justify-center transition-all duration-300 ${
-            isUnlocked
-              ? 'border-pink-400/80 text-pink-600 shadow-md bg-white/30'
-              : 'border-pink-300/40 text-pink-300/60 opacity-60 grayscale'
-          }`}
-        >
-          <div className="w-[calc(100%-18px)] sm:w-[calc(100%-24px)] h-[calc(100%-18px)] sm:h-[calc(100%-24px)] rounded-full border border-dashed border-pink-400/60 flex flex-col items-center justify-center px-4 text-center">
-            <span className="text-[8.5px] sm:text-[10px] font-bold tracking-[0.2em]">PRESENÇA CONFIRMADA</span>
-            <span className="font-display text-[22px] sm:text-[34px] leading-none mt-2 sm:mt-3 text-pink-900 truncate max-w-full">
-              {authorName}
-            </span>
-            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 mt-2 opacity-70" strokeWidth={1.4} />
-            <span className="text-[8.5px] sm:text-[10px] font-bold tracking-[0.16em] mt-2 sm:mt-3">{eventLabel}</span>
-          </div>
-        </div>
+        <PresenceStamp authorName={authorName} unlocked={isUnlocked} />
 
         <p className="mt-4 sm:mt-6 text-center text-[14px] sm:text-[17px] font-bold text-slate-800">
           {stand} – {dateLabel}
@@ -135,5 +119,36 @@ export default function StampPage({ stamp, onRedeemCode, onScanQr }) {
         </div>
       </div>
     </div>
+  )
+}
+
+function PresenceStamp({ authorName, unlocked }) {
+  const id = useId().replace(/:/g, '')
+  const words = authorName.split(/\s+/).filter(Boolean)
+  const pivot = Math.max(1, Math.ceil(words.length / 2))
+  const firstLine = words.slice(0, pivot).join(' ')
+  const secondLine = words.slice(pivot).join(' ')
+
+  return (
+    <svg viewBox="0 0 360 360" role="img" aria-label={`Carimbo de presença de ${authorName}`} className={`mx-auto mt-4 sm:mt-6 w-[74vw] max-w-[290px] text-[#d65e91] ${unlocked ? 'opacity-100' : 'opacity-45'}`}>
+      <defs>
+        <path id={`${id}-top`} d="M 56 178 A 124 124 0 0 1 304 178" />
+        <path id={`${id}-bottom`} d="M 52 207 A 132 132 0 0 0 308 207" />
+        <filter id={`${id}-ink`} x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="7" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale=".55" /></filter>
+      </defs>
+      <g fill="none" stroke="currentColor" filter={`url(#${id}-ink)`}>
+        <circle cx="180" cy="180" r="164" strokeWidth="4.5" />
+        <circle cx="180" cy="180" r="153" strokeWidth="1.8" />
+        <circle cx="180" cy="180" r="127" strokeWidth="1.5" strokeDasharray="3 7" />
+        <path d="M88 143c-15 23-17 51-8 77M272 143c15 23 17 51 8 77" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M87 155c-14-5-20-13-19-24 13 3 20 11 19 24zm-8 27c-14-1-22-8-24-20 14 0 22 7 24 20zm2 28c-14 3-24-2-29-13 13-4 23 2 29 13zm192-55c14-5 20-13 19-24-13 3-20 11-19 24zm8 27c14-1 22-8 24-20-14 0-22 7-24 20zm-2 28c14 3 24-2 29-13-13-4-23 2-29 13z" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M142 242c15-9 27-9 38 0v30c-11-7-23-7-38 0zm76 0c-15-9-27-9-38 0v30c11-7 23-7 38 0zM180 242v30M132 256l-12-6m108 6 12-6" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      <text fill="currentColor" className="font-sans text-[20px] font-black tracking-[2px]"><textPath href={`#${id}-top`} startOffset="50%" textAnchor="middle">PRESENÇA CONFIRMADA</textPath></text>
+      <text fill="currentColor" className="font-sans text-[18px] font-black tracking-[1.4px]"><textPath href={`#${id}-bottom`} startOffset="50%" textAnchor="middle">BIENAL DO LIVRO SP 2026</textPath></text>
+      <text x="180" y="124" textAnchor="middle" fill="currentColor" className="font-sans text-[14px] font-bold tracking-[7px]">✦ ♥ ✦</text>
+      <text x="180" y={secondLine ? '170' : '190'} textAnchor="middle" fill="currentColor" className="font-display text-[53px]">{firstLine}</text>
+      {secondLine && <text x="180" y="214" textAnchor="middle" fill="currentColor" className="font-display text-[53px]">{secondLine}</text>}
+    </svg>
   )
 }
