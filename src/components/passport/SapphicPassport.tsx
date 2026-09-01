@@ -114,6 +114,7 @@ export function SapphicPassport() {
     const identifier = safeCode(userId);
     return {
       userId,
+      cloudSync: Boolean(user?.id) && !localDemo,
       profile: {
         fullName: "",
         birthDate: "",

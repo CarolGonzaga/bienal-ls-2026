@@ -556,34 +556,36 @@
   .passport-mobile-navigation {
     position: relative;
     z-index: 50;
-    width: min(calc(100% - 2.5rem), 30rem);
+    order: 2;
+    width: min(calc(100% - 1.5rem), 30rem);
     max-width: none;
     margin-inline: auto;
     padding-inline: 0.2rem;
   }
 
   .passport-book-wrap {
+    order: 1;
     width: min(
-      calc(100% - 3rem),
+      calc(100% - 1.5rem),
       calc((100cqh - 7.25rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.59)
     );
-    margin: 0.35rem auto 0;
+    margin: 0 auto;
   }
 
   .passport-book-wrap .passport-spread {
     height: min(
       calc(100cqh - 7.25rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
-      calc((100cqw - 3rem) / 0.59),
+      calc((100cqw - 1.5rem) / 0.59),
       760px
     );
   }
 
   .passport-cover-stage {
-    width: min(calc(100% - 3.5rem), calc((100cqh - 2rem) * 0.5634));
+    width: min(calc(100% - 1.5rem), calc((100cqh - 2rem) * 0.5634));
   }
 
   .passport-cover-stage .passport-spread {
-    height: min(calc(100cqh - 2rem), calc((100cqw - 3.5rem) / 0.5634), 760px);
+    height: min(calc(100cqh - 2rem), calc((100cqw - 1.5rem) / 0.5634), 760px);
   }
 
   .passport-spread-open {
@@ -638,6 +640,14 @@
   .identity-field-pair {
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(0.3rem, 0.8vh, 0.45rem);
+  }
+
+  .identity-document-note {
+    padding-bottom: 2rem;
+  }
+
+  .identity-stamp-count {
+    line-height: 1.35;
   }
 
   .identity-passport-photo .script-name-signature {
@@ -722,7 +732,7 @@
 
   .passport-book-wrap {
     width: min(
-      calc(100% - 3rem),
+      calc(100% - 1.5rem),
       calc((100cqh - 6.35rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.62)
     );
   }
@@ -730,7 +740,7 @@
   .passport-book-wrap .passport-spread {
     height: min(
       calc(100cqh - 6.35rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)),
-      calc((100cqw - 3rem) / 0.62)
+      calc((100cqw - 1.5rem) / 0.62)
     );
   }
 

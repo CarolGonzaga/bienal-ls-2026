@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Download,
   UserRoundCheck,
+  ArrowLeft,
   Menu,
   X
 } from 'lucide-react'
@@ -284,7 +285,7 @@ export default function App() {
     <div className={`brand-shell site-theme theme-${mapTheme} relative flex flex-col overflow-x-hidden font-sans lg:overflow-hidden ${activeTabMode === 'passport' ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'} ${reducedMotion ? 'reduce-motion' : ''}`}>
 
       {/* Header Navigation */}
-      <header className="site-header sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl">
+      <header className={`site-header sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl ${activeTabMode === 'passport' ? 'hidden md:block' : ''}`}>
         <div className="mx-auto flex h-20 w-full items-center justify-between gap-4 px-3 sm:px-4 lg:px-5">
 
           {/* Logo & Title */}
@@ -423,6 +424,12 @@ export default function App() {
           })}
         </div>
       </header>
+
+      {activeTabMode === 'passport' && <div className="z-40 flex shrink-0 items-center bg-[#7b4051] px-3 py-2 md:hidden">
+        <button type="button" onClick={() => handleNavigate('map')} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-black text-white shadow-sm transition active:scale-[0.98]" aria-label="Voltar para o mapa">
+          <ArrowLeft className="h-4 w-4" /><span>Voltar para o mapa</span>
+        </button>
+      </div>}
 
       {!online && <div className="z-30 flex shrink-0 items-center justify-center bg-amber-100 px-3 py-2 text-center text-xs font-bold text-amber-900">Você está usando os dados salvos neste aparelho.{offlineReadiness?.lastUpdated ? ` Última atualização: ${new Date(offlineReadiness.lastUpdated).toLocaleString('pt-BR')}.` : ''}</div>}
 
