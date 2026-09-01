@@ -91,16 +91,17 @@ export default function App() {
   const online = useOfflineStore(s => s.online)
   const offlineReadiness = useOfflineStore(s => s.readiness)
   const refreshOfflineStatus = useOfflineStore(s => s.refreshStatus)
-  const passportEnabled = usePassportStore(s => s.enabled) || (import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1')
+  const passportTestMode = (import.meta.env.DEV || import.meta.env.VITE_PASSPORT_TEST === '1') && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
+  const passportEnabled = usePassportStore(s => s.enabled) || passportTestMode
   const loadPassport = usePassportStore(s => s.load)
-  const localPassportDemo = import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
+  const localPassportDemo = passportTestMode
 
   const currentPath =
     window.location.pathname.replace(/^\/mapasaficobienal/, '') || '/'
 
   useEffect(() => {
-    if (import.meta.env.DEV && new URLSearchParams(window.location.search).get('passaporteTeste') === '1') setActiveTabMode('passport')
-  }, [setActiveTabMode])
+    if (passportTestMode) setActiveTabMode('passport')
+  }, [passportTestMode, setActiveTabMode])
 
   const isPublicLanding =
     currentPath === '/' || currentPath === ''
@@ -280,7 +281,7 @@ export default function App() {
   }
 
   return (
-    <div className={`brand-shell site-theme theme-${mapTheme} relative flex min-h-[100dvh] flex-col overflow-x-hidden font-sans lg:overflow-hidden ${reducedMotion ? 'reduce-motion' : ''}`}>
+    <div className={`brand-shell site-theme theme-${mapTheme} relative flex flex-col overflow-x-hidden font-sans lg:overflow-hidden ${activeTabMode === 'passport' ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'} ${reducedMotion ? 'reduce-motion' : ''}`}>
 
       {/* Header Navigation */}
       <header className="site-header sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl">
@@ -426,7 +427,7 @@ export default function App() {
       {!online && <div className="z-30 flex shrink-0 items-center justify-center bg-amber-100 px-3 py-2 text-center text-xs font-bold text-amber-900">Você está usando os dados salvos neste aparelho.{offlineReadiness?.lastUpdated ? ` Última atualização: ${new Date(offlineReadiness.lastUpdated).toLocaleString('pt-BR')}.` : ''}</div>}
 
       {/* Main Content Render */}
-      <main className="site-main relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto lg:h-[calc(100dvh-80px)] lg:overflow-hidden">
+      <main className={`site-main relative flex min-h-0 w-full flex-1 flex-col ${activeTabMode === 'passport' ? 'overflow-hidden' : 'overflow-y-auto'} lg:h-[calc(100dvh-80px)] lg:overflow-hidden`}>
         {isAuthOpen ? (
           <AuthModal
             isOpen
@@ -480,7 +481,7 @@ export default function App() {
         onClose={() => setIsAccessibilityOpen(false)}
       />
       <MapTutorial open={isTutorialOpen} onFinish={finishTutorial} />
-      <button type="button" onClick={() => setIsContributionOpen(true)} aria-label="Adicionar informação" title="Adicionar informação" className="contribution-floating fixed bottom-4 right-4 z-[70] flex h-11 w-11 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"><Plus className="h-5 w-5 sm:h-7 sm:w-7" /></button>
+      {activeTabMode !== 'passport' && <button type="button" onClick={() => setIsContributionOpen(true)} aria-label="Adicionar informação" title="Adicionar informação" className="contribution-floating fixed bottom-4 right-4 z-[70] flex h-11 w-11 items-center justify-center rounded-full text-white shadow-xl transition-transform hover:scale-105 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"><Plus className="h-5 w-5 sm:h-7 sm:w-7" /></button>}
       <ContributionModal open={isContributionOpen} onClose={() => setIsContributionOpen(false)} user={user} exhibitors={exhibitors} />
       <ContributionNotifications user={user} />
       <OfflinePreparationPanel open={isOfflinePanelOpen} onClose={() => setIsOfflinePanelOpen(false)}/>
