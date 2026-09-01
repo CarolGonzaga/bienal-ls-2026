@@ -358,7 +358,7 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
               setModalPreset(null);
               setModalOpen(true);
             }}
-            className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-4 z-30 rounded-full bg-[var(--violet-deep)] px-4 py-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[var(--paper)] shadow-lg transition hover:-translate-y-[2px] md:bottom-[calc(env(safe-area-inset-bottom)+3.2rem)] lg:hidden"
+            className="fixed bottom-[calc(env(safe-area-inset-bottom)+3.2rem)] right-4 z-30 hidden rounded-full bg-[var(--violet-deep)] px-4 py-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[var(--paper)] shadow-lg transition hover:-translate-y-[2px] md:block lg:hidden"
           >
             + Adicionar livro
           </button>

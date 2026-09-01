@@ -27,6 +27,7 @@ import {
   KeyRound,
   MapPin,
   Megaphone,
+  Plus,
   Share2,
   ShoppingBag,
   Stamp,
@@ -398,10 +399,20 @@ function BooksPage({
       footer={
         <div className="flex justify-end">
           <button
+            type="button"
             onClick={() => openAddBook()}
             className="hidden items-center gap-2 rounded-full border border-dashed border-[var(--rose-antique)] bg-[oklch(0.93_0.02_60)] px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-[var(--violet-deep)] transition hover:-translate-y-[2px] lg:inline-flex"
           >
             + Adicionar livro
+          </button>
+          <button
+            type="button"
+            onClick={() => openAddBook()}
+            aria-label="Adicionar livro"
+            title="Adicionar livro"
+            className="passport-mobile-add-book"
+          >
+            <Plus aria-hidden className="size-4" strokeWidth={1.8} />
           </button>
         </div>
       }

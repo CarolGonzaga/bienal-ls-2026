@@ -546,6 +546,10 @@
   line-height: 1.25;
 }
 
+.passport-mobile-add-book {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .passport-shell {
     justify-content: flex-start;
@@ -685,6 +689,30 @@
   .book-list-card input,
   .book-list-card select {
     font-size: 0.68rem;
+  }
+
+  .passport-mobile-add-book {
+    position: absolute;
+    right: 0.05rem;
+    bottom: 0.15rem;
+    z-index: 20;
+    display: grid;
+    width: 1.9rem;
+    height: 1.9rem;
+    place-items: center;
+    border: 1px solid oklch(0.7 0.12 355 / 0.58);
+    border-radius: 999px;
+    background: oklch(0.98 0.012 65 / 0.96);
+    color: var(--violet-deep);
+    box-shadow: 0 4px 12px -7px oklch(0.28 0.08 355 / 0.7);
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .passport-mobile-add-book:active {
+    transform: scale(0.94);
   }
 
   .author-profile-grid {
