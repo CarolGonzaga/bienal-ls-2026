@@ -548,14 +548,17 @@
 
 @media (max-width: 767px) {
   .passport-shell {
-    gap: 0.45rem;
+    justify-content: flex-start;
+    gap: 0.35rem;
     padding-top: max(0.35rem, env(safe-area-inset-top));
   }
 
   .passport-mobile-navigation {
     position: relative;
     z-index: 50;
-    max-width: 30rem;
+    width: min(calc(100% - 2.5rem), 30rem);
+    max-width: none;
+    margin-inline: auto;
     padding-inline: 0.2rem;
   }
 
@@ -564,7 +567,7 @@
       calc(100% - 3rem),
       calc((100cqh - 7.25rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.59)
     );
-    margin-block: auto;
+    margin: 0.35rem auto 0;
   }
 
   .passport-book-wrap .passport-spread {
@@ -630,6 +633,11 @@
 
   .identity-passport-grid > .grid {
     gap: clamp(0.38rem, 1vh, 0.55rem);
+  }
+
+  .identity-field-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(0.3rem, 0.8vh, 0.45rem);
   }
 
   .identity-passport-photo .script-name-signature {

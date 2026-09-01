@@ -106,7 +106,7 @@ function IdentityPage() {
             value={profile.fullName}
             onChange={(fullName) => updateProfile({ fullName })}
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="identity-field-pair grid grid-cols-2 gap-3">
             <ProfileField
               label="Data de nascimento"
               type="date"
@@ -119,7 +119,7 @@ function IdentityPage() {
               onChange={(nationality) => updateProfile({ nationality })}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="identity-field-pair grid grid-cols-2 gap-3">
             <ProfileField
               label="Naturalidade"
               value={profile.birthplace}
@@ -233,11 +233,11 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Visite o site Lendo Sáficos"
-          className="grid aspect-square size-[clamp(7.25rem,18vh,8.25rem)] shrink-0 place-items-center rounded-2xl bg-white shadow-[0_5px_16px_-10px_rgb(108_18_50_/_0.45)]"
+          className="grid aspect-square size-[clamp(9.4rem,23.4vh,10.7rem)] shrink-0 place-items-center rounded-2xl bg-white shadow-[0_5px_16px_-10px_rgb(108_18_50_/_0.45)]"
         >
           <QRCodeSVG
             value="https://www.lendosaficos.com.br/"
-            size={104}
+            size={135}
             bgColor="#ffffff"
             fgColor="var(--violet-deep)"
             level="M"
@@ -259,7 +259,7 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
         </div>
       </div>
 
-      <div className="hairline my-[clamp(0.8rem,2vh,1.2rem)]" />
+      <div className="hairline mt-[clamp(0.8rem,2vh,1.2rem)] mb-[clamp(1.15rem,3vh,1.65rem)]" />
 
       <p className="text-center text-[0.65rem] uppercase tracking-[0.14em] text-[var(--ink-soft)]">
         Encontre rapidamente cada seção do seu passaporte

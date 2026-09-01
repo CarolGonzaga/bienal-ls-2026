@@ -16,7 +16,16 @@ import {
   type PassportIntegration,
 } from "../../lib/passport-store";
 import { Passport } from "./Passport";
+import "@fontsource/karla/400.css";
+import "@fontsource/karla/500.css";
+import "@fontsource/karla/600.css";
+import "@fontsource/karla/700.css";
+import "@fontsource/nunito-sans/400.css";
+import "@fontsource/nunito-sans/600.css";
+import "@fontsource/nunito-sans/700.css";
 import "@fontsource/parisienne/400.css";
+import "@fontsource/tangerine/400.css";
+import "@fontsource/tangerine/700.css";
 import "./passport.css";
 
 const safeCode = (value: string) => {
@@ -106,9 +115,9 @@ export function SapphicPassport() {
     return {
       userId,
       profile: {
-        fullName: user?.name || "Leitora Sáfica",
+        fullName: "",
         birthDate: "",
-        nationality: "Brasileira",
+        nationality: "",
         birthplace: "",
         issuedAt: new Date().toLocaleDateString("pt-BR"),
         passportCode: `PLS-2026-${identifier.slice(0, 6)}`,
