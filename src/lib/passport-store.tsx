@@ -120,9 +120,11 @@ const saveCloudCopy = async (userId: string, payload: PersistedPassport) => {
 export function PassportProvider({
   integration,
   children,
+  persistence = true,
 }: {
   integration: PassportIntegration;
   children: ReactNode;
+  persistence?: boolean;
 }) {
   const [state, setState] = useState<PassportState>({
     profile: integration.profile,
@@ -136,7 +138,7 @@ export function PassportProvider({
   const editVersionRef = useRef(0);
   const skipNextPersistRef = useRef(true);
   const cloudEnabled = Boolean(
-    integration.cloudSync && isSupabaseConfigured && UUID_PATTERN.test(integration.userId),
+    persistence && integration.cloudSync && isSupabaseConfigured && UUID_PATTERN.test(integration.userId),
   );
 
   useEffect(() => {
@@ -145,6 +147,20 @@ export function PassportProvider({
 
   useEffect(() => {
     let active = true;
+    if (!persistence) {
+      skipNextPersistRef.current = true;
+      setState({
+        profile: integration.profile,
+        userBooks: [],
+        stamps: integration.stamps,
+        pageId: null,
+        opened: true,
+      });
+      setHydrated(true);
+      return () => {
+        active = false;
+      };
+    }
     const hydrationEditVersion = editVersionRef.current;
     setHydrated(false);
     void getPersonalOfflineData<PersistedPassport>(integration.userId, STORAGE_TYPE)
@@ -205,14 +221,14 @@ export function PassportProvider({
     return () => {
       active = false;
     };
-  }, [cloudEnabled, integration.userId]);
+  }, [cloudEnabled, integration.userId, persistence]);
 
   useEffect(() => {
     setState((current) => ({ ...current, stamps: integration.stamps }));
   }, [integration.stamps]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || !persistence) return;
     if (skipNextPersistRef.current) {
       skipNextPersistRef.current = false;
       return;
@@ -232,10 +248,10 @@ export function PassportProvider({
       window.clearTimeout(localTimer);
       window.clearTimeout(cloudTimer);
     };
-  }, [cloudEnabled, hydrated, integration.userId, state.profile, state.userBooks]);
+  }, [cloudEnabled, hydrated, integration.userId, persistence, state.profile, state.userBooks]);
 
   useEffect(() => {
-    if (!cloudEnabled) return;
+    if (!cloudEnabled || !persistence) return;
     const syncAfterReconnect = () => {
       const current = stateRef.current;
       const payload: PersistedPassport = {
@@ -248,7 +264,7 @@ export function PassportProvider({
     };
     window.addEventListener("online", syncAfterReconnect);
     return () => window.removeEventListener("online", syncAfterReconnect);
-  }, [cloudEnabled, integration.userId]);
+  }, [cloudEnabled, integration.userId, persistence]);
 
   const setStatus = useCallback(
     (bookId: string, status: BookStatus, extra?: Partial<UserBook>) => {

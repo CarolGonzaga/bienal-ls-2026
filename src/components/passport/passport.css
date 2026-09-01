@@ -851,6 +851,28 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.author-passport-preview .author-preview-shell {
+  container-type: size;
+}
+
+@media (max-width: 767px) {
+  .author-passport-preview .author-preview-shell {
+    justify-content: flex-start;
+    gap: 0.55rem;
+    padding-top: max(3.65rem, calc(env(safe-area-inset-top) + 3.1rem));
+    padding-bottom: max(0.45rem, env(safe-area-inset-bottom));
+  }
+
+  .author-passport-preview .author-preview-book-wrap {
+    order: 1;
+  }
+
+  .author-passport-preview .author-preview-mobile-pagination {
+    order: 2;
+    margin-top: auto;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--violet-deep);
   outline-offset: 3px;

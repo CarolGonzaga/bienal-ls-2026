@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { appPath } from '../../lib/paths'
 import { optimizePassportPhoto } from '../../utils/optimizeImage'
 import AuthorContentRequests from './AuthorContentRequests'
-import { LOCAL_AUTHOR_SCENARIOS } from '../../data/localAuthorScenarios'
+import { LOCAL_AUTHOR_EXHIBITORS, LOCAL_AUTHOR_SCENARIOS } from '../../data/localAuthorScenarios'
 import AuthorPassportPreview from '../passport/AuthorPassportPreview'
 
 const CONSENT_VERSION = 'bienal-2026-v1'
@@ -17,7 +17,9 @@ const normalizePassportIdentity = profile => ({
 })
 
 export default function AuthorDashboard() {
-  const localScenarioKey = import.meta.env.DEV ? new URLSearchParams(window.location.search).get('cenario') : null
+  const localScenarioKey = (import.meta.env.DEV || import.meta.env.VITE_PASSPORT_TEST === '1')
+    ? new URLSearchParams(window.location.search).get('cenario')
+    : null
   const localScenario = localScenarioKey ? LOCAL_AUTHOR_SCENARIOS[localScenarioKey] : null
   const [account, setAccount] = useState(null)
   const [author, setAuthor] = useState(null)
@@ -27,7 +29,7 @@ export default function AuthorDashboard() {
   const [qr, setQr] = useState('')
   const [qrVisible, setQrVisible] = useState(false)
   const [preview, setPreview] = useState(false)
-  const [previewEvents, setPreviewEvents] = useState([])
+  const [previewData, setPreviewData] = useState({ requests: [], exhibitors: [] })
   const [participationModalOpen, setParticipationModalOpen] = useState(false)
   const [participationSaving, setParticipationSaving] = useState(false)
   const [notice, setNotice] = useState('')
@@ -53,7 +55,7 @@ export default function AuthorDashboard() {
     setAccount({ user: auth.user, authorId: link.author_id })
     const [{ data: authorData }, { data: profileData }, { data: draftRequest }, { data: codeData }] = await Promise.all([
       supabase.from('authors').select('id,name,first_name,bio,message').eq('id', link.author_id).maybeSingle(),
-      supabase.from('passport_profiles').select('author_id,photo_path,photo_width,photo_height,photo_mime,photo_size,bio,message,passport_display_name,passport_age,passport_city,status,participation_status,consent_version,consent_accepted_at,updated_at').eq('author_id', link.author_id).maybeSingle(),
+      supabase.from('passport_profiles').select('author_id,photo_path,photo_width,photo_height,photo_mime,photo_size,bio,message,books,presences,autograph_sessions,sale_locations,passport_display_name,passport_age,passport_city,status,participation_status,consent_version,consent_accepted_at,updated_at').eq('author_id', link.author_id).maybeSingle(),
       supabase.from('author_change_requests').select('id,payload,status').eq('author_id', link.author_id).eq('request_type', 'profile').in('status', ['draft', 'pending']).order('updated_at', { ascending: false }).limit(1).maybeSingle(),
       supabase.rpc('get_my_passport_code')
     ])
@@ -141,18 +143,27 @@ export default function AuthorDashboard() {
   const downloadQr = async () => { const value = await generateQr(); if (!value) return; const link = document.createElement('a'); link.href = value; link.download = `passaporte-${author?.first_name || 'autora'}.png`; link.click() }
   const openPreview = async () => {
     if (localScenario) {
-      setPreviewEvents(localScenario.existingRequests || [])
+      setPreviewData({ requests: localScenario.existingRequests || [], exhibitors: LOCAL_AUTHOR_EXHIBITORS })
       setPreview(true)
       return
     }
-    const { data, error } = await supabase
-      .from('author_change_requests')
-      .select('id,request_type,payload,status,created_at')
-      .eq('author_id', account.authorId)
-      .in('request_type', ['presence', 'autograph'])
-      .order('created_at', { ascending: false })
-    if (error) setNotice(`Não foi possível carregar toda a agenda da pré-visualização: ${error.message}`)
-    setPreviewEvents(data || [])
+    const [{ data: requests, error: requestsError }, { data: exhibitors, error: exhibitorsError }] = await Promise.all([
+      supabase
+        .from('author_change_requests')
+        .select('id,request_type,payload,status,affected_date,created_at')
+        .eq('author_id', account.authorId)
+        .in('request_type', ['presence', 'book', 'autograph', 'urgent'])
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('exhibitors')
+        .select('id,name,stand_code')
+        .eq('active', true)
+        .is('deleted_at', null)
+        .order('stand_code'),
+    ])
+    const previewError = requestsError || exhibitorsError
+    if (previewError) setNotice(`Não foi possível carregar todos os dados da pré-visualização: ${previewError.message}`)
+    setPreviewData({ requests: requests || [], exhibitors: exhibitors || [] })
     setPreview(true)
   }
 
@@ -178,7 +189,7 @@ export default function AuthorDashboard() {
         <UrgentForm urgentType={urgentType} setUrgentType={setUrgentType} urgentDate={urgentDate} setUrgentDate={setUrgentDate} urgentText={urgentText} setUrgentText={setUrgentText} onSend={sendUrgent}/></div></section>}
     {!participating && <div className="mt-5"><UrgentForm urgentType={urgentType} setUrgentType={setUrgentType} urgentDate={urgentDate} setUrgentDate={setUrgentDate} urgentText={urgentText} setUrgentText={setUrgentText} onSend={sendUrgent}/></div>}
     <AuthorContentRequests authorId={account.authorId} notice={setNotice} agendaOnly={!participating} localScenario={localScenario} passportRequestStatus={profile.change_request_id ? profile.status : (profile.status === 'draft' || profile.status === 'pending' ? profile.status : '')} passportRequestUpdatedAt={profile.updated_at || ''}/>
-    {preview && <AuthorPassportPreview author={author} profile={profile} photoUrl={photo} events={previewEvents} onClose={() => setPreview(false)}/>}
+    {preview && <AuthorPassportPreview author={author} profile={profile} photoUrl={photo} requests={previewData.requests} exhibitors={previewData.exhibitors} code={code} onClose={() => setPreview(false)}/>}
     {participationModalOpen && <ParticipationModal saving={participationSaving} onChoose={chooseParticipation}/>}</main></div>
 }
 

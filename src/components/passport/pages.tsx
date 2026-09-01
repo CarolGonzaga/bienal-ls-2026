@@ -607,11 +607,11 @@ function AuthorNav({ author }: { author: Author }) {
   );
 }
 
-function AuthorProfilePage({ author }: { author: Author }) {
+function AuthorProfilePage({ author, preview = false }: { author: Author; preview?: boolean }) {
   const { hasStamp } = usePassport();
   const longMessage = author.message.length > 100;
   return (
-    <PageFrame footer={<AuthorNav author={author} />}>
+    <PageFrame footer={preview ? undefined : <AuthorNav author={author} />}>
       <div className="flex justify-start">
         <img
           src={passportAsset("selo1.png")}
@@ -682,17 +682,26 @@ function AuthorProfilePage({ author }: { author: Author }) {
   );
 }
 
-function AuthorBooksPage({ author }: { author: Author }) {
+function AuthorBooksPage({
+  author,
+  preview = false,
+  catalogBooks,
+}: {
+  author: Author;
+  preview?: boolean;
+  catalogBooks?: Book[];
+}) {
   const { setStatus, userBooks } = usePassport();
+  const previewBookById = (id: string) => catalogBooks?.find((book) => book.id === id);
   return (
     <PageFrame
       eyebrow={author.name}
       title="Livros da autora"
-      footer={<AuthorNav author={author} />}
+      footer={preview ? undefined : <AuthorNav author={author} />}
     >
       <div className="grid gap-[clamp(0.45rem,1vh,0.7rem)]">
         {author.books.slice(0, 3).map((id) => {
-          const book = bookById(id);
+          const book = previewBookById(id) ?? bookById(id);
           if (!book) return null;
           const inBienalList = userBooks.some(
             (entry) => entry.bookId === id && entry.status === "want_to_buy_bienal",
@@ -747,6 +756,11 @@ function AuthorBooksPage({ author }: { author: Author }) {
             </article>
           );
         })}
+        {!author.books.length && (
+          <p className="dashed-frame p-6 text-center text-[0.82rem] text-[var(--ink-soft)]">
+            Os livros cadastrados pela autora aparecerão nesta página.
+          </p>
+        )}
       </div>
     </PageFrame>
   );
@@ -757,11 +771,13 @@ function AuthorSchedulePage({
   entries,
   continuation = 0,
   showUpdates,
+  preview = false,
 }: {
   author: Author;
   entries: ScheduleEntry[];
   continuation?: number;
   showUpdates: boolean;
+  preview?: boolean;
 }) {
   return (
     <PageFrame
@@ -773,7 +789,7 @@ function AuthorSchedulePage({
           {continuation ? ` · ${continuation + 1}` : ""}
         </span>
       }
-      footer={<AuthorNav author={author} />}
+      footer={preview ? undefined : <AuthorNav author={author} />}
     >
       <p className="text-[clamp(0.82rem,1.5vw,0.95rem)]">
         {author.name.split(" ")[0]} estará na Bienal do Livro de São Paulo entre os dias 4 e 13 de
@@ -817,6 +833,11 @@ function AuthorSchedulePage({
             </div>
           </li>
         ))}
+        {!entries.length && (
+          <li className="p-6 text-center text-[0.82rem] text-[var(--ink-soft)]">
+            A programação desta autora aparecerá aqui.
+          </li>
+        )}
       </ul>
 
       {showUpdates && (
@@ -840,7 +861,7 @@ function AuthorSchedulePage({
 
 /* =======================  CARIMBO  ======================= */
 
-function AuthorStampPage({ author }: { author: Author }) {
+function AuthorStampPage({ author, preview = false }: { author: Author; preview?: boolean }) {
   const { addStamp, hasStamp, stamps } = usePassport();
   const [code, setCode] = useState("");
   const [feedback, setFeedback] = useState<"idle" | "ok" | "dup" | "error">("idle");
@@ -877,7 +898,7 @@ function AuthorStampPage({ author }: { author: Author }) {
           <Stamp aria-hidden className="size-5" /> Resgate seu carimbo
         </span>
       }
-      footer={<AuthorNav author={author} />}
+      footer={preview ? undefined : <AuthorNav author={author} />}
     >
       {already && feedback !== "ok" ? (
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
@@ -1493,6 +1514,48 @@ function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
   return out;
+}
+
+export function buildAuthorPreviewPages(author: Author, catalogBooks: Book[] = []): PageDef[] {
+  const pages: PageDef[] = [
+    {
+      id: `autora-${author.id}-perfil`,
+      section: "autoras",
+      render: () => <AuthorProfilePage author={author} preview />,
+    },
+    {
+      id: `autora-${author.id}-livros`,
+      section: "autoras",
+      render: () => (
+        <AuthorBooksPage author={author} preview catalogBooks={catalogBooks} />
+      ),
+    },
+  ];
+
+  const schedulePages = chunk(author.schedule, 4);
+  schedulePages.forEach((entries, scheduleIndex) => {
+    pages.push({
+      id: `autora-${author.id}-programacao${scheduleIndex ? `-${scheduleIndex}` : ""}`,
+      section: "autoras",
+      render: () => (
+        <AuthorSchedulePage
+          author={author}
+          entries={entries}
+          continuation={scheduleIndex}
+          showUpdates={scheduleIndex === schedulePages.length - 1}
+          preview
+        />
+      ),
+    });
+  });
+
+  pages.push({
+    id: `autora-${author.id}-carimbo`,
+    section: "autoras",
+    render: () => <AuthorStampPage author={author} preview />,
+  });
+
+  return pages;
 }
 
 export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef[] {
