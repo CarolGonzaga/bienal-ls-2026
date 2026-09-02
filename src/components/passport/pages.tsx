@@ -605,7 +605,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
         src={passportAsset("ondas.png")}
         alt=""
         aria-hidden="true"
-        className="author-profile-waves pointer-events-none absolute inset-x-[33.5%] bottom-0 z-0 w-[33%] object-contain opacity-20"
+        className="author-profile-waves pointer-events-none absolute right-0 bottom-0 z-0 w-[33%] object-contain opacity-20"
       />
       <img
         src={passportAsset("selo3.png")}
@@ -656,7 +656,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
             <p className="label-caps flex items-center gap-2">
               <Heart aria-hidden className="size-4" /> Mensagem para você
             </p>
-            <p className="mt-1.5 font-ananda text-[clamp(1.35rem,2.6vw,1.85rem)] leading-snug text-[var(--violet-deep)]">
+            <p className="mt-1.5 font-message text-[clamp(1.35rem,2.6vw,1.85rem)] leading-snug text-[var(--violet-deep)]">
               {author.message}
             </p>
           </div>
@@ -960,7 +960,7 @@ function AuthorStampPage({ author, preview = false }: { author: Author; preview?
             <StampSeal author={author} />
           </div>
 
-          <div className="mt-[clamp(0.45rem,1.2vh,0.8rem)] grid gap-3 sm:grid-cols-2">
+          <div className="stamp-redeem-actions grid gap-3 sm:grid-cols-2">
             <button
               onClick={() => setScannerOpen(true)}
               className="dashed-frame flex flex-col items-center justify-center gap-2 p-6 transition hover:-translate-y-[3px] hover:bg-[oklch(0.9_0.03_320_/_0.3)]"

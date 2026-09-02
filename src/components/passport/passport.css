@@ -5,7 +5,7 @@
   --font-display: "Nunito Sans", sans-serif;
   --font-script: "Tangerine", "Dancing Script", cursive;
   --font-signature: "Parisienne", "Dancing Script", cursive;
-  --font-message: "Oooh Baby", "Parisienne", "Dancing Script", cursive;
+  --font-message: "Solitreo", "Parisienne", "Dancing Script", cursive;
   --font-body: "Karla", "Plus Jakarta Sans", system-ui, sans-serif;
   --font-stamp: "Oswald", Impact, sans-serif;
 
@@ -83,8 +83,12 @@
   font-family: var(--font-signature);
 }
 
-.font-ananda {
+.font-message {
   font-family: var(--font-message);
+}
+
+.stamp-redeem-actions {
+  margin-top: calc(clamp(0.45rem, 1.2vh, 0.8rem) + 20px);
 }
 
 .font-body {
