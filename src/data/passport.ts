@@ -11,6 +11,8 @@ export type Book = {
   authorId?: string;
   autographAvailable?: boolean;
   onSale?: boolean;
+  featured?: boolean;
+  displayOrder?: number;
 };
 
 export type ScheduleEntry = {

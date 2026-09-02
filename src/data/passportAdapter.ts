@@ -102,6 +102,8 @@ const profileBook = (
     price: text(row.price),
     autographAvailable: Boolean(row.autograph_available ?? row.autographAvailable),
     onSale: sale?.available_for_sale !== false && Boolean(sale),
+    featured: Boolean(row.featured),
+    displayOrder: Number(row.display_order) || undefined,
   };
 };
 
@@ -152,11 +154,12 @@ export function buildPassportCatalog({
 
     (profile?.books || []).forEach((row: any) => {
       const mapped = profileBook(row, author, profile!, exhibitors);
-      if (!outputBooks.has(mapped.id)) outputBooks.set(mapped.id, mapped);
+      outputBooks.set(mapped.id, { ...outputBooks.get(mapped.id), ...mapped });
     });
 
     const authoredBooks = [...outputBooks.values()]
-      .filter((book) => book.authorId === author.id)
+      .filter((book) => book.authorId === author.id && book.featured)
+      .sort((a, b) => (a.displayOrder ?? 99) - (b.displayOrder ?? 99) || a.title.localeCompare(b.title))
       .slice(0, 3);
     const relatedEvents = events
       .filter(

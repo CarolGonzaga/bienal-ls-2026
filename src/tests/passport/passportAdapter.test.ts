@@ -49,7 +49,7 @@ test("adapta autoras, livros, estandes e agenda publicados ao novo passaporte", 
         passport_display_name: "Lívia M.",
         passport_age: 34,
         passport_city: "São Paulo / SP",
-        books: [],
+        books: [{ id: "book-1", title: "Entre Estrelas", publisher: "Editora Horizonte", genre: "Romance", synopsis: "Sinopse", autograph_available: true, featured: true, display_order: 1 }],
         presences: [],
         autograph_sessions: [],
         sale_locations: [
@@ -144,7 +144,7 @@ test("mantém livros comunitários aprovados no catálogo de compras", () => {
   assert.equal(catalog.books[0]?.onSale, true);
 });
 
-test("limita a três os livros exibidos no perfil de cada autora", () => {
+test("exibe somente três livros destacados e mantém os demais no catálogo", () => {
   const author = {
     id: "author-limit",
     slug: "autora-limite",
@@ -167,14 +167,14 @@ test("limita a três os livros exibidos no perfil de cada autora", () => {
 
   const catalog = buildPassportCatalog({
     authors: [author],
-    profiles: [{ author_id: author.id, books: [], presences: [], autograph_sessions: [], sale_locations: [] }],
+    profiles: [{ author_id: author.id, books: books.map((book, index) => ({ ...book, featured: index !== 2, display_order: index + 1 })), presences: [], autograph_sessions: [], sale_locations: [] }],
     books,
     events: [],
     exhibitors: [],
     photoUrl: () => "",
   });
 
-  assert.equal(catalog.authors[0]?.books.length, 3);
+  assert.deepEqual(catalog.authors[0]?.books, ["book-1", "book-2", "book-4"]);
   assert.equal(catalog.books.length, 4);
 });
 
