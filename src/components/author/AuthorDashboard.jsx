@@ -29,7 +29,7 @@ export default function AuthorDashboard() {
   const [qr, setQr] = useState('')
   const [qrVisible, setQrVisible] = useState(false)
   const [preview, setPreview] = useState(false)
-  const [previewData, setPreviewData] = useState({ requests: [], exhibitors: [] })
+  const [previewData, setPreviewData] = useState({ requests: [], exhibitors: [], books: [], presences: [], autographSessions: [], saleLocations: [] })
   const [participationModalOpen, setParticipationModalOpen] = useState(false)
   const [participationSaving, setParticipationSaving] = useState(false)
   const [notice, setNotice] = useState('')
@@ -143,11 +143,11 @@ export default function AuthorDashboard() {
   const downloadQr = async () => { const value = await generateQr(); if (!value) return; const link = document.createElement('a'); link.href = value; link.download = `passaporte-${author?.first_name || 'autora'}.png`; link.click() }
   const openPreview = async () => {
     if (localScenario) {
-      setPreviewData({ requests: localScenario.existingRequests || [], exhibitors: LOCAL_AUTHOR_EXHIBITORS })
+      setPreviewData({ requests: localScenario.existingRequests || [], exhibitors: LOCAL_AUTHOR_EXHIBITORS, books: [], presences: [], autographSessions: [], saleLocations: [] })
       setPreview(true)
       return
     }
-    const [{ data: requests, error: requestsError }, { data: exhibitors, error: exhibitorsError }] = await Promise.all([
+    const [requestResult, exhibitorResult, presenceResult, bookLinkResult, eventLinkResult, saleResult] = await Promise.all([
       supabase
         .from('author_change_requests')
         .select('id,request_type,payload,status,affected_date,created_at')
@@ -160,10 +160,37 @@ export default function AuthorDashboard() {
         .eq('active', true)
         .is('deleted_at', null)
         .order('stand_code'),
+      supabase
+        .from('author_presences')
+        .select('id,presence_date,start_time,end_time,stand_code,exhibitor_id,notes,guaranteed,status')
+        .eq('author_id', account.authorId)
+        .is('deleted_at', null)
+        .order('presence_date')
+        .order('start_time'),
+      supabase.from('author_books').select('book_id').eq('author_id', account.authorId).is('deleted_at', null),
+      supabase.from('event_authors').select('event_id').eq('author_id', account.authorId),
+      supabase.from('book_stand_availability').select('book_id,stand_code,exhibitor_id,available_for_sale').eq('author_id', account.authorId).is('deleted_at', null),
     ])
-    const previewError = requestsError || exhibitorsError
+    const bookIds = (bookLinkResult.data || []).map(item => item.book_id)
+    const eventIds = (eventLinkResult.data || []).map(item => item.event_id)
+    const [bookResult, eventResult] = await Promise.all([
+      bookIds.length
+        ? supabase.from('books').select('id,title,publisher,cover_url,genre,notes,autograph_available').in('id', bookIds).is('deleted_at', null).order('title')
+        : Promise.resolve({ data: [], error: null }),
+      eventIds.length
+        ? supabase.from('events').select('id,event_date,start_time,end_time,stand_code,exhibitor_id,books,location_text,notes').in('id', eventIds).eq('event_type', 'autograph').is('deleted_at', null).order('event_date').order('start_time')
+        : Promise.resolve({ data: [], error: null }),
+    ])
+    const previewError = requestResult.error || exhibitorResult.error || presenceResult.error || bookLinkResult.error || eventLinkResult.error || saleResult.error || bookResult.error || eventResult.error
     if (previewError) setNotice(`Não foi possível carregar todos os dados da pré-visualização: ${previewError.message}`)
-    setPreviewData({ requests: requests || [], exhibitors: exhibitors || [] })
+    setPreviewData({
+      requests: requestResult.data || [],
+      exhibitors: exhibitorResult.data || [],
+      books: bookResult.data || [],
+      presences: presenceResult.data || [],
+      autographSessions: eventResult.data || [],
+      saleLocations: saleResult.data || [],
+    })
     setPreview(true)
   }
 
@@ -178,6 +205,13 @@ export default function AuthorDashboard() {
   if (!account) return <div className="site-theme flex min-h-[100dvh] items-center justify-center p-5"><div className="auth-card rounded-3xl border p-8 text-center"><h1 className="auth-title text-2xl font-black">Painel de autoras</h1><p className="auth-muted mt-3 text-sm">{accessState === 'signed-out' ? 'Entre na sua conta para acessar este painel.' : 'Sua conta ainda não foi vinculada a uma autora verificada.'}</p><a href={appPath(accessState === 'signed-out' ? '/login' : '/')} onClick={handleGoBack} className="auth-link mt-4 inline-block font-bold">Voltar</a></div></div>
 
   const photo = profile.photo_path ? supabase.storage.from('passport-photos').getPublicUrl(profile.photo_path).data.publicUrl : ''
+  const previewProfile = {
+    ...profile,
+    books: previewData.books.length ? previewData.books : profile.books,
+    presences: previewData.presences.length ? previewData.presences : profile.presences,
+    autograph_sessions: previewData.autographSessions.length ? previewData.autographSessions : profile.autograph_sessions,
+    sale_locations: previewData.saleLocations.length ? previewData.saleLocations : profile.sale_locations,
+  }
   return <div className="site-theme min-h-[100dvh] bg-[#fff8fb] p-4 text-[#56132f] sm:p-8"><main className="mx-auto max-w-5xl">
     <a href={appPath('/')} onClick={handleGoBack} className="text-sm font-bold text-[#d43276] hover:underline inline-flex items-center gap-1">← Voltar ao mapa</a>
     <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-3xl font-black">Painel da autora</h1><p className="mt-1 text-sm text-[#805269]">{author?.name}</p></div>{participating ? <div className="flex flex-wrap gap-2"><button onClick={() => setParticipationModalOpen(true)} className="route-soft-button rounded-xl border px-4 py-3 text-sm font-black">Gerenciar participação</button><button onClick={() => void openPreview()} className="route-soft-button flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-black"><Eye className="h-4 w-4"/>Pré-visualizar meu Passaporte</button></div> : <button onClick={() => setParticipationModalOpen(true)} className="route-primary-button rounded-xl px-4 py-3 text-sm font-black">Participar do Passaporte</button>}</div>
@@ -189,7 +223,7 @@ export default function AuthorDashboard() {
         <UrgentForm urgentType={urgentType} setUrgentType={setUrgentType} urgentDate={urgentDate} setUrgentDate={setUrgentDate} urgentText={urgentText} setUrgentText={setUrgentText} onSend={sendUrgent}/></div></section>}
     {!participating && <div className="mt-5"><UrgentForm urgentType={urgentType} setUrgentType={setUrgentType} urgentDate={urgentDate} setUrgentDate={setUrgentDate} urgentText={urgentText} setUrgentText={setUrgentText} onSend={sendUrgent}/></div>}
     <AuthorContentRequests authorId={account.authorId} notice={setNotice} agendaOnly={!participating} localScenario={localScenario} passportRequestStatus={profile.change_request_id ? profile.status : (profile.status === 'draft' || profile.status === 'pending' ? profile.status : '')} passportRequestUpdatedAt={profile.updated_at || ''}/>
-    {preview && <AuthorPassportPreview author={author} profile={profile} photoUrl={photo} requests={previewData.requests} exhibitors={previewData.exhibitors} code={code} onClose={() => setPreview(false)}/>}
+    {preview && <AuthorPassportPreview author={author} profile={previewProfile} photoUrl={photo} requests={previewData.requests} exhibitors={previewData.exhibitors} code={code} onClose={() => setPreview(false)}/>}
     {participationModalOpen && <ParticipationModal saving={participationSaving} onChoose={chooseParticipation}/>}</main></div>
 }
 

@@ -28,6 +28,9 @@ const dateParts = (isoDate?: string) => {
 const timeRange = (start?: string, end?: string) =>
   start ? `${start.slice(0, 5)}${end ? ` — ${end.slice(0, 5)}` : ""}` : "Horário a confirmar";
 
+const scheduleIdentity = (entry: ScheduleEntry) =>
+  [entry.kind, normalize(entry.date), normalize(entry.time.split("—")[0]), normalize(entry.booth)].join("|");
+
 const resolveExhibitor = (
   exhibitors: Exhibitor[],
   exhibitorId?: string,
@@ -171,7 +174,7 @@ export function buildPassportCatalog({
       ),
     ];
     const schedule = new Map<string, ScheduleEntry>();
-    [...relatedEvents, ...profileSchedule].forEach((entry) => schedule.set(entry.id, entry));
+    [...relatedEvents, ...profileSchedule].forEach((entry) => schedule.set(scheduleIdentity(entry), entry));
     const cityValue = profile?.passport_city?.trim() || "";
     const [city = "Cidade não informada", state = ""] = cityValue.split("/").map((part) => part.trim());
 

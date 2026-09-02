@@ -40,6 +40,7 @@ const findExhibitor = (exhibitors, row = {}) => exhibitors.find(item => item.id 
 
 const mapSchedule = (row, kind, exhibitors, fallbackId) => {
   const dateValue = row.date || row.presence_date || row.event_date
+  const startValue = String(row.start_time || row.startTime || '').slice(0, 5)
   const date = dateLabel(dateValue)
   const exhibitor = findExhibitor(exhibitors, row)
   const standCode = clean(row.stand_code || row.standCode)
@@ -53,8 +54,8 @@ const mapSchedule = (row, kind, exhibitors, fallbackId) => {
     publisher: exhibitor?.name || clean(row.publisher || row.location_text || row.locationName, 'Expositor a confirmar'),
     kind,
     related,
-    sortKey: `${dateValue || ''}-${row.start_time || row.startTime || ''}`,
-    dedupeKey: [kind, dateValue, row.start_time || row.startTime, standCode].join('|'),
+    sortKey: `${dateValue || ''}-${startValue}`,
+    dedupeKey: [kind, dateValue, startValue, normalize(row.exhibitor_id || standCode || row.location_text || row.locationName)].join('|'),
   }
 }
 
@@ -146,7 +147,7 @@ const buildPreviewCatalog = ({ author, profile, photoUrl, requests, exhibitors, 
 
 const pageLabel = id => {
   if (id.endsWith('-perfil')) return 'Perfil da autora'
-  if (id.endsWith('-livros')) return 'Livros da autora'
+  if (id.includes('-livros')) return 'Livros da autora'
   if (id.includes('-programacao')) return 'Onde encontrar a autora'
   if (id.endsWith('-carimbo')) return 'Resgate do carimbo'
   return 'Passaporte Sáfico'
@@ -158,7 +159,10 @@ function PreviewBook({ author, profile, photoUrl, requests, exhibitors, code, on
     () => buildPreviewCatalog({ author, profile, photoUrl, requests, exhibitors, code }),
     [author, code, exhibitors, photoUrl, profile, requests],
   )
-  const pages = useMemo(() => buildAuthorPreviewPages(previewAuthor, previewBooks), [previewAuthor, previewBooks])
+  const pages = useMemo(
+    () => buildAuthorPreviewPages(previewAuthor, previewBooks, { schedulePageSize: isMobile ? 4 : 6 }),
+    [isMobile, previewAuthor, previewBooks],
+  )
   const [current, setCurrent] = useState(0)
   const touch = useRef(null)
   const step = isMobile ? 1 : 2

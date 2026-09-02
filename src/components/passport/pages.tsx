@@ -686,42 +686,48 @@ function AuthorBooksPage({
   author,
   preview = false,
   catalogBooks,
+  bookIds,
+  continuation = 0,
 }: {
   author: Author;
   preview?: boolean;
   catalogBooks?: Book[];
+  bookIds?: string[];
+  continuation?: number;
 }) {
   const { setStatus, userBooks } = usePassport();
   const previewBookById = (id: string) => catalogBooks?.find((book) => book.id === id);
+  const visibleBookIds = bookIds ?? author.books;
   return (
     <PageFrame
       eyebrow={author.name}
-      title="Livros da autora"
+      title={`Livros da autora${continuation ? ` · ${continuation + 1}` : ""}`}
       footer={preview ? undefined : <AuthorNav author={author} />}
     >
       <div className="grid gap-[clamp(0.45rem,1vh,0.7rem)]">
-        {author.books.slice(0, 3).map((id) => {
+        {visibleBookIds.map((id) => {
           const book = previewBookById(id) ?? bookById(id);
           if (!book) return null;
+          const longSynopsis = book.synopsis.length > 260;
           const inBienalList = userBooks.some(
             (entry) => entry.bookId === id && entry.status === "want_to_buy_bienal",
           );
           return (
             <article
               key={id}
-              className="dashed-frame grid grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)] gap-3 p-2 sm:grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)_auto]"
+              className={`dashed-frame grid grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)] gap-3 p-2 sm:grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)_auto] ${longSynopsis ? "author-book-card-long" : ""}`}
             >
               <img
                 src={book.cover}
                 alt={`Capa de ${book.title}`}
                 loading="lazy"
-                className="w-full rounded-[4px] object-cover shadow-[0_10px_20px_-12px_oklch(0.3_0.05_20/0.9)]"
+                className="aspect-[2/3] w-full rounded-[4px] object-cover shadow-[0_10px_20px_-12px_oklch(0.3_0.05_20/0.9)]"
               />
               <div className="min-w-0">
                 <h3 className="font-display text-[clamp(1rem,2vw,1.25rem)] font-bold leading-tight text-[var(--ink)]">
                   {book.title}
                 </h3>
-                <p className="mt-1 text-[clamp(0.76rem,1.4vw,0.86rem)] leading-snug">
+                <p className={`mt-1 leading-snug ${longSynopsis ? "text-[clamp(0.68rem,1.1vw,0.76rem)]" : "text-[clamp(0.76rem,1.4vw,0.86rem)]"}`}>
                   {book.synopsis}
                 </p>
                 <p className="mt-1 text-[0.66rem] uppercase tracking-[0.12em] text-[var(--rose-burnt)]">
@@ -756,7 +762,7 @@ function AuthorBooksPage({
             </article>
           );
         })}
-        {!author.books.length && (
+        {!visibleBookIds.length && (
           <p className="dashed-frame p-6 text-center text-[0.82rem] text-[var(--ink-soft)]">
             Os livros cadastrados pela autora aparecerão nesta página.
           </p>
@@ -779,6 +785,7 @@ function AuthorSchedulePage({
   showUpdates: boolean;
   preview?: boolean;
 }) {
+  const dense = entries.length > 4;
   return (
     <PageFrame
       watermark={false}
@@ -796,12 +803,12 @@ function AuthorSchedulePage({
         setembro de 2026.
       </p>
 
-      <ul className="mt-[clamp(0.7rem,2vh,1.1rem)] divide-y divide-dotted divide-[oklch(0.72_0.06_30_/_0.6)] rounded-[10px] border border-dashed border-[var(--rose-antique)]">
+      <ul className={`${dense ? "mt-2" : "mt-[clamp(0.7rem,2vh,1.1rem)]"} divide-y divide-dotted divide-[oklch(0.72_0.06_30_/_0.6)] rounded-[10px] border border-dashed border-[var(--rose-antique)]`}>
         {entries.map((s) => (
-          <li key={s.id} className="grid gap-1 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
+          <li key={s.id} className={`grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"}`}>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-body text-[0.95rem] font-bold text-[var(--ink)]">
+                <span className={`font-body font-bold text-[var(--ink)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                   <CalendarDays aria-hidden className="mr-1 inline size-4" /> {s.weekday}, {s.date}
                 </span>
                 <span
@@ -814,20 +821,20 @@ function AuthorSchedulePage({
                   {s.kind === "presenca" ? "Presença confirmada" : "Sessão de autógrafos"}
                 </span>
               </div>
-              <p className="mt-1 flex items-center gap-1 text-[0.85rem] text-[var(--ink)]">
+              <p className={`mt-1 flex items-center gap-1 text-[var(--ink)] ${dense ? "text-[0.72rem]" : "text-[0.85rem]"}`}>
                 <Clock3 aria-hidden className="size-4" /> {s.time}
               </p>
               {s.related && (
-                <p className="flex items-center gap-1 text-[0.82rem] text-[var(--ink-soft)]">
+                <p className={`flex items-center gap-1 text-[var(--ink-soft)] ${dense ? "text-[0.7rem]" : "text-[0.82rem]"}`}>
                   <BookOpen aria-hidden className="size-4" /> Livro: {s.related}
                 </p>
               )}
             </div>
             <div className="sm:text-right">
-              <span className="inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display text-[0.95rem] font-bold text-[var(--violet-deep)]">
+              <span className={`inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                 {s.booth}
               </span>
-              <p className="mt-1 flex items-center gap-1 text-[0.8rem] text-[var(--ink-soft)] sm:justify-end">
+              <p className={`mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
                 <Building2 aria-hidden className="size-4" /> {s.publisher}
               </p>
             </div>
@@ -1516,23 +1523,63 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
-export function buildAuthorPreviewPages(author: Author, catalogBooks: Book[] = []): PageDef[] {
+function paginateAuthorBookIds(
+  ids: string[],
+  resolveBook: (id: string) => Book | undefined,
+): string[][] {
+  if (!ids.length) return [[]];
+  const pages: string[][] = [];
+  let current: string[] = [];
+  let used = 0;
+  ids.forEach((id) => {
+    const book = resolveBook(id);
+    const cost = (book?.synopsis.length ?? 0) > 260 || (book?.title.length ?? 0) > 52 ? 2 : 1;
+    if (current.length && used + cost > 2) {
+      pages.push(current);
+      current = [];
+      used = 0;
+    }
+    current.push(id);
+    used += cost;
+  });
+  if (current.length) pages.push(current);
+  return pages;
+}
+
+export function buildAuthorPreviewPages(
+  author: Author,
+  catalogBooks: Book[] = [],
+  options: { schedulePageSize?: number } = {},
+): PageDef[] {
   const pages: PageDef[] = [
     {
       id: `autora-${author.id}-perfil`,
       section: "autoras",
       render: () => <AuthorProfilePage author={author} preview />,
     },
-    {
-      id: `autora-${author.id}-livros`,
-      section: "autoras",
-      render: () => (
-        <AuthorBooksPage author={author} preview catalogBooks={catalogBooks} />
-      ),
-    },
   ];
 
-  const schedulePages = chunk(author.schedule, 4);
+  const bookPages = paginateAuthorBookIds(
+    author.books,
+    (id) => catalogBooks.find((book) => book.id === id),
+  );
+  bookPages.forEach((bookIds, bookPageIndex) => {
+    pages.push({
+      id: `autora-${author.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,
+      section: "autoras",
+      render: () => (
+        <AuthorBooksPage
+          author={author}
+          preview
+          catalogBooks={catalogBooks}
+          bookIds={bookIds}
+          continuation={bookPageIndex}
+        />
+      ),
+    });
+  });
+
+  const schedulePages = chunk(author.schedule, options.schedulePageSize ?? 4);
   schedulePages.forEach((entries, scheduleIndex) => {
     pages.push({
       id: `autora-${author.id}-programacao${scheduleIndex ? `-${scheduleIndex}` : ""}`,
@@ -1597,10 +1644,19 @@ export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef
       section: "autoras",
       render: () => <AuthorProfilePage author={a} />,
     });
-    pages.push({
-      id: `autora-${a.id}-livros`,
-      section: "autoras",
-      render: () => <AuthorBooksPage author={a} />,
+    const authorBookPages = paginateAuthorBookIds(a.books, bookById);
+    authorBookPages.forEach((bookIds, bookPageIndex) => {
+      pages.push({
+        id: `autora-${a.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,
+        section: "autoras",
+        render: () => (
+          <AuthorBooksPage
+            author={a}
+            bookIds={bookIds}
+            continuation={bookPageIndex}
+          />
+        ),
+      });
     });
     const schedulePages = chunk(a.schedule, 4);
     schedulePages.forEach((entries, scheduleIndex) => {

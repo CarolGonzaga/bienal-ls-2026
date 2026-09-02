@@ -337,7 +337,7 @@ export default function AdminDashboard() {
     const [contributions, exhibitors, books, events, authors, passportProfiles, authorRequests, auditLogs, health, budget] = await Promise.all([
       supabase.from('community_contributions').select('id,user_id,client_submission_id,contribution_type,contributor_role,payload,submitter_name,submitter_contact,status,admin_notes,reviewed_at,review_resolution,review_target_type,review_target_id,review_payload,review_version,created_at,updated_at').is('deleted_at', null).order('created_at', { ascending: false }),
       supabase.from('exhibitors').select('id,logo,name,description,reason_to_visit,stand_code,active,relevance_level,relevance_reasons,categories,featured,created_at,updated_at,deleted_at').is('deleted_at', null).order('name'),
-      supabase.from('books').select('id,title,author_name,publisher,stand_code,exhibitor_id,notes,tags,active,source_contribution_id,created_at,updated_at,deleted_at').is('deleted_at', null).order('created_at', { ascending: false }),
+      supabase.from('books').select('id,title,author_name,publisher,cover_url,genre,autograph_available,stand_code,exhibitor_id,notes,tags,active,source_contribution_id,created_at,updated_at,deleted_at').is('deleted_at', null).order('created_at', { ascending: false }),
       supabase.from('events').select('id,event_type,author_name,books,event_date,start_time,end_time,stand_code,exhibitor_id,location_text,official_link,notes,tags,active,source_contribution_id,created_at,updated_at,deleted_at').is('deleted_at', null).order('event_date', { ascending: true }).order('start_time', { ascending: true }),
       supabase.from('authors').select('id,slug,name,first_name,bio,message,active,published,created_at,updated_at,deleted_at').is('deleted_at', null).order('name'),
       supabase.from('passport_profiles').select('author_id,photo_path,bio,message,books,presences,autograph_sessions,sale_locations,status,consent_version,consent_accepted_at,submitted_at,reviewed_at,updated_at,deleted_at'),
@@ -768,6 +768,7 @@ export default function AdminDashboard() {
               profiles={data.passportProfiles}
               requests={data.authorRequests}
               books={data.books}
+              events={data.events}
               onReload={load}
               notify={notify}
             />
