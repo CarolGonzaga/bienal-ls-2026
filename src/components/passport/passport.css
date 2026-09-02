@@ -5,7 +5,7 @@
   --font-display: "Nunito Sans", sans-serif;
   --font-script: "Tangerine", "Dancing Script", cursive;
   --font-signature: "Parisienne", "Dancing Script", cursive;
-  --font-message: var(--font-script);
+  --font-message: "Oooh Baby", "Parisienne", "Dancing Script", cursive;
   --font-body: "Karla", "Plus Jakarta Sans", system-ui, sans-serif;
   --font-stamp: "Oswald", Impact, sans-serif;
 
@@ -829,10 +829,6 @@
 }
 
 @media (min-width: 768px) {
-  .sapphic-passport-v2 {
-    --font-message: "Ananda", "Parisienne", "Dancing Script", cursive;
-  }
-
   .passport-spread {
     height: min(calc(100cqh - clamp(3rem, 8cqh, 6rem)), 760px);
   }

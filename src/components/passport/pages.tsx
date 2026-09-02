@@ -605,7 +605,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
         src={passportAsset("ondas.png")}
         alt=""
         aria-hidden="true"
-        className="author-profile-waves pointer-events-none absolute inset-x-[17%] bottom-0 z-0 w-[66%] object-contain opacity-20"
+        className="author-profile-waves pointer-events-none absolute inset-x-[33.5%] bottom-0 z-0 w-[33%] object-contain opacity-20"
       />
       <img
         src={passportAsset("selo3.png")}
