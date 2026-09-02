@@ -720,7 +720,7 @@ function AuthorBooksPage({
                 src={book.cover}
                 alt={`Capa de ${book.title}`}
                 loading="lazy"
-                className="aspect-[2/3] w-full rounded-[4px] object-cover shadow-[0_10px_20px_-12px_oklch(0.3_0.05_20/0.9)]"
+                className="author-book-cover aspect-[2/3] w-full rounded-[4px] object-cover shadow-[0_10px_20px_-12px_oklch(0.3_0.05_20/0.9)]"
               />
               <div className="author-book-copy min-w-0">
                 <h3 className="font-display text-[clamp(1rem,2vw,1.25rem)] font-bold leading-tight text-[var(--ink)]">
@@ -729,12 +729,12 @@ function AuthorBooksPage({
                 <p className={`author-book-synopsis mt-1 overflow-y-auto pr-1 leading-snug ${longSynopsis ? "text-[clamp(0.68rem,1.1vw,0.76rem)]" : "text-[clamp(0.76rem,1.4vw,0.86rem)]"}`}>
                   {book.synopsis}
                 </p>
-                <p className="mt-1 text-[0.66rem] uppercase tracking-[0.12em] text-[var(--rose-burnt)]">
+                <p className="author-book-meta mt-1 text-[0.66rem] uppercase tracking-[0.12em] text-[var(--rose-burnt)]">
                   {book.genre} · {book.publisher}
                 </p>
                 <InkButton
                   variant="ghost"
-                  className="mt-1 px-3 py-1.5"
+                  className="author-book-add-button mt-1 px-3 py-1.5"
                   disabled={inBienalList}
                   onClick={() => setStatus(book.id, "want_to_buy_bienal", { source: "author" })}
                 >
