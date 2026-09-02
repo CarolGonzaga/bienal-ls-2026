@@ -18,6 +18,7 @@ import { optimizePassportPhoto } from "../../utils/optimizeImage";
 const EVENT_START = "2026-09-04";
 const EVENT_END = "2026-09-13";
 const PASSPORT_BOOK_LIMIT = 3;
+const BOOK_SYNOPSIS_MAX_LENGTH = 2000;
 const newPresence = () => ({
   presence_date: "",
   start_time: "",
@@ -804,9 +805,11 @@ export default function AuthorContentRequests({
                 />
                 <label className="text-xs font-bold">
                   Sinopse{" "}
-                  <span className="font-normal opacity-55">({book.synopsis.length}/650)</span>
+                  <span className="font-normal opacity-55">
+                    ({book.synopsis.length}/{BOOK_SYNOPSIS_MAX_LENGTH})
+                  </span>
                   <textarea
-                    maxLength={650}
+                    maxLength={BOOK_SYNOPSIS_MAX_LENGTH}
                     value={book.synopsis}
                     onChange={(event) =>
                       setBookItems((items) =>
