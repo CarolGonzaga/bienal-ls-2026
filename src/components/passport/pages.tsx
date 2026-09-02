@@ -1675,7 +1675,7 @@ export function buildPages(
       section: "autoras",
       render: () => <AuthorProfilePage author={a} />,
     });
-    const authorBookPages = mobile ? paginateAuthorBookIds(a.books, bookById) : chunk(a.books, 3);
+    const authorBookPages = mobile ? paginateAuthorBookIds(a.books, bookById) : chunk(a.books, 1);
     authorBookPages.forEach((bookIds, bookPageIndex) => {
       pages.push({
         id: `autora-${a.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,

@@ -304,32 +304,6 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
           </nav>
         </div>
 
-        {/* controles inferiores */}
-        <div className="hidden w-full max-w-[min(1120px,97vw)] items-center justify-between gap-2 md:flex">
-          <button
-            onClick={prev}
-            disabled={current === 0}
-            aria-label="Página anterior"
-            className="hidden rounded-full border border-[oklch(0.9_0.04_50_/_0.5)] px-3 py-1.5 text-[0.75rem] text-[var(--paper)] transition active:scale-95 disabled:opacity-30"
-          >
-            <ChevronLeft aria-hidden className="size-4" />
-          </button>
-          <p
-            aria-live="polite"
-            className="flex-1 text-center text-[0.58rem] uppercase tracking-[0.22em] text-[oklch(0.95_0.02_60_/_0.75)]"
-          >
-            página {String(current + 1).padStart(2, "0")} de {pages.length}
-          </p>
-          <button
-            onClick={next}
-            disabled={current >= pages.length - 1}
-            aria-label="Próxima página"
-            className="hidden rounded-full border border-[oklch(0.9_0.04_50_/_0.5)] px-3 py-1.5 text-[0.75rem] text-[var(--paper)] transition active:scale-95 disabled:opacity-30"
-          >
-            <ChevronRight aria-hidden className="size-4" />
-          </button>
-        </div>
-
         {/* abas mobile */}
         <nav
           aria-label="Seções do passaporte"
