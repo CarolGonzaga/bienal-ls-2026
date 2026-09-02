@@ -972,10 +972,11 @@
   }
 
   .author-books-list {
-    grid-template-rows: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, 1fr);
+    --author-book-card-height: clamp(9.75rem, 21vh, 10.35rem);
+    grid-template-rows: repeat(3, var(--author-book-card-height));
+    grid-auto-rows: var(--author-book-card-height);
     align-content: start;
-    height: 100%;
+    height: auto;
   }
 
   .author-book-card {
@@ -996,11 +997,13 @@
   .author-book-cover {
     grid-area: cover;
     aspect-ratio: 2 / 3;
-    width: auto;
-    height: 100%;
+    width: 5rem;
+    height: auto;
     min-height: 0;
-    max-width: 7.5rem;
+    max-width: 100%;
+    max-height: 100%;
     justify-self: start;
+    align-self: start;
   }
 
   .author-book-copy {
@@ -1077,14 +1080,16 @@
     min-height: 0;
     flex: 1 1 auto;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 0.5rem;
+    justify-content: flex-start;
+    gap: 0.75rem;
     border: 0;
   }
 
   .author-schedule-card {
-    min-height: 0;
-    flex: 0 0 calc((100% - 2rem) / 5);
+    box-sizing: border-box;
+    min-height: 4.8rem;
+    height: 4.8rem;
+    flex: 0 0 4.8rem;
     align-items: center;
     padding: 0.55rem 0.7rem;
     border: 1px dashed var(--rose-antique) !important;
