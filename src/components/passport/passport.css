@@ -883,16 +883,17 @@
 
   .book-list-card > article {
     align-items: stretch;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 7rem minmax(0, 1fr);
+    column-gap: 0.65rem;
   }
 
   .book-list-card .buy-book-cover {
     aspect-ratio: 2 / 3;
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     min-height: 0;
-    max-width: 6.25rem;
-    align-self: stretch;
+    max-width: none;
+    align-self: center;
   }
 
   .book-list-card article > .min-w-0 {
@@ -976,8 +977,8 @@
   }
 
   .author-books-list {
-    --author-book-card-height: clamp(19.5rem, 42vh, 20.7rem);
-    grid-template-rows: var(--author-book-card-height);
+    --author-book-card-height: clamp(13rem, 28vh, 14rem);
+    grid-template-rows: repeat(2, var(--author-book-card-height));
     grid-auto-rows: var(--author-book-card-height);
     align-content: start;
     height: auto;
@@ -1098,6 +1099,36 @@
     padding: 0.55rem 0.7rem;
     border: 1px dashed var(--rose-antique) !important;
     border-radius: 10px;
+    grid-template-columns: minmax(0, 1fr) 8.25rem !important;
+    column-gap: 0.75rem !important;
+  }
+
+  .author-schedule-card > div:last-child {
+    min-width: 0;
+  }
+
+  .author-schedule-date,
+  .author-schedule-kind {
+    white-space: nowrap;
+  }
+
+  .author-schedule-booth {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .author-schedule-publisher {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .author-schedule-publisher svg {
+    flex: none;
   }
 
   .author-schedule-date,

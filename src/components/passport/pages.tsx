@@ -831,10 +831,10 @@ function AuthorSchedulePage({
               )}
             </div>
             <div className="sm:text-right">
-              <span className={`author-schedule-booth inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
+              <span title={s.booth} className={`author-schedule-booth inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                 {s.booth}
               </span>
-              <p className={`author-schedule-publisher mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
+              <p title={s.publisher} className={`author-schedule-publisher mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
                 <Building2 aria-hidden className="size-4" /> {s.publisher}
               </p>
             </div>
@@ -1675,7 +1675,7 @@ export function buildPages(
       section: "autoras",
       render: () => <AuthorProfilePage author={a} />,
     });
-    const authorBookPages = mobile ? paginateAuthorBookIds(a.books, bookById) : chunk(a.books, 1);
+    const authorBookPages = mobile ? paginateAuthorBookIds(a.books, bookById) : chunk(a.books, 2);
     authorBookPages.forEach((bookIds, bookPageIndex) => {
       pages.push({
         id: `autora-${a.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,
