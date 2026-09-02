@@ -299,10 +299,6 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
 
 function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
   const { updateBook } = usePassport();
-  const { goTo } = useNav();
-  const author = authors.find((a) => a.id === (entry.authorId ?? book.authorId));
-  const source = entry.source ?? (book.authorId ? "author" : "catalog");
-  const confirmedAtBienal = source === "author" && !!author?.schedule.length;
   const selectedBooth = entry.booth ?? book.booth ?? "";
   return (
     <article className="dashed-frame grid grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)] gap-3 p-[clamp(0.6rem,1.6vw,0.9rem)]">
@@ -314,8 +310,8 @@ function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
       />
       <div className="min-w-0 space-y-1.5">
         <Field label="Título">{book.title}</Field>
-        <Field label="Autora">{entry.author ?? book.author}</Field>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
+          <Field label="Autora">{entry.author ?? book.author}</Field>
           <label className="min-w-0">
             <span className="label-caps block opacity-70">Editora</span>
             <input
@@ -324,6 +320,8 @@ function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
               className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
             />
           </label>
+        </div>
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2">
           <label className="min-w-0">
             <span className="label-caps block opacity-70">Estande</span>
             <select
@@ -355,25 +353,16 @@ function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
               className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
             />
           </label>
+          <label className="flex cursor-pointer items-center gap-1.5 pb-0.5 text-[0.75rem] text-[var(--ink)]">
+            <input
+              type="checkbox"
+              checked={!!entry.bought}
+              onChange={(e) => updateBook(entry.bookId, { bought: e.target.checked })}
+              className="size-4 accent-[var(--violet-deep)]"
+            />
+            Comprei
+          </label>
         </div>
-        <label className="mt-1 flex cursor-pointer items-center gap-2 text-[0.8rem] text-[var(--ink)]">
-          <input
-            type="checkbox"
-            checked={!!entry.bought}
-            onChange={(e) => updateBook(entry.bookId, { bought: e.target.checked })}
-            className="size-4 accent-[var(--violet-deep)]"
-          />
-          Comprei <Check aria-hidden className="size-4" />
-        </label>
-        {confirmedAtBienal && author && (
-          <button
-            onClick={() => goTo(`autora-${author.id}-perfil`)}
-            className="text-left text-[0.75rem] italic text-[var(--seal)] underline decoration-dotted underline-offset-4"
-          >
-            Você pode encontrar esta autora na Bienal{" "}
-            <Heart aria-hidden className="inline size-3" />
-          </button>
-        )}
       </div>
     </article>
   );
@@ -422,7 +411,7 @@ function BooksPage({
           {empty}
         </div>
       ) : (
-        <div className="books-page-list grid h-full content-between gap-[clamp(1rem,2vh,1.35rem)]">
+        <div className="books-page-list grid h-full content-between gap-[clamp(0.45rem,1vh,0.7rem)]">
           {entries.map((e) => {
             const catalogBook = bookById(e.bookId);
             const book =
@@ -505,10 +494,9 @@ function AuthorsIntroPage() {
         Encontre autoras participantes no estande, escaneie o QR Code ou digite o código para
         desbloquear o carimbo delas no seu passaporte.
       </p>
-      <p className="mt-1.5 font-script text-[clamp(1.4rem,2.6vw,1.75rem)] text-[var(--seal)]">
+      <p className="authors-intro-memory mt-1.5 font-script text-[clamp(1.4rem,2.6vw,1.75rem)] text-[var(--seal)]">
         Cada carimbo é uma memória da Bienal.
       </p>
-
       <div className="pointer-events-none absolute inset-x-[22.5%] bottom-0">
         <Skyline />
       </div>
@@ -536,13 +524,13 @@ function AuthorsIndexPage({
         </p>
       }
     >
-      <ul className="grid gap-[clamp(0.5rem,1.4vh,0.9rem)]">
+      <ul className="authors-index-list grid gap-[clamp(0.3rem,0.7vh,0.48rem)]">
         {pageAuthors.map((a) => {
           const stamped = hasStamp(a.id);
           return (
             <li
               key={a.id}
-              className="dashed-frame grid grid-cols-[minmax(0,3.5rem)_minmax(0,1fr)] gap-3 p-2.5"
+              className="authors-index-card dashed-frame grid grid-cols-[minmax(0,3.5rem)_minmax(0,1fr)] gap-3 p-2.5"
             >
               <img
                 src={a.photo}
@@ -550,9 +538,9 @@ function AuthorsIndexPage({
                 loading="lazy"
                 className="aspect-square w-full self-center rounded-full object-cover"
               />
-              <div className="relative min-h-[6.2rem] min-w-0">
+              <div className="authors-index-content relative min-h-[6.2rem] min-w-0">
                 <div className="flex h-full flex-col justify-center pr-[8.5rem]">
-                  <p className="script-name min-w-0 truncate text-4xl">{a.name}</p>
+                  <p className="authors-index-name script-name min-w-0 truncate text-4xl">{a.name}</p>
                   <p className="text-[0.68rem] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
                     {[a.city, a.state].filter(Boolean).join(" / ")}
                   </p>
@@ -609,10 +597,21 @@ function AuthorNav({ author }: { author: Author }) {
 
 function AuthorProfilePage({ author, preview = false }: { author: Author; preview?: boolean }) {
   const { hasStamp } = usePassport();
-  const longMessage = author.message.length > 100;
   return (
     <PageFrame footer={preview ? undefined : <AuthorNav author={author} />}>
-      <div className="flex justify-start">
+      <img
+        src={passportAsset("ondas.png")}
+        alt=""
+        aria-hidden="true"
+        className="author-profile-waves pointer-events-none absolute inset-x-[17%] bottom-0 z-0 w-[66%] object-contain opacity-20"
+      />
+      <img
+        src={passportAsset("selo3.png")}
+        alt=""
+        aria-hidden="true"
+        className="author-profile-seal absolute right-0 top-0 z-20 w-[clamp(3rem,5.5vw,4.2rem)] -rotate-6 object-contain opacity-45"
+      />
+      <div className="relative z-10 flex justify-start">
         <img
           src={passportAsset("selo1.png")}
           alt="Passaporte Sáfico — Bienal 2026"
@@ -620,7 +619,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
         />
       </div>
 
-      <header className="mt-[clamp(0.35rem,1.2vh,0.8rem)] text-center">
+      <header className="relative z-10 mt-[clamp(0.35rem,1.2vh,0.8rem)] text-center">
         <h2 className="script-name text-[clamp(2.8rem,6.5vw,4.5rem)]">{author.name}</h2>
         <p className="mt-1 text-[0.72rem] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
           {[
@@ -633,7 +632,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
         </p>
       </header>
 
-      <div className="author-profile-grid mt-[clamp(0.8rem,2vh,1.25rem)]">
+      <div className="author-profile-grid relative z-10 mt-[clamp(0.8rem,2vh,1.25rem)]">
         <img
           src={author.photo}
           alt={author.name}
@@ -650,14 +649,12 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
           </p>
         </section>
 
-        <section
-          className={`author-profile-message dashed-frame gap-3 p-[clamp(0.65rem,1.5vw,0.85rem)] ${longMessage ? "grid grid-cols-[minmax(0,1fr)_auto] items-end" : "relative pr-[5.2rem]"}`}
-        >
+        <section className="author-profile-message dashed-frame relative p-[clamp(0.65rem,1.5vw,0.85rem)] pr-[5.2rem]">
           <div className="min-w-0">
             <p className="label-caps flex items-center gap-2">
               <Heart aria-hidden className="size-4" /> Mensagem para você
             </p>
-            <p className="mt-1.5 font-script text-[clamp(1.55rem,3vw,2.1rem)] leading-snug text-[var(--violet-deep)]">
+            <p className="mt-1.5 font-ananda text-[clamp(1.35rem,2.6vw,1.85rem)] leading-snug text-[var(--violet-deep)]">
               {author.message}
             </p>
           </div>
@@ -665,7 +662,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
             src={passportAsset("selo3.png")}
             alt=""
             aria-hidden="true"
-            className={`w-[clamp(2.8rem,5.5vw,4rem)] shrink-0 -rotate-6 object-contain opacity-45 ${longMessage ? "self-end" : "absolute right-3 bottom-2"}`}
+            className="author-profile-message-seal absolute right-3 bottom-2 w-[clamp(2.8rem,5.5vw,4rem)] -rotate-6 object-contain opacity-45"
           />
         </section>
 
@@ -704,7 +701,7 @@ function AuthorBooksPage({
       title={`Livros da autora${continuation ? ` · ${continuation + 1}` : ""}`}
       footer={preview ? undefined : <AuthorNav author={author} />}
     >
-      <div className="grid gap-[clamp(0.45rem,1vh,0.7rem)]">
+      <div className="author-books-list grid gap-[clamp(0.35rem,0.7vh,0.5rem)]">
         {visibleBookIds.map((id) => {
           const book = previewBookById(id) ?? bookById(id);
           if (!book) return null;
@@ -715,7 +712,7 @@ function AuthorBooksPage({
           return (
             <article
               key={id}
-              className={`dashed-frame grid grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)] gap-3 p-2 sm:grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)_auto] ${longSynopsis ? "author-book-card-long" : ""}`}
+              className={`author-book-card dashed-frame grid grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)] gap-3 p-2 sm:grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)_auto] ${longSynopsis ? "author-book-card-long" : ""}`}
             >
               <img
                 src={book.cover}
@@ -727,7 +724,7 @@ function AuthorBooksPage({
                 <h3 className="font-display text-[clamp(1rem,2vw,1.25rem)] font-bold leading-tight text-[var(--ink)]">
                   {book.title}
                 </h3>
-                <p className={`mt-1 leading-snug ${longSynopsis ? "text-[clamp(0.68rem,1.1vw,0.76rem)]" : "text-[clamp(0.76rem,1.4vw,0.86rem)]"}`}>
+                <p className={`author-book-synopsis mt-1 overflow-y-auto pr-1 leading-snug ${longSynopsis ? "text-[clamp(0.68rem,1.1vw,0.76rem)]" : "text-[clamp(0.76rem,1.4vw,0.86rem)]"}`}>
                   {book.synopsis}
                 </p>
                 <p className="mt-1 text-[0.66rem] uppercase tracking-[0.12em] text-[var(--rose-burnt)]">
@@ -848,19 +845,28 @@ function AuthorSchedulePage({
       </ul>
 
       {showUpdates && (
-        <section className="dashed-frame mt-[clamp(0.7rem,2vh,1.1rem)] p-3">
-          <p className="label-caps flex items-center gap-2">
-            <Megaphone aria-hidden className="size-4" /> Atualizações de última hora
-          </p>
-          <p className="mt-2 border-l-2 border-[var(--lilac)] pl-3 text-[0.84rem]">
-            Fique de olho! Atualizações podem acontecer até o dia do evento.
-          </p>
-          {author.updates.map((u) => (
-            <p key={u.date} className="mt-1.5 border-l-2 border-[var(--lilac)] pl-3 text-[0.84rem]">
-              {u.date}: {u.text}
-            </p>
-          ))}
-        </section>
+        <>
+          {author.updates.length === 0 && (
+            <section className="schedule-generic-update dashed-frame mt-[clamp(0.7rem,2vh,1.1rem)] p-3">
+              <p className="label-caps flex items-center gap-2">
+                <Megaphone aria-hidden className="size-4" /> Atualizações de última hora
+              </p>
+              <p className="mt-2 border-l-2 border-[var(--lilac)] pl-3 text-[0.84rem]">
+                Fique de olho! Atualizações podem acontecer até o dia do evento.
+              </p>
+            </section>
+          )}
+          {author.updates.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Atualizações de última hora">
+              {author.updates.map((u) => (
+                <p key={`${u.date}-${u.text}`} className="inline-flex items-center gap-1.5 rounded-full bg-[var(--seal)] px-2.5 py-1 text-[0.68rem] font-bold text-white shadow-sm">
+                  <Megaphone aria-hidden className="size-3.5 shrink-0" />
+                  <span>{u.date}: {u.text}</span>
+                </p>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </PageFrame>
   );
@@ -874,24 +880,29 @@ function AuthorStampPage({ author, preview = false }: { author: Author; preview?
   const [feedback, setFeedback] = useState<"idle" | "ok" | "dup" | "error">("idle");
   const [animating, setAnimating] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const already = hasStamp(author.id);
   const redeemedStamp = stamps.find((stamp) => stamp.authorId === author.id);
 
   const redeem = async (value: string, source: "manual" | "qr" = "manual") => {
     if (!value.trim()) {
       setFeedback("error");
+      setFeedbackMessage("Digite ou escaneie o código da autora.");
       return;
     }
     const res = await addStamp(author.id, value.trim(), source);
     if (res.duplicate) {
       setFeedback("dup");
+      setFeedbackMessage(res.message ?? "Este carimbo já foi resgatado.");
       return;
     }
     if (!res.ok) {
       setFeedback("error");
+      setFeedbackMessage(res.message ?? "Código inválido.");
       return;
     }
     setFeedback("ok");
+    setFeedbackMessage(res.message ?? "Carimbo desbloqueado.");
     setAnimating(true);
     window.setTimeout(() => setAnimating(false), 950);
   };
@@ -970,6 +981,7 @@ function AuthorStampPage({ author, preview = false }: { author: Author; preview?
                 onChange={(e) => {
                   setCode(e.target.value);
                   setFeedback("idle");
+                  setFeedbackMessage("");
                 }}
                 placeholder="AUTORA-XXXX-XXXX"
                 className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-center font-body text-[0.9rem] uppercase tracking-[0.14em] outline-none focus:border-[var(--violet-deep)]"
@@ -991,7 +1003,7 @@ function AuthorStampPage({ author, preview = false }: { author: Author; preview?
 
           {feedback === "error" && (
             <p className="mt-3 text-center text-[0.8rem] text-[var(--rose-burnt)]">
-              Código inválido. Confira o código ou peça ajuda à autora no estande.
+              {feedbackMessage || "Código inválido. Confira o código ou peça ajuda à autora no estande."}
             </p>
           )}
           {feedback === "dup" && (
@@ -1549,7 +1561,7 @@ function paginateAuthorBookIds(
 export function buildAuthorPreviewPages(
   author: Author,
   catalogBooks: Book[] = [],
-  options: { schedulePageSize?: number } = {},
+  options: { schedulePageSize?: number; bookPageSize?: number } = {},
 ): PageDef[] {
   const pages: PageDef[] = [
     {
@@ -1559,10 +1571,9 @@ export function buildAuthorPreviewPages(
     },
   ];
 
-  const bookPages = paginateAuthorBookIds(
-    author.books,
-    (id) => catalogBooks.find((book) => book.id === id),
-  );
+  const bookPages = options.bookPageSize
+    ? chunk(author.books, options.bookPageSize)
+    : paginateAuthorBookIds(author.books, (id) => catalogBooks.find((book) => book.id === id));
   bookPages.forEach((bookIds, bookPageIndex) => {
     pages.push({
       id: `autora-${author.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,
@@ -1605,7 +1616,12 @@ export function buildAuthorPreviewPages(
   return pages;
 }
 
-export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef[] {
+export function buildPages(
+  userBooks: UserBook[],
+  stamps: StampEntry[],
+  options: { mobile?: boolean } = {},
+): PageDef[] {
+  const mobile = options.mobile ?? false;
   const buy = userBooks.filter((b) => b.status === "want_to_buy_bienal");
   const purchased = buy.filter((b) => b.bought);
 
@@ -1614,7 +1630,7 @@ export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef
     { id: "sumario", section: "id", render: () => null }, // substituído abaixo
   ];
 
-  chunk(buy, 2).forEach((group, i) =>
+  chunk(buy, mobile ? 2 : 3).forEach((group, i) =>
     pages.push({
       id: `bienal-${i}`,
       section: "bienal",
@@ -1630,7 +1646,7 @@ export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef
   );
 
   pages.push({ id: "autoras-intro", section: "autoras", render: () => <AuthorsIntroPage /> });
-  chunk(authors, 3).forEach((pageAuthors, pageNumber) => {
+  chunk(authors, mobile ? 3 : 6).forEach((pageAuthors, pageNumber) => {
     pages.push({
       id: pageNumber ? `autoras-index-${pageNumber}` : "autoras-index",
       section: "autoras",
@@ -1644,7 +1660,7 @@ export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef
       section: "autoras",
       render: () => <AuthorProfilePage author={a} />,
     });
-    const authorBookPages = paginateAuthorBookIds(a.books, bookById);
+    const authorBookPages = mobile ? paginateAuthorBookIds(a.books, bookById) : chunk(a.books, 3);
     authorBookPages.forEach((bookIds, bookPageIndex) => {
       pages.push({
         id: `autora-${a.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,
@@ -1658,7 +1674,7 @@ export function buildPages(userBooks: UserBook[], stamps: StampEntry[]): PageDef
         ),
       });
     });
-    const schedulePages = chunk(a.schedule, 4);
+    const schedulePages = chunk(a.schedule, mobile ? 4 : 6);
     schedulePages.forEach((entries, scheduleIndex) => {
       pages.push({
         id: `autora-${a.id}-programacao${scheduleIndex ? `-${scheduleIndex}` : ""}`,

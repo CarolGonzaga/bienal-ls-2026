@@ -47,7 +47,18 @@ export const usePassportStore = create<PassportState>((set, get) => ({
     let code: string
     try { code = extractPassportCode(raw) } catch (error) { return { ok: false, message: error instanceof Error ? error.message : 'Código inválido.' } }
     const hash = await sha256Hex(code)
-    const match = get().codes.find(item => item.code_hash === hash && codeIsValidAt(item.valid_from, item.valid_until))
+    let match = get().codes.find(item => item.code_hash === hash && codeIsValidAt(item.valid_from, item.valid_until))
+    if (!match && isSupabaseConfigured && navigator.onLine) {
+      const { data, error } = await supabase
+        .from('passport_code_manifest')
+        .select('author_id,code_hash,valid_from,valid_until,version')
+        .eq('code_hash', hash)
+        .maybeSingle()
+      if (!error && data && codeIsValidAt(data.valid_from, data.valid_until)) {
+        match = data as PassportCodeHash
+        set({ codes: [...get().codes.filter(item => item.author_id !== match?.author_id), match] })
+      }
+    }
     if (!match) return { ok: false, message: 'Código inválido ou fora do período de validade.' }
     const author = get().authors.find(item => item.id === match.author_id)
     if (expectedAuthorId && match.author_id !== expectedAuthorId) return { ok: false, differentAuthor: author, message: 'Este código pertence a outra autora.' }

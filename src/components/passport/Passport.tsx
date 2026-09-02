@@ -28,8 +28,8 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
   const { userBooks, stamps, pageId, setPageId, opened, setOpened, hydrated } = usePassport();
   const isMobile = useIsMobile();
   const pages = useMemo(
-    () => buildPages(userBooks, stamps),
-    [userBooks, stamps, catalogVersion],
+    () => buildPages(userBooks, stamps, { mobile: isMobile }),
+    [userBooks, stamps, catalogVersion, isMobile],
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPreset, setModalPreset] = useState<string | null>(null);
