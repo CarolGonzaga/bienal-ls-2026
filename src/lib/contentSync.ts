@@ -19,7 +19,7 @@ const VERSION_FIELD: Record<OfflineDatasetKey, keyof ContentManifest> = {
   passport: 'passport_version', passport_codes: 'passport_codes_version'
 }
 
-let activeSync: Promise<ContentManifest | null> | null = null
+const activeSyncs = new Map<string, Promise<ContentManifest | null>>()
 
 const fetchManifest = async (): Promise<ContentManifest | null> => {
   const { data, error } = await supabase.from('content_manifest')
@@ -40,11 +40,13 @@ const downloadSection = async (section: OfflineDatasetKey) => {
 
 export const syncPublicContent = async ({ force = false, sections }: { force?: boolean; sections?: OfflineDatasetKey[] } = {}) => {
   if (!isSupabaseConfigured || !navigator.onLine) return (await getOfflineMeta<ContentManifest>('contentManifest'))
-  if (activeSync && !force) return activeSync
-  activeSync = (async () => {
+  const requested = sections || (Object.keys(VERSION_FIELD) as OfflineDatasetKey[])
+  const syncKey = `${force ? 'force' : 'versioned'}:${[...requested].sort().join(',')}`
+  const running = activeSyncs.get(syncKey)
+  if (running) return running
+  const syncTask = (async () => {
     const remote = await fetchManifest()
     if (!remote) return null
-    const requested = sections || (Object.keys(VERSION_FIELD) as OfflineDatasetKey[])
     for (const section of requested) {
       const local = await getOfflineDataset(section)
       const version = Number(remote[VERSION_FIELD[section]])
@@ -56,11 +58,12 @@ export const syncPublicContent = async ({ force = false, sections }: { force?: b
     await putOfflineMeta('contentManifest', remote)
     await putOfflineMeta('lastSuccessfulSync', new Date().toISOString())
     return remote
-  })().finally(() => { activeSync = null })
-  return activeSync
+  })()
+  activeSyncs.set(syncKey, syncTask)
+  return syncTask.finally(() => activeSyncs.delete(syncKey))
 }
 
-export const cacheOfflineAssets = async (exhibitorLogos: string[] = [], passportPhotos: string[] = []) => {
+export const cacheOfflineAssets = async (exhibitorLogos: string[] = [], passportPhotos: string[] = [], bookCovers: string[] = []) => {
   const cache = await caches.open(OFFLINE_ASSET_CACHE)
   const loadedResources = typeof performance === 'undefined' ? [] : performance.getEntriesByType('resource')
     .map(entry => entry.name).filter(url => url.startsWith(window.location.origin))
@@ -69,14 +72,16 @@ export const cacheOfflineAssets = async (exhibitorLogos: string[] = [], passport
     ...CORE_OFFLINE_ASSETS.map(url => ({ url, critical: true })),
     ...loadedResources.map(url => ({ url, critical: true })),
     ...exhibitorLogos.map(file => ({ url: appPath(`/expositores/${file}`), critical: false })),
-    ...photoUrls.map(url => ({ url, critical: true }))
+    ...photoUrls.map(url => ({ url, critical: true })),
+    ...bookCovers.map(url => ({ url, critical: false }))
   ]
   const byUrl = new Map<string, boolean>()
   for (const item of candidates) byUrl.set(item.url, Boolean(byUrl.get(item.url) || item.critical))
   const results = await Promise.all([...byUrl].map(async ([url, critical]) => {
     try {
-      const response = await fetch(url, { cache: 'reload' })
-      if (!response.ok) return { url, ok: false, critical }
+      const crossOrigin = new URL(url, window.location.origin).origin !== window.location.origin
+      const response = await fetch(url, { cache: 'reload', ...(crossOrigin ? { mode: 'no-cors' as const } : {}) })
+      if (!response.ok && response.type !== 'opaque') return { url, ok: false, critical }
       await cache.put(url, response.clone())
       return { url, ok: true, critical }
     } catch { return { url, ok: false, critical } }

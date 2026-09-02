@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { BookOpen, MapPin, Search, Sparkles } from 'lucide-react'
 import { useContentStore } from '../../stores/useContentStore'
 import { useExhibitorStore } from '../../stores/useExhibitorStore'
@@ -15,11 +15,15 @@ export const BookShowcase: React.FC = () => {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all' | 'bienal' | 'autograph'>('all')
   const books = useContentStore(state => state.books)
+  const loadContent = useContentStore(state => state.loadContent)
   const exhibitors = useExhibitorStore(state => state.exhibitors)
   const setActiveTabMode = useExhibitorStore(state => state.setActiveTabMode)
   const setSelectedExhibitorId = useExhibitorStore(state => state.setSelectedExhibitorId)
   const setSelectedStandId = useMapStore(state => state.setSelectedStandId)
   const geometries = useAdminMapStore(state => state.geometries)
+  const fallbackCover = appPath('/logo-ls-watermark.png')
+
+  useEffect(() => { void loadContent() }, [loadContent])
 
   const visibleBooks = useMemo(() => {
     const term = normalize(query.trim())
@@ -45,7 +49,7 @@ export const BookShowcase: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-5 overflow-y-auto px-3 py-4 sm:px-5 sm:py-7">
+    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-4 overflow-y-auto px-3 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 sm:gap-5 sm:px-5 sm:py-7">
       <header className="rounded-3xl border border-[#efbfd6] bg-gradient-to-br from-[#fff8fb] to-[#fce8f2] p-5 shadow-sm sm:p-7">
         <div className="flex items-start gap-3">
           <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#d43276] text-white shadow-lg shadow-[#d43276]/20">
@@ -54,7 +58,7 @@ export const BookShowcase: React.FC = () => {
           <div>
             <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[#b94185]">Curadoria colaborativa</p>
             <h1 className="mt-1 text-2xl font-black text-[#56132f] sm:text-3xl">Vitrine de livros da Bienal</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#805269]">Livros enviados pela comunidade e pelas autoras, revisados antes da publicação. Os títulos disponíveis também aparecem ao adicionar um livro à lista de compras do Passaporte.</p>
+            <p className="mt-1.5 max-w-2xl text-xs leading-5 text-[#805269]">Livros enviados pela comunidade e pelas autoras, revisados antes da publicação. Os títulos disponíveis também aparecem ao adicionar um livro à lista de compras do Passaporte.</p>
           </div>
         </div>
       </header>
@@ -83,7 +87,7 @@ export const BookShowcase: React.FC = () => {
           <p className="mt-1 text-sm">Tente outra busca ou selecione “Todos”.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {visibleBooks.map(book => {
             const exhibitor = exhibitors.find(item => book.exhibitorIds.includes(item.id))
               || exhibitors.find(item => item.standCode.toUpperCase() === book.standCode?.toUpperCase())
@@ -91,7 +95,7 @@ export const BookShowcase: React.FC = () => {
             return (
               <article key={book.id} className="group flex min-w-0 flex-col overflow-hidden rounded-3xl border border-[#efbfd6] bg-white/90 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#b94185]/10">
                 <div className="relative aspect-[2/3] overflow-hidden bg-gradient-to-br from-[#f9e6ef] to-[#eadcf2]">
-                  <img src={book.coverUrl || appPath('/logo-ls-watermark.png')} alt={`Capa de ${book.title}`} loading="lazy" className={`size-full ${book.coverUrl ? 'object-cover' : 'object-contain p-8 opacity-45'} transition duration-300 group-hover:scale-[1.03]`} />
+                  <img src={book.coverUrl || fallbackCover} alt={`Capa de ${book.title}`} loading="lazy" onError={event => { const image = event.currentTarget; if (image.src !== new URL(fallbackCover, window.location.origin).href) { image.src = fallbackCover; image.classList.remove('object-cover'); image.classList.add('object-contain', 'p-8', 'opacity-45') } }} className={`size-full ${book.coverUrl ? 'object-cover' : 'object-contain p-8 opacity-45'} transition duration-300 group-hover:scale-[1.03]`} />
                   {book.autographAvailable && <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#d43276] px-2 py-1 text-[9px] font-black uppercase tracking-wider text-white shadow"><Sparkles className="size-3" />Autógrafo</span>}
                 </div>
                 <div className="flex flex-1 flex-col p-3.5">

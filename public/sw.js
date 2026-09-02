@@ -1,5 +1,5 @@
 // Alterar a versão invalida a resposta antiga do service worker quando há nova publicação.
-const CACHE_NAME = 'mapasafico-v3'
+const CACHE_NAME = 'mapasafico-v4'
 const OFFLINE_ASSET_CACHE = 'mapasafico-offline-assets-v1'
 const BASE = '/mapasaficobienal'
 const APP_SHELL = [`${BASE}/login`, `${BASE}/index.html`, `${BASE}/manifest.json`, `${BASE}/logo-icon.png`, `${BASE}/logo-texto.png`, `${BASE}/logo-completo.png`, `${BASE}/logo-ls-watermark.png`]
@@ -16,7 +16,10 @@ self.addEventListener('fetch', event => {
   const request = event.request
   if (request.method !== 'GET') return
   const url = new URL(request.url)
-  if (url.origin !== self.location.origin) return
+  if (url.origin !== self.location.origin) {
+    event.respondWith(caches.match(request).then(cached => cached || fetch(request)))
+    return
+  }
 
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).then(response => {
