@@ -308,13 +308,13 @@ function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
         src={book.cover}
         alt={`Capa de ${book.title}`}
         loading="lazy"
-        className="w-full rounded-[3px] object-cover shadow-[0_6px_14px_-6px_oklch(0.3_0.05_20/0.7)]"
+        className="buy-book-cover w-full rounded-[3px] object-cover shadow-[0_6px_14px_-6px_oklch(0.3_0.05_20/0.7)]"
       />
       <div className="min-w-0 space-y-1.5">
         <Field label="Título">{book.title}</Field>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="buy-card-author-publisher grid grid-cols-2 gap-2">
           <Field label="Autora">{entry.author ?? book.author}</Field>
-          <label className="min-w-0">
+          <label className="buy-card-publisher min-w-0">
             <span className="label-caps block opacity-70">Editora</span>
             <input
               value={entry.publisher ?? book.publisher}
@@ -621,7 +621,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
         />
       </div>
 
-      <header className="relative z-10 mt-[clamp(0.35rem,1.2vh,0.8rem)] text-center">
+      <header className="author-profile-header relative z-10 mt-[clamp(0.35rem,1.2vh,0.8rem)] text-center">
         <h2 className="script-name text-[clamp(2.8rem,6.5vw,4.5rem)]">{author.name}</h2>
         <p className="mt-1 text-[0.72rem] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
           {[
@@ -1122,6 +1122,13 @@ function StampSeal({
   compact?: boolean;
   story?: boolean;
 }) {
+  const nameParts = String(author.name ?? "").trim().split(/\s+/).filter(Boolean);
+  const splitAt = Math.ceil(nameParts.length / 2);
+  const nameLines =
+    nameParts.length > 1
+      ? [nameParts.slice(0, splitAt).join(" "), nameParts.slice(splitAt).join(" ")]
+      : nameParts;
+
   return (
     <div
       role="img"
@@ -1145,7 +1152,11 @@ function StampSeal({
       <span
         className={`relative z-10 max-w-[58%] -translate-y-[20%] text-center font-signature leading-[0.9] text-[var(--violet-deep)] ${story ? "text-[2rem]" : compact ? "text-[clamp(0.72rem,1.5vw,1rem)]" : "text-[clamp(1.2rem,3vw,2rem)]"}`}
       >
-        {author.name}
+        {nameLines.map((line, index) => (
+          <span key={`${line}-${index}`} className="block">
+            {line}
+          </span>
+        ))}
       </span>
     </div>
   );
@@ -1678,7 +1689,7 @@ export function buildPages(
         ),
       });
     });
-    const schedulePages = chunk(a.schedule, mobile ? 4 : 6);
+    const schedulePages = chunk(a.schedule, mobile ? 4 : 5);
     schedulePages.forEach((entries, scheduleIndex) => {
       pages.push({
         id: `autora-${a.id}-programacao${scheduleIndex ? `-${scheduleIndex}` : ""}`,

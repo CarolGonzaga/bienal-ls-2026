@@ -162,7 +162,7 @@ function PreviewBook({ author, profile, photoUrl, requests, exhibitors, code, on
   )
   const pages = useMemo(
     () => buildAuthorPreviewPages(previewAuthor, previewBooks, {
-      schedulePageSize: isMobile ? 4 : 6,
+      schedulePageSize: isMobile ? 4 : 5,
       bookPageSize: isMobile ? undefined : 3,
     }),
     [isMobile, previewAuthor, previewBooks],
