@@ -548,7 +548,7 @@ function AuthorsIndexPage({
                 src={a.photo}
                 alt={a.name}
                 loading="lazy"
-                className="aspect-square w-full rounded-full object-cover"
+                className="aspect-square w-full self-center rounded-full object-cover"
               />
               <div className="relative min-h-[6.2rem] min-w-0">
                 <div className="flex h-full flex-col justify-center pr-[8.5rem]">
@@ -645,7 +645,7 @@ function AuthorProfilePage({ author, preview = false }: { author: Author; previe
           <p className="label-caps flex items-center gap-2">
             <BookOpen aria-hidden className="size-4" /> Sobre a autora
           </p>
-          <p className="mt-[clamp(0.8rem,2vh,1.2rem)] text-[clamp(0.86rem,1.6vw,1rem)] leading-[1.75]">
+          <p className="mt-[clamp(0.55rem,1.3vh,0.8rem)] text-[clamp(0.84rem,1.5vw,0.96rem)] leading-[1.4]">
             {author.bio}
           </p>
         </section>
