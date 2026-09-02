@@ -155,7 +155,9 @@ export function buildPassportCatalog({
       if (!outputBooks.has(mapped.id)) outputBooks.set(mapped.id, mapped);
     });
 
-    const authoredBooks = [...outputBooks.values()].filter((book) => book.authorId === author.id);
+    const authoredBooks = [...outputBooks.values()]
+      .filter((book) => book.authorId === author.id)
+      .slice(0, 3);
     const relatedEvents = events
       .filter(
         (event) =>
@@ -203,6 +205,34 @@ export function buildPassportCatalog({
       label: `Estande ${exhibitor.standCode}`,
       exhibitor: exhibitor.name,
     }));
+
+  // A vitrine e o modal de compras também usam o catálogo público completo.
+  // Livros aprovados pela comunidade podem não pertencer a uma autora já
+  // publicada no Passaporte, mas ainda precisam ficar disponíveis à leitora.
+  books.forEach((book) => {
+    if (outputBooks.has(book.id)) return;
+    const matchedAuthor = outputAuthors.find(
+      (author) => normalize(author.name) === normalize(book.authorName),
+    );
+    const exhibitor = resolveExhibitor(
+      exhibitors,
+      book.exhibitorIds[0],
+      book.standCode,
+    );
+    outputBooks.set(book.id, {
+      id: book.id,
+      title: book.title,
+      author: book.authorName,
+      ...(matchedAuthor ? { authorId: matchedAuthor.id } : {}),
+      cover: book.coverUrl || passportAsset("logo-ls-watermark.png"),
+      genre: book.genre || "Livro",
+      publisher: book.publisher || exhibitor?.name || "Editora não informada",
+      synopsis: book.synopsis || `Livro de ${book.authorName}.`,
+      booth: book.standCode || exhibitor?.standCode,
+      autographAvailable: book.autographAvailable,
+      onSale: Boolean(book.standCode || exhibitor),
+    });
+  });
 
   return {
     authors: outputAuthors,

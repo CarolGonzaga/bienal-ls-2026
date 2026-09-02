@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react'
 import {
   Calendar,
+  BookOpen,
   Compass,
   Award,
   Bookmark,
@@ -46,6 +47,7 @@ const SapphicPassport = lazy(() => import('./components/passport/SapphicPassport
 const ExhibitorList = lazy(() => import('./components/exhibitors/ExhibitorList').then(module => ({ default: module.ExhibitorList })))
 const RoutePlanner = lazy(() => import('./components/route/RoutePlanner').then(module => ({ default: module.RoutePlanner })))
 const ScheduleView = lazy(() => import('./components/schedule/ScheduleView').then(module => ({ default: module.ScheduleView })))
+const BookShowcase = lazy(() => import('./components/books/BookShowcase').then(module => ({ default: module.BookShowcase })))
 const TabFallback = () => <div className="p-8 text-center text-sm font-bold">Carregando…</div>
 
 const TEMPORARILY_DISABLED_TABS = new Set([])
@@ -316,6 +318,7 @@ export default function App() {
             {[
               { id: 'map', label: 'Mapa', icon: Compass },
               { id: 'list', label: 'Listas', icon: List },
+              { id: 'books', label: 'Livros', icon: BookOpen },
               { id: 'passport', label: 'Passaporte', icon: Award, disabled: !passportEnabled },
               { id: 'route', label: 'Minha Rota', icon: Bookmark },
               { id: 'schedule', label: 'Programação', icon: Calendar }
@@ -395,10 +398,11 @@ export default function App() {
         </div>
 
         {/* Mobile Navigation bar */}
-        <div data-tutorial="navigation" className="site-mobile-nav flex items-center justify-around border-t px-2 py-2 text-xs font-semibold md:hidden">
+        <div data-tutorial="navigation" className="site-mobile-nav flex items-center justify-start overflow-x-auto border-t px-2 py-2 text-xs font-semibold md:hidden">
           {[
             { id: 'map', label: 'Mapa', icon: Compass },
             { id: 'list', label: 'Listas', icon: List },
+            { id: 'books', label: 'Livros', icon: BookOpen },
             { id: 'passport', label: 'Passaporte', icon: Award, disabled: !passportEnabled },
             { id: 'route', label: 'Rota', icon: Bookmark },
             { id: 'schedule', label: 'Agenda', icon: Calendar }
@@ -414,7 +418,7 @@ export default function App() {
                 aria-disabled={isDisabled}
                 title={isDisabled ? 'Disponível em breve' : undefined}
                 onClick={() => handleNavigate(tab.id)}
-                className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
+                className={`flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
                   }`}
               >
                 <Icon className="w-4 h-4" />
@@ -465,6 +469,7 @@ export default function App() {
         ) : (
           <>
             {activeTabMode === 'list' && <Suspense fallback={<TabFallback />}><ExhibitorList /></Suspense>}
+            {activeTabMode === 'books' && <Suspense fallback={<TabFallback />}><BookShowcase /></Suspense>}
             {activeTabMode === 'route' && <Suspense fallback={<TabFallback />}><RoutePlanner /></Suspense>}
             {activeTabMode === 'schedule' && <Suspense fallback={<TabFallback />}><ScheduleView /></Suspense>}
             {activeTabMode === 'passport' && passportEnabled && <Suspense fallback={<TabFallback />}><SapphicPassport /></Suspense>}

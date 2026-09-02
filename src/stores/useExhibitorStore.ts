@@ -5,7 +5,7 @@ import { isSupabaseConfigured } from '../lib/supabase.js'
 import { getOfflineDataset } from '../lib/offlineDb'
 import { syncPublicContent } from '../lib/contentSync'
 
-export type ActiveTabMode = 'map' | 'list' | 'passport' | 'route' | 'schedule' | 'admin'
+export type ActiveTabMode = 'map' | 'list' | 'books' | 'passport' | 'route' | 'schedule' | 'admin'
 
 interface ExhibitorState {
   exhibitors: Exhibitor[]

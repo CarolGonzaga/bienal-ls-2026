@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   BookOpen, Building2, CalendarDays, Check, ChevronUp,
-  Activity, ClipboardList, LayoutDashboard, LogOut, Pencil, Plus, RefreshCw,
+  Activity, ClipboardList, ImagePlus, LayoutDashboard, LogOut, Pencil, Plus, RefreshCw,
   Save, Trash2, Users
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -9,6 +9,7 @@ import { appPath } from '../../lib/paths'
 import { useMapStore } from '../../stores/useMapStore'
 import AuthorsAdminPanel from './AuthorsAdminPanel'
 import SystemHealthPanel from './SystemHealthPanel'
+import { optimizePassportPhoto } from '../../utils/optimizeImage'
 
 const TABS = [
   ['overview', 'Visão geral', LayoutDashboard],
@@ -185,10 +186,13 @@ const EventEditor = ({ item, exhibitors, onSave, onCancel }) => {
 
 /* ── Book Editor ────────────────────────────────────────── */
 const BookEditor = ({ item, exhibitors, onSave, onCancel }) => {
+  const [uploadingCover, setUploadingCover] = useState(false)
+  const [coverError, setCoverError] = useState('')
   const [form, setForm] = useState({
     title: item.title || '',
     author_name: item.author_name || '',
     publisher: item.publisher || '',
+    cover_url: item.cover_url || '',
     stand_code: item.stand_code || '',
     exhibitor_id: item.exhibitor_id || '',
     notes: item.notes || '',
@@ -196,11 +200,33 @@ const BookEditor = ({ item, exhibitors, onSave, onCancel }) => {
     active: item.active !== false
   })
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }))
+  const uploadCover = async file => {
+    if (!file) return
+    setUploadingCover(true); setCoverError('')
+    try {
+      const optimized = await optimizePassportPhoto(file)
+      const path = `admin/${item.id || 'new'}/${crypto.randomUUID()}.webp`
+      const { error } = await supabase.storage.from('passport-book-covers').upload(path, optimized.blob, { upsert: false, contentType: optimized.mime, cacheControl: '31536000' })
+      if (error) throw error
+      set('cover_url', supabase.storage.from('passport-book-covers').getPublicUrl(path).data.publicUrl)
+    } catch (error) {
+      setCoverError(error instanceof Error ? error.message : 'Não foi possível enviar a capa.')
+    } finally { setUploadingCover(false) }
+  }
   return (
     <div className="mt-4 grid gap-4 rounded-2xl bg-black/5 p-4 dark:bg-white/5 sm:grid-cols-2">
       <Field label="Título"><TextInput value={form.title} onChange={v => set('title', v)} placeholder="Título do livro" /></Field>
       <Field label="Nome da autora"><TextInput value={form.author_name} onChange={v => set('author_name', v)} placeholder="Nome da autora" /></Field>
       <Field label="Editora"><TextInput value={form.publisher} onChange={v => set('publisher', v)} placeholder="Nome da editora" /></Field>
+      <Field label="URL da capa"><TextInput type="url" value={form.cover_url} onChange={v => set('cover_url', v)} placeholder="https://..." /></Field>
+      <div className="sm:col-span-2 flex flex-wrap items-end gap-4">
+        <label className="admin-secondary flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-black">
+          <ImagePlus className="h-4 w-4" />{uploadingCover ? 'Enviando…' : 'Enviar arquivo da capa'}
+          <input type="file" accept="image/jpeg,image/png,image/webp" disabled={uploadingCover} className="sr-only" onChange={event => { void uploadCover(event.target.files?.[0]); event.target.value = '' }} />
+        </label>
+        {form.cover_url && <img src={form.cover_url} alt={`Capa de ${form.title || 'livro'}`} className="h-32 w-24 rounded-lg object-cover shadow" />}
+      </div>
+      {coverError && <p className="text-xs font-bold text-rose-600 sm:col-span-2">{coverError}</p>}
       <Field label="Código do estande"><TextInput value={form.stand_code} onChange={v => set('stand_code', v)} placeholder="Ex: K33" /></Field>
       <Field label="Expositor vinculado">
         <select value={form.exhibitor_id} onChange={e => set('exhibitor_id', e.target.value)} className="admin-input w-full rounded-xl border px-3 py-2 text-xs">
@@ -218,7 +244,11 @@ const BookEditor = ({ item, exhibitors, onSave, onCancel }) => {
         <Toggle label="Livro ativo (visível no site)" value={form.active} onChange={v => set('active', v)} />
       </div>
       <div className="sm:col-span-2">
-        <FormActions onSave={() => onSave(form)} onCancel={onCancel} />
+        <FormActions onSave={() => {
+          if (uploadingCover) return
+          if (form.cover_url && !/^https?:\/\//i.test(form.cover_url.trim())) return setCoverError('Informe uma URL iniciada por http:// ou https://.')
+          onSave(form)
+        }} onCancel={onCancel} />
       </div>
     </div>
   )
