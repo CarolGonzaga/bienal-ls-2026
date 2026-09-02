@@ -177,3 +177,18 @@ test("limita a três os livros exibidos no perfil de cada autora", () => {
   assert.equal(catalog.authors[0]?.books.length, 3);
   assert.equal(catalog.books.length, 4);
 });
+
+test("tolera campos opcionais nulos recebidos do banco", () => {
+  const catalog = buildPassportCatalog({
+    authors: [{ id: "author-null", slug: "autora-null", name: "Autora Nula", first_name: "Autora", bio: null, message: null, active: true, published: true } as any],
+    profiles: [{ author_id: "author-null", passport_city: null, books: [], presences: [], autograph_sessions: [], sale_locations: [] } as any],
+    books: [{ id: "book-null", title: "Livro", authorName: null, exhibitorIds: [], standCode: null } as any],
+    events: [],
+    exhibitors: [{ ...exhibitors[0], standCode: null } as any],
+    photoUrl: () => "",
+  });
+
+  assert.equal(catalog.authors.length, 1);
+  assert.equal(catalog.books.length, 1);
+  assert.equal(catalog.booths.length, 0);
+});

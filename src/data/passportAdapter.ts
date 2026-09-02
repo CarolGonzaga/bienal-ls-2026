@@ -4,8 +4,8 @@ import type { Exhibitor } from "../types";
 import { passportAsset } from "../lib/passport-assets.ts";
 import type { Author, Book, Booth, PassportCatalog, ScheduleEntry } from "./passport";
 
-const normalize = (value = "") =>
-  value
+const normalize = (value: unknown = "") =>
+  String(value ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/gi, "")
