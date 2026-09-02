@@ -225,7 +225,8 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
 
   return (
     <PageFrame institutional eyebrow="Passaporte Sáfico" title="Sumário">
-      <div className="flex flex-col items-center gap-2">
+      <div className="summary-page-content flex h-full flex-col">
+      <div className="summary-social-block flex flex-col items-center gap-2">
         <p className="text-center text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[var(--violet-deep)]">
           Siga o Lendo Sáficos
         </p>
@@ -260,13 +261,13 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
         </div>
       </div>
 
-      <div className="hairline mt-[clamp(0.8rem,2vh,1.2rem)] mb-[clamp(1.15rem,3vh,1.65rem)]" />
+      <div className="summary-divider hairline mt-[clamp(0.8rem,2vh,1.2rem)] mb-[clamp(1.15rem,3vh,1.65rem)]" />
 
-      <p className="text-center text-[0.65rem] uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+      <p className="summary-description text-center text-[0.65rem] uppercase tracking-[0.14em] text-[var(--ink-soft)]">
         Encontre rapidamente cada seção do seu passaporte
       </p>
 
-      <ul className="mt-[clamp(0.4rem,1vh,0.7rem)] space-y-1.5">
+      <ul className="summary-list mt-[clamp(0.4rem,1vh,0.7rem)] space-y-1.5">
         {items.map((it) => (
           <li key={it.id}>
             <button
@@ -290,6 +291,7 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
 
       <div className="pointer-events-none absolute inset-x-[15%] bottom-0">
         <Skyline className="w-full" />
+      </div>
       </div>
     </PageFrame>
   );
@@ -472,9 +474,9 @@ function AuthorsIntroPage() {
   ];
   return (
     <PageFrame eyebrow="Regras de uso" title="Como funciona o passaporte?">
-      <ol className="space-y-1.5">
+      <ol className="authors-intro-steps space-y-1.5">
         {steps.map((s, i) => (
-          <li key={s.text} className="flex items-center gap-3">
+            <li key={s.text} className="authors-intro-step flex items-center gap-3">
             <span className="shrink-0 font-stamp text-[0.65rem] tracking-[0.1em] text-[var(--rose-burnt)]">
               {i + 1}.
             </span>
@@ -488,9 +490,9 @@ function AuthorsIntroPage() {
         ))}
       </ol>
 
-      <div className="hairline my-[clamp(0.8rem,1.8vh,1.2rem)]" />
+      <div className="authors-intro-divider hairline my-[clamp(0.8rem,1.8vh,1.2rem)]" />
 
-      <p className="text-[clamp(0.8rem,1.4vw,0.9rem)] leading-relaxed text-[var(--ink)]">
+      <p className="authors-intro-description text-[clamp(0.8rem,1.4vw,0.9rem)] leading-relaxed text-[var(--ink)]">
         Encontre autoras participantes no estande, escaneie o QR Code ou digite o código para
         desbloquear o carimbo delas no seu passaporte.
       </p>
@@ -720,7 +722,7 @@ function AuthorBooksPage({
                 loading="lazy"
                 className="aspect-[2/3] w-full rounded-[4px] object-cover shadow-[0_10px_20px_-12px_oklch(0.3_0.05_20/0.9)]"
               />
-              <div className="min-w-0">
+              <div className="author-book-copy min-w-0">
                 <h3 className="font-display text-[clamp(1rem,2vw,1.25rem)] font-bold leading-tight text-[var(--ink)]">
                   {book.title}
                 </h3>
@@ -744,7 +746,7 @@ function AuthorBooksPage({
                   {inBienalList ? "Na lista da Bienal" : "Incluir na lista da Bienal"}
                 </InkButton>
               </div>
-              <div className="col-span-2 flex flex-wrap items-start gap-1.5 sm:col-span-1 sm:flex-col sm:items-end">
+              <div className="author-book-tags col-span-2 flex flex-wrap items-start gap-1.5 sm:col-span-1 sm:flex-col sm:items-end">
                 {book.onSale && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[var(--brand-pink-soft)] px-2 py-1 text-[0.58rem] font-bold uppercase tracking-[0.08em] text-[var(--violet-deep)]">
                     <Check aria-hidden className="size-3" /> À venda na Bienal
@@ -795,21 +797,22 @@ function AuthorSchedulePage({
       }
       footer={preview ? undefined : <AuthorNav author={author} />}
     >
-      <p className="text-[clamp(0.82rem,1.5vw,0.95rem)]">
+      <div className="author-schedule-content">
+      <p className="author-schedule-intro text-[clamp(0.82rem,1.5vw,0.95rem)]">
         {author.name.split(" ")[0]} estará na Bienal do Livro de São Paulo entre os dias 4 e 13 de
         setembro de 2026.
       </p>
 
-      <ul className={`${dense ? "mt-2" : "mt-[clamp(0.7rem,2vh,1.1rem)]"} divide-y divide-dotted divide-[oklch(0.72_0.06_30_/_0.6)] rounded-[10px] border border-dashed border-[var(--rose-antique)]`}>
+      <ul className={`author-schedule-list ${dense ? "mt-2" : "mt-[clamp(0.7rem,2vh,1.1rem)]"} divide-y divide-dotted divide-[oklch(0.72_0.06_30_/_0.6)] rounded-[10px] border border-dashed border-[var(--rose-antique)]`}>
         {entries.map((s) => (
-          <li key={s.id} className={`grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"}`}>
+          <li key={s.id} className={`author-schedule-card grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"}`}>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-body font-bold text-[var(--ink)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
+                <span className={`author-schedule-date font-body font-bold text-[var(--ink)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                   <CalendarDays aria-hidden className="mr-1 inline size-4" /> {s.weekday}, {s.date}
                 </span>
                 <span
-                  className={`rounded-[4px] px-2 py-0.5 text-[0.58rem] font-bold uppercase tracking-[0.12em] ${
+                  className={`author-schedule-kind rounded-[4px] px-2 py-0.5 text-[0.58rem] font-bold uppercase tracking-[0.12em] ${
                     s.kind === "presenca"
                       ? "bg-[var(--brand-pink-soft)] text-[var(--violet-deep)]"
                       : "bg-[var(--seal)] text-white"
@@ -818,20 +821,20 @@ function AuthorSchedulePage({
                   {s.kind === "presenca" ? "Presença confirmada" : "Sessão de autógrafos"}
                 </span>
               </div>
-              <p className={`mt-1 flex items-center gap-1 text-[var(--ink)] ${dense ? "text-[0.72rem]" : "text-[0.85rem]"}`}>
+              <p className={`author-schedule-time mt-1 flex items-center gap-1 text-[var(--ink)] ${dense ? "text-[0.72rem]" : "text-[0.85rem]"}`}>
                 <Clock3 aria-hidden className="size-4" /> {s.time}
               </p>
               {s.related && (
-                <p className={`flex items-center gap-1 text-[var(--ink-soft)] ${dense ? "text-[0.7rem]" : "text-[0.82rem]"}`}>
+                <p className={`author-schedule-related flex items-center gap-1 text-[var(--ink-soft)] ${dense ? "text-[0.7rem]" : "text-[0.82rem]"}`}>
                   <BookOpen aria-hidden className="size-4" /> Livro: {s.related}
                 </p>
               )}
             </div>
             <div className="sm:text-right">
-              <span className={`inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
+              <span className={`author-schedule-booth inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                 {s.booth}
               </span>
-              <p className={`mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
+              <p className={`author-schedule-publisher mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
                 <Building2 aria-hidden className="size-4" /> {s.publisher}
               </p>
             </div>
@@ -857,7 +860,7 @@ function AuthorSchedulePage({
             </section>
           )}
           {author.updates.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Atualizações de última hora">
+            <div className="author-schedule-updates mt-2 flex flex-wrap gap-1.5" aria-label="Atualizações de última hora">
               {author.updates.map((u) => (
                 <p key={`${u.date}-${u.text}`} className="inline-flex items-center gap-1.5 rounded-full bg-[var(--seal)] px-2.5 py-1 text-[0.68rem] font-bold text-white shadow-sm">
                   <Megaphone aria-hidden className="size-3.5 shrink-0" />
@@ -868,6 +871,7 @@ function AuthorSchedulePage({
           )}
         </>
       )}
+      </div>
     </PageFrame>
   );
 }
