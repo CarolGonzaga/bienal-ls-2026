@@ -1099,7 +1099,7 @@
     padding: 0.55rem 0.7rem;
     border: 1px dashed var(--rose-antique) !important;
     border-radius: 10px;
-    grid-template-columns: 10.5rem minmax(0, 1fr) !important;
+    grid-template-columns: minmax(14.5rem, 1fr) minmax(max-content, 1fr) !important;
     column-gap: 0.75rem !important;
   }
 
@@ -1108,7 +1108,9 @@
   }
 
   .author-schedule-date,
-  .author-schedule-kind {
+  .author-schedule-kind,
+  .author-schedule-time,
+  .author-schedule-related {
     white-space: nowrap;
   }
 
