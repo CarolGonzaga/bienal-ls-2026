@@ -301,6 +301,7 @@ function SummaryPage({ index }: { index: Record<string, number> }) {
 
 function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
   const { updateBook } = usePassport();
+  const isReaderAddedBook = entry.source === "user" || entry.bookId.startsWith("custom-");
   const selectedBooth = entry.booth ?? book.booth ?? "";
   return (
     <article className="dashed-frame grid grid-cols-[minmax(0,5.5rem)_minmax(0,1fr)] gap-3 p-[clamp(0.6rem,1.6vw,0.9rem)]">
@@ -314,47 +315,59 @@ function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
         <Field label="Título">{book.title}</Field>
         <div className="buy-card-author-publisher grid grid-cols-2 gap-2">
           <Field label="Autora">{entry.author ?? book.author}</Field>
-          <label className="buy-card-publisher min-w-0">
-            <span className="label-caps block opacity-70">Editora</span>
-            <input
-              value={entry.publisher ?? book.publisher}
-              onChange={(event) => updateBook(entry.bookId, { publisher: event.target.value })}
-              className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
-            />
-          </label>
+          {isReaderAddedBook ? (
+            <label className="buy-card-publisher min-w-0">
+              <span className="label-caps block opacity-70">Editora</span>
+              <input
+                value={entry.publisher ?? book.publisher}
+                onChange={(event) => updateBook(entry.bookId, { publisher: event.target.value })}
+                className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
+              />
+            </label>
+          ) : (
+            <Field label="Editora">{entry.publisher ?? book.publisher}</Field>
+          )}
         </div>
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2">
-          <label className="min-w-0">
-            <span className="label-caps block opacity-70">Estande</span>
-            <select
-              value={selectedBooth}
-              onChange={(event) => {
-                const value = event.target.value;
-                const booth = booths.find((item) => item.id === value);
-                updateBook(entry.bookId, {
-                  booth: value,
-                  ...(entry.source === "user" && booth ? { publisher: booth.exhibitor } : {}),
-                });
-              }}
-              className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
-            >
-              <option value="">—</option>
-              {booths.map((booth) => (
-                <option key={booth.id} value={booth.id}>
-                  {booth.id}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="min-w-0">
-            <span className="label-caps block opacity-70">Preço</span>
-            <input
-              value={entry.price ?? book.price ?? ""}
-              onChange={(event) => updateBook(entry.bookId, { price: event.target.value })}
-              placeholder="R$ 00,00"
-              className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
-            />
-          </label>
+          {isReaderAddedBook ? (
+            <label className="min-w-0">
+              <span className="label-caps block opacity-70">Estande</span>
+              <select
+                value={selectedBooth}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  const booth = booths.find((item) => item.id === value);
+                  updateBook(entry.bookId, {
+                    booth: value,
+                    ...(booth ? { publisher: booth.exhibitor } : {}),
+                  });
+                }}
+                className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
+              >
+                <option value="">—</option>
+                {booths.map((booth) => (
+                  <option key={booth.id} value={booth.id}>
+                    {booth.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <Field label="Estande">{selectedBooth || "—"}</Field>
+          )}
+          {isReaderAddedBook ? (
+            <label className="min-w-0">
+              <span className="label-caps block opacity-70">Preço</span>
+              <input
+                value={entry.price ?? book.price ?? ""}
+                onChange={(event) => updateBook(entry.bookId, { price: event.target.value })}
+                placeholder="R$ 00,00"
+                className="w-full border-b border-dotted border-[var(--rose-antique)] bg-transparent text-[0.78rem] outline-none"
+              />
+            </label>
+          ) : (
+            <Field label="Preço">{entry.price ?? book.price ?? "—"}</Field>
+          )}
           <label className="flex cursor-pointer items-center gap-1.5 pb-0.5 text-[0.75rem] text-[var(--ink)]">
             <input
               type="checkbox"
@@ -436,15 +449,17 @@ function BooksPage({
             return (
               <div key={e.bookId} className="book-list-card relative">
                 <BuyCard entry={e} book={book} />
-                <button
-                  type="button"
-                  onClick={() => openAddBook(e.bookId)}
-                  aria-label={`Editar ${book.title}`}
-                  title="Editar livro"
-                  className="absolute right-8 top-1.5 grid size-6 place-items-center rounded-full bg-[oklch(0.96_0.015_60_/_0.9)] text-[var(--ink-soft)] opacity-65 transition hover:text-[var(--violet-deep)] hover:opacity-100"
-                >
-                  <Pencil aria-hidden className="size-3" />
-                </button>
+                {(e.source === "user" || e.bookId.startsWith("custom-")) && (
+                  <button
+                    type="button"
+                    onClick={() => openAddBook(e.bookId)}
+                    aria-label={`Editar ${book.title}`}
+                    title="Editar livro"
+                    className="absolute right-8 top-1.5 grid size-6 place-items-center rounded-full bg-[oklch(0.96_0.015_60_/_0.9)] text-[var(--ink-soft)] opacity-65 transition hover:text-[var(--violet-deep)] hover:opacity-100"
+                  >
+                    <Pencil aria-hidden className="size-3" />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => removeBook(e.bookId)}

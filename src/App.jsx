@@ -97,6 +97,7 @@ export default function App() {
   const passportTestMode = (import.meta.env.DEV || import.meta.env.VITE_PASSPORT_TEST === '1') && new URLSearchParams(window.location.search).get('passaporteTeste') === '1'
   const passportEnabled = usePassportStore(s => s.enabled) || passportTestMode
   const loadPassport = usePassportStore(s => s.load)
+  const syncPendingPassportStamps = usePassportStore(s => s.syncPendingStamps)
   const localPassportDemo = passportTestMode
 
   const currentPath =
@@ -148,14 +149,14 @@ export default function App() {
 
   useEffect(() => {
     const refreshContent = () => { if (navigator.onLine && user) { void loadExhibitors(); void loadContent(); void loadPassport(user.id) } }
-    const reconnect = () => { setOnline(true); refreshContent(); void syncUserData(user.id); void flushQueuedContributions(user.id); void supabase.from('user_route_settings').upsert({ user_id: user.id, origin_id: routeOriginGateId, user_position: userPosition }) }
+    const reconnect = () => { setOnline(true); refreshContent(); void syncUserData(user.id); void syncPendingPassportStamps(user.id); void flushQueuedContributions(user.id); void supabase.from('user_route_settings').upsert({ user_id: user.id, origin_id: routeOriginGateId, user_position: userPosition }) }
     const disconnect = () => setOnline(false)
     const foreground = () => { if (document.visibilityState === 'visible') refreshContent() }
     window.addEventListener('online', reconnect)
     window.addEventListener('offline', disconnect)
     document.addEventListener('visibilitychange', foreground)
     return () => { window.removeEventListener('online', reconnect); window.removeEventListener('offline', disconnect); document.removeEventListener('visibilitychange', foreground) }
-  }, [loadContent, loadExhibitors, loadPassport, routeOriginGateId, setOnline, syncUserData, user, userPosition])
+  }, [loadContent, loadExhibitors, loadPassport, routeOriginGateId, setOnline, syncPendingPassportStamps, syncUserData, user, userPosition])
 
   useEffect(() => {
     if (!isSupabaseConfigured) return

@@ -100,6 +100,16 @@ export const preloadOfflineQrTools = async () => {
   }
 }
 
+export const preloadOfflineViews = async () => {
+  await Promise.all([
+    import('../components/passport/SapphicPassport'),
+    import('../components/exhibitors/ExhibitorList'),
+    import('../components/route/RoutePlanner'),
+    import('../components/schedule/ScheduleView'),
+    import('../components/books/BookShowcase'),
+  ])
+}
+
 export const getOfflineReadiness = async () => {
   const keys = Object.keys(VERSION_FIELD) as OfflineDatasetKey[]
   const datasets = Object.fromEntries(await Promise.all(keys.map(async key => [key, Boolean(await getOfflineDataset(key))])))

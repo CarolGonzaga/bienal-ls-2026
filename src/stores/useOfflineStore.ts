@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { cacheOfflineAssets, getOfflineReadiness, preloadOfflineQrTools, syncPublicContent } from '../lib/contentSync'
+import { cacheOfflineAssets, getOfflineReadiness, preloadOfflineQrTools, preloadOfflineViews, syncPublicContent } from '../lib/contentSync'
 import { getOfflineDataset } from '../lib/offlineDb'
 
 type Readiness = Awaited<ReturnType<typeof getOfflineReadiness>>
@@ -24,6 +24,8 @@ export const useOfflineStore = create<OfflineState>((set, get) => ({
       await syncPublicContent({ force })
       set({ progress: 'Preparando leitor de QR para uso offline...' })
       await preloadOfflineQrTools()
+      set({ progress: 'Preparando mapa e passaporte para uso offline...' })
+      await preloadOfflineViews()
       set({ progress: 'Salvando imagens e mapa...' })
       const [exhibitors, passport, books] = await Promise.all([getOfflineDataset<any[]>('exhibitors'), getOfflineDataset<any[]>('passport'), getOfflineDataset<any[]>('books')])
       const logos = (exhibitors?.data || []).filter(item => item.active && !item.deleted_at).map(item => item.logo).filter(Boolean)

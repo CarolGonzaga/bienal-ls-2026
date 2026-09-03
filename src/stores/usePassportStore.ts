@@ -47,19 +47,29 @@ export const usePassportStore = create<PassportState>((set, get) => ({
     let code: string
     try { code = extractPassportCode(raw) } catch (error) { return { ok: false, message: error instanceof Error ? error.message : 'Código inválido.' } }
     const hash = await sha256Hex(code)
-    let match = get().codes.find(item => item.code_hash === hash && codeIsValidAt(item.valid_from, item.valid_until))
-    if (!match && isSupabaseConfigured && navigator.onLine) {
+    let candidate = get().codes.find(item => item.code_hash === hash)
+    if ((!candidate || !codeIsValidAt(candidate.valid_from, candidate.valid_until)) && isSupabaseConfigured && navigator.onLine) {
       const { data, error } = await supabase
         .from('passport_code_manifest')
         .select('author_id,code_hash,valid_from,valid_until,version')
         .eq('code_hash', hash)
         .maybeSingle()
-      if (!error && data && codeIsValidAt(data.valid_from, data.valid_until)) {
-        match = data as PassportCodeHash
-        set({ codes: [...get().codes.filter(item => item.author_id !== match?.author_id), match] })
+      if (!error && data) {
+        candidate = data as PassportCodeHash
+        set({ codes: [...get().codes.filter(item => item.author_id !== candidate?.author_id), candidate] })
       }
     }
-    if (!match) return { ok: false, message: 'Código inválido ou fora do período de validade.' }
+    if (!candidate) return { ok: false, message: 'Código inválido. Confira os caracteres e tente novamente.' }
+    if (!codeIsValidAt(candidate.valid_from, candidate.valid_until)) {
+      const now = new Date()
+      const validFrom = new Date(candidate.valid_from)
+      const validUntil = new Date(candidate.valid_until)
+      const formatDate = (date: Date) => new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(date)
+      if (now < validFrom) return { ok: false, message: `Este código poderá ser resgatado a partir de ${formatDate(validFrom)}.` }
+      if (now > validUntil) return { ok: false, message: `Este código expirou em ${formatDate(validUntil)}.` }
+      return { ok: false, message: 'Código fora do período de validade.' }
+    }
+    const match = candidate
     const author = get().authors.find(item => item.id === match.author_id)
     if (expectedAuthorId && match.author_id !== expectedAuthorId) return { ok: false, differentAuthor: author, message: 'Este código pertence a outra autora.' }
     if (get().stamps.some(item => item.authorId === match.author_id)) return { ok: true, authorId: match.author_id, message: 'Este carimbo já faz parte do seu Passaporte.' }

@@ -95,6 +95,7 @@ type Ctx = PassportState & {
 const STORAGE_TYPE = "sapphicPassportV2";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PassportContext = createContext<Ctx | null>(null);
+const isReaderAddedBook = (book: UserBook) => book.source === "user" || book.bookId.startsWith("custom-");
 
 const timestamp = (value?: string) => {
   const parsed = value ? Date.parse(value) : 0;
@@ -295,9 +296,12 @@ export function PassportProvider({
     editVersionRef.current += 1;
     setState((current) => ({
       ...current,
-      userBooks: current.userBooks.map((book) =>
-        book.bookId === bookId ? { ...book, ...patch } : book,
-      ),
+      userBooks: current.userBooks.map((book) => {
+        if (book.bookId !== bookId) return book;
+        if (isReaderAddedBook(book)) return { ...book, ...patch };
+        const permittedPatch: Partial<UserBook> = "bought" in patch ? { bought: patch.bought } : {};
+        return { ...book, ...permittedPatch };
+      }),
     }));
   }, []);
 
