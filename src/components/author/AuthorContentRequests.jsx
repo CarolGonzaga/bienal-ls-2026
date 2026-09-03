@@ -15,9 +15,15 @@ import { supabase } from "../../lib/supabase";
 import { LOCAL_AUTHOR_EXHIBITORS } from "../../data/localAuthorScenarios";
 import { optimizePassportPhoto } from "../../utils/optimizeImage";
 import { friendlySubmissionError } from "../../utils/friendlySubmissionError";
+import {
+  BIENAL_END_DATE,
+  BIENAL_START_DATE,
+  eventTimeWindow,
+  validateEventTime,
+} from "../../utils/eventScheduleHours";
 
-const EVENT_START = "2026-09-04";
-const EVENT_END = "2026-09-13";
+const EVENT_START = BIENAL_START_DATE;
+const EVENT_END = BIENAL_END_DATE;
 const PASSPORT_BOOK_LIMIT = 3;
 const BOOK_SYNOPSIS_MAX_LENGTH = 2000;
 const newPresence = () => ({
@@ -107,8 +113,8 @@ const validateContent = (requestType, item, index = 0) => {
     if (date < EVENT_START || date > EVENT_END)
       return `A data deve estar entre 04/09/2026 e 13/09/2026.`;
     if (!item.start_time) return `Informe o horário inicial${suffix}.`;
-    if (item.end_time && item.end_time < item.start_time)
-      return "O horário final não pode ser anterior ao horário inicial.";
+    const timeError = validateEventTime(date, item.start_time, item.end_time);
+    if (timeError) return timeError;
     if (requestType === "presence" && item.location_unspecified) {
       if (String(item.notes || "").trim().length < 10)
         return "Conte, de forma breve, em qual região da Bienal as leitoras poderão encontrar você.";
@@ -324,6 +330,8 @@ export default function AuthorContentRequests({
     return featured.size;
   }, [existing.books, pendingBooks]);
   const featuredSlots = Math.max(0, PASSPORT_BOOK_LIMIT - projectedFeaturedCount);
+  const presenceTimeWindow = eventTimeWindow(presence.presence_date);
+  const autographTimeWindow = eventTimeWindow(autograph.event_date);
 
   const load = async () => {
     if (localScenario) {
@@ -730,16 +738,23 @@ export default function AuthorContentRequests({
                 label="Horário inicial"
                 type="time"
                 required
+                min={presenceTimeWindow.min}
+                max={presenceTimeWindow.max}
                 value={presence.start_time}
                 onChange={(value) => setPresence({ ...presence, start_time: value })}
               />
               <Input
                 label="Horário final"
                 type="time"
+                min={presenceTimeWindow.min}
+                max={presenceTimeWindow.max}
                 value={presence.end_time}
                 onChange={(value) => setPresence({ ...presence, end_time: value })}
               />
             </div>
+            <p className="text-xs font-normal text-[#8a3a63]">
+              Horários permitidos neste dia: {presenceTimeWindow.label}.
+            </p>
             <label className="flex items-center gap-2 rounded-xl border border-[#edcddd] p-3 text-xs font-bold">
               <input
                 type="checkbox"
@@ -1007,16 +1022,23 @@ export default function AuthorContentRequests({
                 label="Horário inicial"
                 type="time"
                 required
+                min={autographTimeWindow.min}
+                max={autographTimeWindow.max}
                 value={autograph.start_time}
                 onChange={(value) => setAutograph({ ...autograph, start_time: value })}
               />
               <Input
                 label="Horário final"
                 type="time"
+                min={autographTimeWindow.min}
+                max={autographTimeWindow.max}
                 value={autograph.end_time}
                 onChange={(value) => setAutograph({ ...autograph, end_time: value })}
               />
             </div>
+            <p className="text-xs font-normal text-[#8a3a63]">
+              Horários permitidos neste dia: {autographTimeWindow.label}.
+            </p>
             <SelectStand exhibitors={exhibitors} item={autograph} setItem={setAutograph} required />
             <Input
               label="Livros (separados por vírgula)"

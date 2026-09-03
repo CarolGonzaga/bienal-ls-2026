@@ -10,6 +10,7 @@ import { useMapStore } from '../../stores/useMapStore'
 import AuthorsAdminPanel from './AuthorsAdminPanel'
 import SystemHealthPanel from './SystemHealthPanel'
 import { optimizePassportPhoto } from '../../utils/optimizeImage'
+import { BIENAL_END_DATE, BIENAL_START_DATE, eventTimeWindow, validateEventTime } from '../../utils/eventScheduleHours'
 
 const TABS = [
   ['overview', 'Visão geral', LayoutDashboard],
@@ -38,13 +39,14 @@ const Field = ({ label, children }) => (
   </div>
 )
 
-const TextInput = ({ value, onChange, placeholder, type = 'text' }) => (
+const TextInput = ({ value, onChange, placeholder, type = 'text', ...props }) => (
   <input
     type={type}
     value={value ?? ''}
     onChange={e => onChange(e.target.value)}
     placeholder={placeholder}
     className="admin-input w-full rounded-xl border px-3 py-2 text-xs"
+    {...props}
   />
 )
 
@@ -119,6 +121,7 @@ const FormActions = ({ onSave, onCancel }) => (
 
 /* ── Event Editor ───────────────────────────────────────── */
 const EventEditor = ({ item, exhibitors, onSave, onCancel }) => {
+  const [validationError, setValidationError] = useState('')
   const [form, setForm] = useState({
     author_name: item.author_name || '',
     event_type: item.event_type || 'autograph',
@@ -135,6 +138,16 @@ const EventEditor = ({ item, exhibitors, onSave, onCancel }) => {
     active: item.active !== false
   })
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }))
+  const timeWindow = eventTimeWindow(form.event_date)
+  const save = () => {
+    if (!form.event_date || form.event_date < BIENAL_START_DATE || form.event_date > BIENAL_END_DATE)
+      return setValidationError('A data deve estar entre 04/09/2026 e 13/09/2026.')
+    if (!form.start_time) return setValidationError('Informe o horário inicial.')
+    const timeError = validateEventTime(form.event_date, form.start_time, form.end_time)
+    if (timeError) return setValidationError(timeError)
+    setValidationError('')
+    onSave(form)
+  }
   return (
     <div className="mt-4 grid gap-4 rounded-2xl bg-black/5 p-4 dark:bg-white/5 sm:grid-cols-2">
       <Field label="Nome da autora"><TextInput value={form.author_name} onChange={v => set('author_name', v)} placeholder="Nome da autora" /></Field>
@@ -142,13 +155,13 @@ const EventEditor = ({ item, exhibitors, onSave, onCancel }) => {
         <SelectInput value={form.event_type} onChange={v => set('event_type', v)} options={[['autograph', 'Sessão de autógrafo'], ['presence', 'Presença']]} />
       </Field>
       <Field label="Data">
-        <TextInput type="date" value={form.event_date} onChange={v => set('event_date', v)} />
+        <TextInput type="date" min={BIENAL_START_DATE} max={BIENAL_END_DATE} value={form.event_date} onChange={v => set('event_date', v)} />
       </Field>
       <Field label="Horário início">
-        <TextInput type="time" value={form.start_time} onChange={v => set('start_time', v)} />
+        <TextInput type="time" min={timeWindow.min} max={timeWindow.max} value={form.start_time} onChange={v => set('start_time', v)} />
       </Field>
       <Field label="Horário fim">
-        <TextInput type="time" value={form.end_time} onChange={v => set('end_time', v)} />
+        <TextInput type="time" min={timeWindow.min} max={timeWindow.max} value={form.end_time} onChange={v => set('end_time', v)} />
       </Field>
       <Field label="Código do estande">
         <TextInput value={form.stand_code} onChange={v => set('stand_code', v)} placeholder="Ex: K33" />
@@ -178,7 +191,9 @@ const EventEditor = ({ item, exhibitors, onSave, onCancel }) => {
         <Toggle label="Evento ativo (visível no site)" value={form.active} onChange={v => set('active', v)} />
       </div>
       <div className="sm:col-span-2">
-        <FormActions onSave={() => onSave(form)} onCancel={onCancel} />
+        <p className="mb-2 text-xs font-bold text-[#8a3a63]">Horários permitidos neste dia: {timeWindow.label}.</p>
+        {validationError && <p className="mb-2 rounded-xl border border-rose-300 bg-rose-50 p-2 text-xs font-bold text-rose-700">{validationError}</p>}
+        <FormActions onSave={save} onCancel={onCancel} />
       </div>
     </div>
   )
