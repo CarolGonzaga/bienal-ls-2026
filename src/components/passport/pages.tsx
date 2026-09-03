@@ -759,7 +759,14 @@ function AuthorBooksPage({
                   ) : (
                     <ShoppingBag aria-hidden className="size-4" />
                   )}
-                  {inBienalList ? "Na lista da Bienal" : "Incluir na lista da Bienal"}
+                  {inBienalList ? (
+                    "Na lista da Bienal"
+                  ) : (
+                    <>
+                      <span className="hidden md:inline">Incluir na lista da Bienal</span>
+                      <span className="md:hidden">Incluir na lista</span>
+                    </>
+                  )}
                 </InkButton>
               </div>
               <div className="author-book-tags col-span-2 flex flex-wrap items-start gap-1.5 sm:col-span-1 sm:flex-col sm:items-end">

@@ -994,7 +994,7 @@
   }
 
   .author-profile-message .font-message {
-    font-size: clamp(0.82rem, 4.35vw, 1.02rem);
+    font-size: clamp(calc(0.82rem - 2px), calc(4.35vw - 2px), calc(1.02rem - 2px));
     line-height: 1.05;
   }
 
@@ -1089,6 +1089,7 @@
     grid-area: synopsis;
     min-height: 0;
     max-height: none;
+    margin-top: 0.35rem !important;
     padding-right: 0.35rem;
     font-size: 0.76rem !important;
     line-height: 1.36;
@@ -1149,17 +1150,21 @@
   .author-schedule-card {
     min-height: 0;
     height: 100%;
+    align-content: center;
     align-items: center;
-    grid-template-columns: minmax(0, 1fr) minmax(8.7rem, 45%) !important;
-    column-gap: 0.55rem !important;
-    padding: 0.7rem !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    column-gap: 0.65rem !important;
+    row-gap: 0.28rem !important;
+    padding: 0.72rem 0.8rem !important;
     border: 1px dashed var(--rose-antique) !important;
     border-radius: 9px;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto auto;
     grid-template-areas:
-      "date location"
-      "time location"
-      "related related";
+      "date time"
+      "booth booth"
+      "publisher publisher"
+      "related related"
+      ". kind";
   }
 
   .author-schedule-main {
@@ -1179,35 +1184,40 @@
   }
 
   .author-schedule-card > div:last-child {
-    grid-area: location;
-    min-width: 0;
-    text-align: right;
+    display: contents;
   }
 
   .author-schedule-date,
   .author-schedule-time {
     white-space: nowrap;
-    font-size: 0.84rem !important;
+    font-size: clamp(0.72rem, 3.4vw, 0.88rem) !important;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  .author-schedule-time {
+    justify-self: end;
+    margin-top: 0 !important;
   }
 
   .author-schedule-related {
     display: flex !important;
+    justify-self: center;
+    max-width: 100%;
     overflow: hidden;
-    font-size: clamp(0.56rem, 2.35vw, 0.7rem) !important;
+    font-size: clamp(0.6rem, 2.55vw, 0.72rem) !important;
     line-height: 1.22;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
   .author-schedule-location-row {
-    display: flex !important;
-    flex-direction: column;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    gap: 0.2rem !important;
+    display: contents !important;
   }
 
   .author-schedule-kind {
+    grid-area: kind;
+    justify-self: end;
     max-width: 100%;
     padding: 0.17rem 0.35rem !important;
     font-size: 0.5rem !important;
@@ -1217,19 +1227,28 @@
   }
 
   .author-schedule-booth {
+    grid-area: booth;
+    justify-self: center;
     max-width: 100%;
-    padding: 0.18rem 0.4rem !important;
-    font-size: 0.9rem !important;
+    padding: 0.05rem 0.35rem !important;
+    border: 0 !important;
+    font-size: clamp(1.15rem, 6vw, 1.55rem) !important;
     line-height: 1.1;
     white-space: nowrap;
   }
 
   .author-schedule-publisher {
-    justify-content: flex-end;
-    margin-top: 0.25rem !important;
-    font-size: 0.68rem !important;
+    grid-area: publisher;
+    justify-self: center;
+    justify-content: center;
+    max-width: 100%;
+    margin-top: 0 !important;
+    overflow: hidden;
+    font-size: clamp(0.6rem, 2.55vw, 0.72rem) !important;
     line-height: 1.1;
-    text-align: right;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .schedule-generic-update {
