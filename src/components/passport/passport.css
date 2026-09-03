@@ -1113,9 +1113,10 @@
   }
 
   .author-schedule-card .author-schedule-kind {
-    padding: 0.22rem 0.45rem;
-    font-size: 0.62rem;
-    letter-spacing: 0.09em;
+    padding: 0.13rem 0.38rem;
+    font-size: 0.52rem;
+    line-height: 1;
+    letter-spacing: 0.08em;
   }
 
   .author-schedule-location-row {
@@ -1123,20 +1124,26 @@
     flex-direction: column;
     align-items: flex-end !important;
     justify-content: flex-start !important;
-    gap: 0.25rem !important;
+    gap: 0.15rem !important;
     min-width: 0;
     white-space: nowrap;
   }
 
-  .author-schedule-booth {
+  .author-schedule-card .author-schedule-booth {
     display: block;
     width: auto;
     flex: none;
     white-space: nowrap;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.86rem;
+    line-height: 1.1;
   }
 
-  .author-schedule-publisher {
+  .author-schedule-card .author-schedule-publisher {
     min-width: 0;
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    line-height: 1.05;
     white-space: nowrap;
   }
 
