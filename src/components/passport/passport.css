@@ -1150,7 +1150,7 @@
   .author-schedule-card {
     min-height: 0;
     height: 100%;
-    align-content: center;
+    align-content: space-between;
     align-items: center;
     grid-template-columns: minmax(0, 1fr) auto !important;
     column-gap: 0.65rem !important;
