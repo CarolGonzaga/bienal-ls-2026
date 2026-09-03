@@ -136,7 +136,7 @@ function IdentityPage() {
 
       <div className="identity-document-note mt-[clamp(1.8rem,4.5vh,2.8rem)] text-center">
         <p className="w-full text-[0.62rem] uppercase leading-relaxed tracking-[0.14em] text-[var(--ink-soft)]">
-          Este documento acompanha a portadora durante a Bienal do Livro de São Paulo 2026.
+          Este documento acompanha a pessoa portadora durante a Bienal do Livro de São Paulo 2026.
         </p>
         <RoundStamp variant={2} className="absolute right-0 bottom-5" />
       </div>
