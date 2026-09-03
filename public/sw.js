@@ -1,5 +1,5 @@
 // Alterar a versão invalida a resposta antiga do service worker quando há nova publicação.
-const CACHE_NAME = 'mapasafico-v6'
+const CACHE_NAME = 'mapasafico-v7'
 const OFFLINE_ASSET_CACHE = 'mapasafico-offline-assets-v1'
 const BASE = '/mapasaficobienal'
 // Preenchido no diretório dist durante o build com todos os módulos, estilos e fontes versionados.
@@ -11,7 +11,13 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => ![CACHE_NAME, OFFLINE_ASSET_CACHE].includes(key)).map(key => caches.delete(key)))).then(() => self.clients.claim()))
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(key => ![CACHE_NAME, OFFLINE_ASSET_CACHE].includes(key)).map(key => caches.delete(key))))
+      .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
+      .then(clients => Promise.allSettled(clients.map(client => client.navigate(client.url))))
+  )
 })
 
 self.addEventListener('fetch', event => {
