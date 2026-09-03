@@ -1099,7 +1099,7 @@
     padding: 0.55rem 0.7rem;
     border: 1px dashed var(--rose-antique) !important;
     border-radius: 10px;
-    grid-template-columns: minmax(0, 1fr) 8.25rem !important;
+    grid-template-columns: 10.5rem minmax(0, 1fr) !important;
     column-gap: 0.75rem !important;
   }
 
@@ -1112,18 +1112,26 @@
     white-space: nowrap;
   }
 
+  .author-schedule-card .author-schedule-kind {
+    padding: 0.22rem 0.45rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.09em;
+  }
+
+  .author-schedule-location-row {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
   .author-schedule-booth {
     display: block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: auto;
+    flex: none;
     white-space: nowrap;
   }
 
   .author-schedule-publisher {
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 

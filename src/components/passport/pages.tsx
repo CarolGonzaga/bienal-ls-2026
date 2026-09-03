@@ -807,18 +807,9 @@ function AuthorSchedulePage({
         {entries.map((s) => (
           <li key={s.id} className={`author-schedule-card grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"}`}>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2">
                 <span className={`author-schedule-date font-body font-bold text-[var(--ink)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                   <CalendarDays aria-hidden className="mr-1 inline size-4" /> {s.weekday}, {s.date}
-                </span>
-                <span
-                  className={`author-schedule-kind rounded-[4px] px-2 py-0.5 text-[0.58rem] font-bold uppercase tracking-[0.12em] ${
-                    s.kind === "presenca"
-                      ? "bg-[var(--brand-pink-soft)] text-[var(--violet-deep)]"
-                      : "bg-[var(--seal)] text-white"
-                  }`}
-                >
-                  {s.kind === "presenca" ? "Presença confirmada" : "Sessão de autógrafos"}
                 </span>
               </div>
               <p className={`author-schedule-time mt-1 flex items-center gap-1 text-[var(--ink)] ${dense ? "text-[0.72rem]" : "text-[0.85rem]"}`}>
@@ -830,10 +821,21 @@ function AuthorSchedulePage({
                 </p>
               )}
             </div>
-            <div className="sm:text-right">
-              <span title={s.booth} className={`author-schedule-booth inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
-                {s.booth}
-              </span>
+            <div className="min-w-0 sm:text-right">
+              <div className="author-schedule-location-row flex items-center justify-end gap-2">
+                <span
+                  className={`author-schedule-kind rounded-[4px] px-2 py-0.5 text-[0.58rem] font-bold uppercase tracking-[0.12em] ${
+                    s.kind === "presenca"
+                      ? "bg-[var(--brand-pink-soft)] text-[var(--violet-deep)]"
+                      : "bg-[var(--seal)] text-white"
+                  }`}
+                >
+                  {s.kind === "presenca" ? "Presença confirmada" : "Sessão de autógrafos"}
+                </span>
+                <span title={s.booth} className={`author-schedule-booth inline-block rounded-[4px] border border-[var(--rose-antique)] bg-transparent px-2 py-0.5 font-display font-bold text-[var(--violet-deep)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
+                  {s.booth}
+                </span>
+              </div>
               <p title={s.publisher} className={`author-schedule-publisher mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
                 <Building2 aria-hidden className="size-4" /> {s.publisher}
               </p>
