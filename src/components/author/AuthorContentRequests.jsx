@@ -15,6 +15,7 @@ import { supabase } from "../../lib/supabase";
 import { LOCAL_AUTHOR_EXHIBITORS } from "../../data/localAuthorScenarios";
 import { optimizePassportPhoto } from "../../utils/optimizeImage";
 import { friendlySubmissionError } from "../../utils/friendlySubmissionError";
+import { dedupeBookTags } from "../../utils/bookTags";
 import {
   BIENAL_END_DATE,
   BIENAL_START_DATE,
@@ -597,9 +598,7 @@ export default function AuthorContentRequests({
           : bookItems.map((book) => ({
                 ...book,
                 notes: book.synopsis,
-                tags: [book.genre, ...book.tags.split(",")]
-                  .map((value) => value.trim())
-                  .filter(Boolean),
+                tags: dedupeBookTags(book.genre, book.tags.split(",")),
                 ...editMetadata,
               }));
     if (activeKind === "book") {

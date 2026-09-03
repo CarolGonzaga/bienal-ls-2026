@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { isSupabaseConfigured } from '../lib/supabase.js'
 import { getOfflineDataset } from '../lib/offlineDb'
 import { syncPublicContent } from '../lib/contentSync'
+import { dedupeBookTags } from '../utils/bookTags'
 
 export type PublishedBook = { id: string; title: string; authorName: string; publisher?: string; coverUrl?: string; genre?: string; autographAvailable?: boolean; synopsis: string; tropes: string[]; exhibitorIds: string[]; standCode?: string }
 export type PublishedEvent = { id: string; eventType: 'autograph' | 'presence'; authorSourceId?: string; date: string; startTime: string; endTime: string; standCode?: string; locationName: string; mapSpaceId?: string; bookTitle?: string; title: string; description: string; speakers: string[]; categories: string[]; exhibitorIds: string[]; active: boolean }
@@ -16,7 +17,7 @@ export const useContentStore = create<ContentState>(set => ({
   books: [],
   events: [],
   loadContent: async () => {
-    const applyBooks = (rows: any[]) => set({ books: rows.filter(row => row.active && !row.deleted_at).map(row => ({ id: row.id, title: row.title, authorName: row.author_name, publisher: row.publisher, coverUrl: row.cover_url || undefined, genre: row.genre || undefined, autographAvailable: Boolean(row.autograph_available), synopsis: row.notes || `Livro de ${row.author_name}`, tropes: row.tags || [], exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], standCode: row.stand_code })) })
+    const applyBooks = (rows: any[]) => set({ books: rows.filter(row => row.active && !row.deleted_at).map(row => ({ id: row.id, title: row.title, authorName: row.author_name, publisher: row.publisher, coverUrl: row.cover_url || undefined, genre: row.genre || undefined, autographAvailable: Boolean(row.autograph_available), synopsis: row.notes || `Livro de ${row.author_name}`, tropes: dedupeBookTags(row.genre, row.tags), exhibitorIds: row.exhibitor_id ? [row.exhibitor_id] : [], standCode: row.stand_code })) })
     const applyEvents = (rows: any[]) => set({ events: rows.filter(row => row.active && !row.deleted_at).map(row => {
       const books = (row.books || []).filter(Boolean)
       const eventType = row.event_type === 'presence' ? 'presence' : 'autograph'
