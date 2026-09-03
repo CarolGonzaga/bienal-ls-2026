@@ -10,6 +10,7 @@ import {
 import { usePassport, type Stamp as StampEntry, type UserBook } from "@/lib/passport-store";
 import { Field, InkButton, PageFrame, RoundStamp, Skyline, useNav, Watermark } from "./ui";
 import { toPng } from "html-to-image";
+import { createPortal } from "react-dom";
 import {
   ArrowDown,
   ArrowLeft,
@@ -510,9 +511,6 @@ function AuthorsIntroPage() {
       <p className="authors-intro-description text-[clamp(0.8rem,1.4vw,0.9rem)] leading-relaxed text-[var(--ink)]">
         Encontre autoras participantes no estande, escaneie o QR Code ou digite o código para
         desbloquear o carimbo delas no seu passaporte.
-      </p>
-      <p className="authors-intro-memory mt-1.5 font-script text-[clamp(1.4rem,2.6vw,1.75rem)] text-[var(--seal)]">
-        Cada carimbo é uma memória da Bienal.
       </p>
       <div className="pointer-events-none absolute inset-x-[22.5%] bottom-0">
         <Skyline />
@@ -1103,28 +1101,35 @@ function QRCodeScanner({
     };
   }, [onCode]);
 
-  return (
+  return createPortal(
     <div
-      className="dashed-frame mt-3 overflow-hidden bg-[oklch(0.25_0.03_300)] p-2 text-center text-white"
-      role="region"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-[oklch(0.16_0.04_320_/_0.72)] p-4 backdrop-blur-[2px]"
+      role="dialog"
+      aria-modal="true"
       aria-label="Leitor de QR Code"
     >
-      {error ? (
-        <p className="px-3 py-5 text-sm">{error}</p>
-      ) : (
-        <div className="relative mx-auto aspect-square max-h-64 overflow-hidden rounded-[8px]">
-          <video ref={videoRef} muted playsInline className="size-full object-cover" />
-          <div className="pointer-events-none absolute inset-[15%] rounded-[10px] border-2 border-[var(--rose-antique)] shadow-[0_0_0_999px_oklch(0.1_0.02_300_/_0.38)]" />
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={onClose}
-        className="mt-2 px-3 py-1 text-xs uppercase tracking-[0.16em] underline underline-offset-4"
-      >
-        Fechar câmera
-      </button>
-    </div>
+      <div className="w-full max-w-sm overflow-hidden rounded-[16px] border border-[oklch(0.9_0.05_50_/_0.55)] bg-[oklch(0.25_0.03_300)] p-3 text-center text-white shadow-2xl">
+        <p className="mb-3 text-[0.64rem] font-bold uppercase tracking-[0.16em] text-[oklch(0.96_0.03_50)]">
+          Aponte a câmera para o QR Code
+        </p>
+        {error ? (
+          <p className="px-3 py-8 text-sm">{error}</p>
+        ) : (
+          <div className="relative mx-auto aspect-square w-full max-w-[18rem] overflow-hidden rounded-[10px]">
+            <video ref={videoRef} muted playsInline className="size-full object-cover" />
+            <div className="pointer-events-none absolute inset-[15%] rounded-[10px] border-2 border-[var(--rose-antique)] shadow-[0_0_0_999px_oklch(0.1_0.02_300_/_0.38)]" />
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-3 min-h-10 px-4 text-xs font-bold uppercase tracking-[0.16em] underline underline-offset-4"
+        >
+          Fechar câmera
+        </button>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -1269,16 +1274,16 @@ function CollectionStoryShell({
         className="paper-surface relative flex h-[1920px] w-[1080px] flex-col overflow-hidden px-20 pt-24 pb-18 text-[var(--ink)]"
       >
         <Watermark />
-        <header className="relative shrink-0 text-center">
+        <header className="relative shrink-0 pr-52 text-left">
           <img
             src={passportAsset("selo3.png")}
             alt=""
-            className="absolute top-0 right-0 size-24 object-contain opacity-55"
+            className="absolute top-[-0.35rem] right-0 size-36 object-contain opacity-65"
           />
-          <p className="font-body text-[26px] font-bold uppercase tracking-[0.28em] text-[var(--seal)]">
+          <p className="font-body text-[24px] font-bold uppercase tracking-[0.2em] text-[var(--seal)]">
             Bienal do Livro de SP 2026
           </p>
-          <h2 className="mt-5 whitespace-nowrap font-display text-[68px] font-bold uppercase tracking-[0.04em] text-[var(--violet-deep)]">
+          <h2 className="mt-4 whitespace-nowrap font-display text-[64px] font-bold uppercase tracking-[0.04em] text-[var(--violet-deep)]">
             {subtitle}
           </h2>
           <div className="hairline mt-8" />
@@ -1650,10 +1655,8 @@ export function buildPages(
     { id: "sumario", section: "id", render: () => null }, // substituído abaixo
   ];
 
-  // No celular, cada livro recebe uma página inteira. Assim os campos ficam
-  // confortáveis para leitura e edição, sem transformar a página em uma área
-  // de rolagem vertical.
-  chunk(buy, mobile ? 1 : 3).forEach((group, i) =>
+  // No celular, dois cartões dividem a página sem usar rolagem vertical.
+  chunk(buy, mobile ? 2 : 3).forEach((group, i) =>
     pages.push({
       id: `bienal-${i}`,
       section: "bienal",
@@ -1698,7 +1701,7 @@ export function buildPages(
         ),
       });
     });
-    const schedulePages = chunk(a.schedule, mobile ? 4 : 5);
+    const schedulePages = chunk(a.schedule, mobile ? 3 : 5);
     schedulePages.forEach((entries, scheduleIndex) => {
       pages.push({
         id: `autora-${a.id}-programacao${scheduleIndex ? `-${scheduleIndex}` : ""}`,

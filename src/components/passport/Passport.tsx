@@ -170,14 +170,14 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.3rem)" }}
       >
         <div className="passport-mobile-navigation w-full shrink-0 md:hidden">
-          <div className="grid grid-cols-[2.65rem_minmax(0,1fr)_2.65rem] items-center gap-2">
+          <div className="grid grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-center gap-2">
             <button
               onClick={prev}
               disabled={current === 0}
               aria-label="Página anterior"
-              className="grid size-[2.65rem] place-items-center rounded-full border border-[oklch(0.9_0.04_50_/_0.55)] bg-[oklch(0.35_0.08_10_/_0.32)] text-[var(--paper)] shadow-sm transition active:scale-95 disabled:opacity-25"
+              className="grid size-[2.25rem] place-items-center rounded-full border border-[oklch(0.9_0.04_50_/_0.55)] bg-[oklch(0.35_0.08_10_/_0.32)] text-[var(--paper)] shadow-sm transition active:scale-95 disabled:opacity-25"
             >
-              <ChevronLeft aria-hidden className="size-5" />
+              <ChevronLeft aria-hidden className="size-4" />
             </button>
             <div className="min-w-0 text-center text-[var(--paper)]">
               <p aria-live="polite" className="text-[0.64rem] font-bold uppercase tracking-[0.18em]">
@@ -191,29 +191,12 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
               onClick={next}
               disabled={current >= pages.length - 1}
               aria-label="Próxima página"
-              className="grid size-[2.65rem] place-items-center rounded-full border border-[oklch(0.9_0.04_50_/_0.55)] bg-[oklch(0.35_0.08_10_/_0.32)] text-[var(--paper)] shadow-sm transition active:scale-95 disabled:opacity-25"
+              className="grid size-[2.25rem] place-items-center rounded-full border border-[oklch(0.9_0.04_50_/_0.55)] bg-[oklch(0.35_0.08_10_/_0.32)] text-[var(--paper)] shadow-sm transition active:scale-95 disabled:opacity-25"
             >
-              <ChevronRight aria-hidden className="size-5" />
+              <ChevronRight aria-hidden className="size-4" />
             </button>
           </div>
 
-          <nav aria-label="Seções do passaporte" className="mt-1.5 grid grid-cols-3 gap-1.5">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => goTo(t.target)}
-                aria-current={pages[current]?.section === t.id ? "page" : undefined}
-                className={`flex min-h-8 items-center justify-center gap-1 rounded-full border px-1.5 py-1 text-[0.52rem] font-bold uppercase tracking-[0.08em] transition active:scale-[0.98] ${
-                  pages[current]?.section === t.id
-                    ? "border-transparent bg-[var(--paper)] text-[var(--violet-deep)]"
-                    : "border-[oklch(0.9_0.04_50_/_0.42)] bg-[oklch(0.35_0.08_10_/_0.2)] text-[oklch(0.97_0.015_60_/_0.88)]"
-                }`}
-              >
-                <t.icon aria-hidden className="size-3" />
-                <span className="truncate">{t.label}</span>
-              </button>
-            ))}
-          </nav>
         </div>
 
         <div className="passport-book-wrap relative w-full max-w-[min(1120px,97vw)] [perspective:1800px]">
