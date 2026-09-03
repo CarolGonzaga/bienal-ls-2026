@@ -220,7 +220,7 @@ const BookEditor = ({ item, exhibitors, onSave, onCancel }) => {
     setUploadingCover(true); setCoverError('')
     try {
       const optimized = await optimizePassportPhoto(file)
-      const path = `admin/${item.id || 'new'}/${crypto.randomUUID()}.webp`
+      const path = `admin/${item.id || 'new'}/${crypto.randomUUID()}.${optimized.extension}`
       const { error } = await supabase.storage.from('passport-book-covers').upload(path, optimized.blob, { upsert: false, contentType: optimized.mime, cacheControl: '31536000' })
       if (error) throw error
       set('cover_url', supabase.storage.from('passport-book-covers').getPublicUrl(path).data.publicUrl)

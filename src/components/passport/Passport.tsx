@@ -403,7 +403,7 @@ function Cover({
           className={`passport-spread relative grid gap-0 overflow-hidden rounded-[14px] md:grid-cols-2 ${
             showPages ? "passport-spread-open passport-spread-open-reveal" : ""
           }`}
-          inert
+          inert={"" as unknown as boolean}
         >
           {opening && !showPages && (
             <>

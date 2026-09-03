@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactNode, type RefObject } from "react";
 import {
   authors,
   bookById,
@@ -1049,9 +1049,6 @@ function AuthorStampPage({ author, preview = false }: { author: Author; preview?
   );
 }
 
-type BarcodeResult = { rawValue: string };
-type BarcodeDetectorInstance = { detect: (source: HTMLVideoElement) => Promise<BarcodeResult[]> };
-
 function QRCodeScanner({
   onCode,
   onClose,
@@ -1060,11 +1057,11 @@ function QRCodeScanner({
   onClose: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
-    let timer = 0;
+    let scanner: { destroy: () => void } | null = null;
     let active = true;
 
     const start = async () => {
@@ -1072,47 +1069,52 @@ function QRCodeScanner({
         if (!navigator.mediaDevices?.getUserMedia) {
           throw new Error("A câmera não está disponível neste navegador.");
         }
-        const Detector = (
-          window as unknown as {
-            BarcodeDetector?: new (options: { formats: string[] }) => BarcodeDetectorInstance;
-          }
-        ).BarcodeDetector;
-        if (!Detector) {
-          throw new Error(
-            "Este navegador não reconhece QR Codes pela câmera. Use o código da autora.",
-          );
-        }
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
-          audio: false,
-        });
         const video = videoRef.current;
         if (!video || !active) return;
-        video.srcObject = stream;
-        await video.play();
-        const detector = new Detector({ formats: ["qr_code"] });
-        timer = window.setInterval(async () => {
-          if (!active || video.readyState < 2) return;
-          try {
-            const results = await detector.detect(video);
-            const value = results[0]?.rawValue;
-            if (value) onCode(value);
-          } catch {
-            // Alguns frames podem falhar enquanto a câmera ajusta o foco.
-          }
-        }, 350);
+        video.muted = true;
+        video.setAttribute("playsinline", "true");
+        const { default: QrScanner } = await import("qr-scanner");
+        scanner = new QrScanner(
+          video,
+          (result) => {
+            const value = typeof result === "string" ? result : result.data;
+            if (active && value) onCode(value);
+          },
+          {
+            preferredCamera: "environment",
+            returnDetailedScanResult: true,
+            maxScansPerSecond: 6,
+          },
+        );
+        await scanner.start();
       } catch (reason) {
-        setError(reason instanceof Error ? reason.message : "Não foi possível abrir a câmera.");
+        setError(cameraErrorMessage(reason));
       }
     };
 
     void start();
     return () => {
       active = false;
-      window.clearInterval(timer);
-      stream?.getTracks().forEach((track) => track.stop());
+      scanner?.destroy();
     };
   }, [onCode]);
+
+  const scanImage = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setError("");
+    try {
+      const { default: QrScanner } = await import("qr-scanner");
+      const result = await QrScanner.scanImage(file, { returnDetailedScanResult: true });
+      const value = typeof result === "string" ? result : result.data;
+      if (!value) throw new Error("QR Code não encontrado.");
+      onCode(value);
+    } catch {
+      setError("Não encontramos um QR Code nessa imagem. Tente aproximar a câmera e evite reflexos.");
+    } finally {
+      event.target.value = "";
+    }
+  };
 
   return createPortal(
     <div
@@ -1125,14 +1127,29 @@ function QRCodeScanner({
         <p className="mb-3 text-[0.64rem] font-bold uppercase tracking-[0.16em] text-[oklch(0.96_0.03_50)]">
           Aponte a câmera para o QR Code
         </p>
-        {error ? (
-          <p className="px-3 py-8 text-sm">{error}</p>
-        ) : (
-          <div className="relative mx-auto aspect-square w-full max-w-[18rem] overflow-hidden rounded-[10px]">
-            <video ref={videoRef} muted playsInline className="size-full object-cover" />
+        <div className={`relative mx-auto aspect-square w-full max-w-[18rem] overflow-hidden rounded-[10px] ${error ? "hidden" : ""}`}>
+            <video ref={videoRef} autoPlay muted playsInline className="size-full object-cover" />
             <div className="pointer-events-none absolute inset-[15%] rounded-[10px] border-2 border-[var(--rose-antique)] shadow-[0_0_0_999px_oklch(0.1_0.02_300_/_0.38)]" />
-          </div>
-        )}
+        </div>
+        {error && <p className="px-3 py-5 text-sm">{error}</p>}
+        <button
+          type="button"
+          onClick={() => imageInputRef.current?.click()}
+          className="mx-auto mt-3 flex min-h-10 items-center justify-center gap-2 rounded-full border border-white/40 px-4 text-xs font-bold uppercase tracking-[0.1em]"
+        >
+          <Camera aria-hidden className="size-4" /> Ler QR por uma foto
+        </button>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={(event) => void scanImage(event)}
+          hidden
+        />
+        <p className="mt-2 px-3 text-[0.65rem] leading-4 text-white/70">
+          No iPhone, esta opção também pode abrir a câmera para fotografar o código.
+        </p>
         <button
           type="button"
           onClick={onClose}
@@ -1144,6 +1161,23 @@ function QRCodeScanner({
     </div>,
     document.body,
   );
+}
+
+function cameraErrorMessage(reason: unknown) {
+  const name = reason instanceof DOMException ? reason.name : "";
+  if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+    return "A câmera está bloqueada. No iPhone, permita o acesso em Ajustes › Safari › Câmera e tente novamente.";
+  }
+  if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+    return "Nenhuma câmera foi encontrada neste aparelho.";
+  }
+  if (name === "NotReadableError" || name === "TrackStartError") {
+    return "A câmera está sendo usada por outro aplicativo. Feche-o e tente novamente.";
+  }
+  if (!window.isSecureContext) {
+    return "A câmera só pode ser aberta em uma conexão segura (HTTPS).";
+  }
+  return reason instanceof Error ? reason.message : "Não foi possível abrir a câmera.";
 }
 
 function StampSeal({

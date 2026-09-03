@@ -544,7 +544,7 @@ export default function AuthorContentRequests({
           ),
         );
       } else {
-        const path = `${authorId}/books/${crypto.randomUUID()}.webp`;
+        const path = `${authorId}/books/${crypto.randomUUID()}.${optimized.extension}`;
         const { error } = await supabase.storage
           .from("passport-book-covers")
           .upload(path, optimized.blob, {

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender-seo.mjs && node scripts/audit-offline-package.mjs",
+    "build": "vite build && node scripts/inject-service-worker-assets.mjs && node scripts/prerender-seo.mjs && node scripts/audit-offline-package.mjs",
     "lint": "eslint .",
     "test:map": "node --experimental-strip-types --test src/tests/map/*.test.ts",
     "test:passport": "node --experimental-strip-types --test src/tests/passport/*.test.ts",

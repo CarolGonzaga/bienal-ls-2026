@@ -1,11 +1,13 @@
 // Alterar a versão invalida a resposta antiga do service worker quando há nova publicação.
-const CACHE_NAME = 'mapasafico-v4'
+const CACHE_NAME = 'mapasafico-v6'
 const OFFLINE_ASSET_CACHE = 'mapasafico-offline-assets-v1'
 const BASE = '/mapasaficobienal'
+// Preenchido no diretório dist durante o build com todos os módulos, estilos e fontes versionados.
+const BUILD_ASSETS = []
 const APP_SHELL = [`${BASE}/login`, `${BASE}/index.html`, `${BASE}/manifest.json`, `${BASE}/logo-icon.png`, `${BASE}/logo-texto.png`, `${BASE}/logo-completo.png`, `${BASE}/logo-ls-watermark.png`]
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()))
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([...APP_SHELL, ...BUILD_ASSETS])).then(() => self.skipWaiting()))
 })
 
 self.addEventListener('activate', event => {
