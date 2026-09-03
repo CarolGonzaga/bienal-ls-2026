@@ -587,7 +587,7 @@ function AuthorNav({ author }: { author: Author }) {
   const prev = authors[i - 1];
   const next = authors[i + 1];
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 text-[0.62rem] uppercase tracking-[0.16em]">
+    <div className="author-page-nav flex flex-wrap items-center justify-between gap-2 pt-2 text-[0.62rem] uppercase tracking-[0.16em]">
       <button
         disabled={!prev}
         onClick={() => prev && goTo(`autora-${prev.id}-perfil`)}
@@ -1346,7 +1346,7 @@ function StampsPage({
               </InkButton>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="passport-stamps-grid grid grid-cols-3 gap-2 sm:gap-3">
               {pageStamps.map((s) => {
                 const author = authors.find((a) => a.id === s.authorId);
                 if (!author) return null;
@@ -1474,7 +1474,7 @@ function PurchasedBooksPage({
               </InkButton>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+            <div className="passport-purchased-books-grid grid grid-cols-3 gap-2.5 sm:gap-3">
               {resolvedBooks.map(({ entry, book }) => (
                 <article
                   key={entry.bookId}
@@ -1650,7 +1650,10 @@ export function buildPages(
     { id: "sumario", section: "id", render: () => null }, // substituído abaixo
   ];
 
-  chunk(buy, mobile ? 2 : 3).forEach((group, i) =>
+  // No celular, cada livro recebe uma página inteira. Assim os campos ficam
+  // confortáveis para leitura e edição, sem transformar a página em uma área
+  // de rolagem vertical.
+  chunk(buy, mobile ? 1 : 3).forEach((group, i) =>
     pages.push({
       id: `bienal-${i}`,
       section: "bienal",
@@ -1666,7 +1669,7 @@ export function buildPages(
   );
 
   pages.push({ id: "autoras-intro", section: "autoras", render: () => <AuthorsIntroPage /> });
-  chunk(authors, mobile ? 3 : 6).forEach((pageAuthors, pageNumber) => {
+  chunk(authors, mobile ? 2 : 6).forEach((pageAuthors, pageNumber) => {
     pages.push({
       id: pageNumber ? `autoras-index-${pageNumber}` : "autoras-index",
       section: "autoras",
@@ -1680,7 +1683,8 @@ export function buildPages(
       section: "autoras",
       render: () => <AuthorProfilePage author={a} />,
     });
-    const authorBookPages = mobile ? paginateAuthorBookIds(a.books, bookById) : chunk(a.books, 2);
+    // A capa e a sinopse ganham espaço editorial próprio no celular.
+    const authorBookPages = mobile ? chunk(a.books, 1) : chunk(a.books, 2);
     authorBookPages.forEach((bookIds, bookPageIndex) => {
       pages.push({
         id: `autora-${a.id}-livros${bookPageIndex ? `-${bookPageIndex}` : ""}`,
@@ -1716,7 +1720,7 @@ export function buildPages(
     });
   });
 
-  const stampPages = chunk(stamps, 6);
+  const stampPages = chunk(stamps, mobile ? 4 : 6);
   stampPages.forEach((pageStamps, pageIndex) => {
     pages.push({
       id: pageIndex ? `carimbos-${pageIndex}` : "carimbos",
@@ -1732,7 +1736,7 @@ export function buildPages(
     });
   });
 
-  const purchasedPages = chunk(purchased, 6);
+  const purchasedPages = chunk(purchased, mobile ? 4 : 6);
   purchasedPages.forEach((entries, pageIndex) => {
     pages.push({
       id: pageIndex ? `meus-livros-${pageIndex}` : "meus-livros",
