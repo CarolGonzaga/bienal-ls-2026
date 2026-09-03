@@ -1237,15 +1237,11 @@ function CollectionShareButton({
 
 function CollectionStoryShell({
   storyRef,
-  title,
-  pageNumber,
-  totalPages,
+  subtitle,
   children,
 }: {
   storyRef: RefObject<HTMLDivElement | null>;
-  title: string;
-  pageNumber: number;
-  totalPages: number;
+  subtitle: string;
   children: ReactNode;
 }) {
   return (
@@ -1265,10 +1261,10 @@ function CollectionStoryShell({
             className="absolute top-0 right-0 size-24 object-contain opacity-55"
           />
           <p className="font-body text-[26px] font-bold uppercase tracking-[0.28em] text-[var(--seal)]">
-            Coleção{totalPages > 1 ? ` · ${pageNumber}/${totalPages}` : ""}
+            Bienal do Livro de SP 2026
           </p>
-          <h2 className="mt-5 whitespace-nowrap font-display text-[68px] font-bold uppercase tracking-[0.06em] text-[var(--violet-deep)]">
-            {title}
+          <h2 className="mt-5 whitespace-nowrap font-display text-[68px] font-bold uppercase tracking-[0.04em] text-[var(--violet-deep)]">
+            {subtitle}
           </h2>
           <div className="hairline mt-8" />
         </header>
@@ -1276,10 +1272,6 @@ function CollectionStoryShell({
         <main className="relative flex min-h-0 flex-1 items-start justify-center pt-16">
           {children}
         </main>
-
-        <footer className="relative shrink-0 border-t border-dashed border-[var(--rose-antique)] pt-8 text-center font-display text-[30px] font-bold uppercase tracking-[0.16em] text-[var(--violet-deep)]">
-          Mapa Sáfico Bienal SP 2026
-        </footer>
       </div>
     </div>
   );
@@ -1363,9 +1355,7 @@ function StampsPage({
 
       <CollectionStoryShell
         storyRef={storyRef}
-        title="Meus carimbos"
-        pageNumber={pageNumber}
-        totalPages={totalPages}
+        subtitle="Carimbos resgatados"
       >
         {pageStamps.length === 0 ? (
           <p className="self-center font-display text-[38px] font-semibold text-[var(--ink-soft)]">
@@ -1498,9 +1488,7 @@ function PurchasedBooksPage({
 
       <CollectionStoryShell
         storyRef={storyRef}
-        title="Meus livros"
-        pageNumber={pageNumber}
-        totalPages={totalPages}
+        subtitle="Livros que comprei"
       >
         {resolvedBooks.length === 0 ? (
           <p className="self-center font-display text-[38px] font-semibold text-[var(--ink-soft)]">
