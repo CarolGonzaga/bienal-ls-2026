@@ -84,6 +84,41 @@ const bookKey = (row) => normalize(row.title);
 const formatDate = (value) =>
   value ? new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR") : "Data a confirmar";
 
+const hasLocation = (item) => Boolean(
+  String(item?.exhibitor_id || "").trim() || String(item?.stand_code || "").trim(),
+);
+
+const validCoverUrl = (value) => {
+  if (!String(value || "").trim() || String(value).startsWith("data:")) return true;
+  try {
+    return ["http:", "https:"].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+};
+
+const validateContent = (requestType, item, index = 0) => {
+  const suffix = requestType === "book" ? ` do livro ${index + 1}` : "";
+  const date = requestType === "presence" ? item.presence_date : item.event_date;
+  if (requestType === "presence" || requestType === "autograph") {
+    if (!date) return `Informe a data${suffix}.`;
+    if (date < EVENT_START || date > EVENT_END)
+      return `A data deve estar entre 04/09/2026 e 13/09/2026.`;
+    if (!item.start_time) return `Informe o horário inicial${suffix}.`;
+    if (item.end_time && item.end_time < item.start_time)
+      return "O horário final não pode ser anterior ao horário inicial.";
+    if (!hasLocation(item)) return `Selecione o estande${suffix}.`;
+  }
+  if (requestType === "book") {
+    if (!String(item.title || "").trim()) return `Informe o título${suffix}.`;
+    if (!validCoverUrl(item.cover_url))
+      return `Informe uma URL de capa válida (http ou https)${suffix}.`;
+    if (item.available_for_sale && !hasLocation(item))
+      return `Selecione o estande onde o livro ${index + 1} estará à venda.`;
+  }
+  return "";
+};
+
 const Input = ({ label, value, onChange, type = "text", required = false, ...props }) => (
   <label className="block text-xs font-bold">
     {label}
@@ -99,10 +134,11 @@ const Input = ({ label, value, onChange, type = "text", required = false, ...pro
   </label>
 );
 
-const SelectStand = ({ exhibitors, item, setItem }) => (
+const SelectStand = ({ exhibitors, item, setItem, required = false, label = "Estande" }) => (
   <label className="block text-xs font-bold">
-    Estande de venda
+    {label}{required ? " *" : ""}
     <select
+      required={required}
       value={item.exhibitor_id}
       onChange={(event) => {
         const stand = exhibitors.find((option) => option.id === event.target.value);
@@ -516,6 +552,16 @@ export default function AuthorContentRequests({
 
   const submit = async (event) => {
     event.preventDefault();
+    const itemsToValidate =
+      activeKind === "presence"
+        ? [presence]
+        : activeKind === "autograph"
+          ? [autograph]
+          : bookItems;
+    const validationError = itemsToValidate
+      .map((item, index) => validateContent(activeKind, item, index))
+      .find(Boolean);
+    if (validationError) return notice(validationError);
     const editMetadata = editing ? { operation: "update", target_id: editing.id } : {};
     const payloads =
       activeKind === "presence"
@@ -531,9 +577,7 @@ export default function AuthorContentRequests({
                 ...editMetadata,
               },
             ]
-          : bookItems
-              .filter((book) => book.title.trim())
-              .map((book) => ({
+          : bookItems.map((book) => ({
                 ...book,
                 notes: book.synopsis,
                 tags: [book.genre, ...book.tags.split(",")]
@@ -622,7 +666,7 @@ export default function AuthorContentRequests({
             {agendaOnly ? "Minha agenda na Bienal" : "Presença, livros e agenda"}
           </h2>
           <p className="mt-1 text-xs opacity-70">
-            Tudo é enviado para revisão antes de aparecer no Mapa e no Passaporte.
+            Tudo é enviado para revisão antes de aparecer no Mapa e no Passaporte. Campos com * são obrigatórios.
           </p>
         </div>
         <button
@@ -687,7 +731,7 @@ export default function AuthorContentRequests({
                 onChange={(value) => setPresence({ ...presence, end_time: value })}
               />
             </div>
-            <SelectStand exhibitors={exhibitors} item={presence} setItem={setPresence} />
+            <SelectStand exhibitors={exhibitors} item={presence} setItem={setPresence} required />
             <label className="text-xs font-bold">
               Observação
               <textarea
@@ -859,6 +903,8 @@ export default function AuthorContentRequests({
                   <SelectStand
                     exhibitors={exhibitors}
                     item={book}
+                    required
+                    label="Estande de venda"
                     setItem={(next) =>
                       setBookItems((items) =>
                         items.map((item, itemIndex) => (itemIndex === index ? next : item)),
@@ -937,7 +983,7 @@ export default function AuthorContentRequests({
                 onChange={(value) => setAutograph({ ...autograph, end_time: value })}
               />
             </div>
-            <SelectStand exhibitors={exhibitors} item={autograph} setItem={setAutograph} />
+            <SelectStand exhibitors={exhibitors} item={autograph} setItem={setAutograph} required />
             <Input
               label="Livros (separados por vírgula)"
               value={autograph.books}

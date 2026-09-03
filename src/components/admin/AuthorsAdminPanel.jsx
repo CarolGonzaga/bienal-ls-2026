@@ -50,10 +50,18 @@ export default function AuthorsAdminPanel({ authors, profiles, requests, books =
       : request.request_type === 'presence'
         ? 'Presença aprovada. Publique o perfil da autora quando os requisitos do Passaporte estiverem completos.'
         : 'Informação aprovada e publicada.'
-    const operation = request.payload?.operation === 'update'
-      ? supabase.rpc('review_author_content_update', { p_request_id: request.id, p_decision: decision, p_notes: null })
-      : supabase.rpc('review_author_content_request', { p_request_id: request.id, p_decision: decision, p_payload: request.payload, p_target_id: requestTarget[request.id] || null, p_notes: null })
-    return run(`content-${request.id}`, () => operation, decision === 'approved' ? approvedMessage : 'Solicitação rejeitada.')
+    return run(`content-${request.id}`, async () => {
+      if (decision === 'approved') {
+        const validation = await supabase.rpc('validate_author_content_payload', {
+          p_request_type: request.request_type,
+          p_payload: request.payload,
+        })
+        if (validation.error) return validation
+      }
+      return request.payload?.operation === 'update'
+        ? supabase.rpc('review_author_content_update', { p_request_id: request.id, p_decision: decision, p_notes: null })
+        : supabase.rpc('review_author_content_request', { p_request_id: request.id, p_decision: decision, p_payload: request.payload, p_target_id: requestTarget[request.id] || null, p_notes: null })
+    }, decision === 'approved' ? approvedMessage : 'Solicitação rejeitada.')
   }
   const rejectInitialProfile = author => run(`reject-${author.id}`, () => supabase.from('passport_profiles').update({ status: 'rejected', reviewed_at: new Date().toISOString() }).eq('author_id', author.id), 'Perfil rejeitado e devolvido para revisão.')
   const softDelete = author => {
