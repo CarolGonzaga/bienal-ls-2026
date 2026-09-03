@@ -399,7 +399,7 @@ export default function App() {
         </div>
 
         {/* Mobile Navigation bar */}
-        <div data-tutorial="navigation" className="site-mobile-nav flex items-center justify-start overflow-x-auto border-t px-2 py-2 text-xs font-semibold md:hidden">
+        <div data-tutorial="navigation" className="site-mobile-nav grid grid-cols-6 items-center overflow-hidden border-t px-1 py-2 text-xs font-semibold md:hidden">
           {[
             { id: 'map', label: 'Mapa', icon: Compass },
             { id: 'list', label: 'Listas', icon: List },
@@ -419,11 +419,11 @@ export default function App() {
                 aria-disabled={isDisabled}
                 title={isDisabled ? 'Disponível em breve' : undefined}
                 onClick={() => handleNavigate(tab.id)}
-                className={`flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
+                className={`flex min-w-0 flex-col items-center gap-0.5 rounded-xl px-0.5 py-1 transition-all ${isDisabled ? 'cursor-not-allowed text-[#98617f] opacity-35' : isActive ? 'bg-[#fff0f6] text-[#cf005e] font-bold' : 'text-[#98617f]'
                   }`}
               >
                 <Icon className="w-4 h-4" />
-                <span className="text-[10px]">{tab.label}</span>
+                <span className="whitespace-nowrap text-[8px] leading-tight min-[340px]:text-[9px] min-[380px]:text-[10px]">{tab.label}</span>
               </button>
             )
           })}
