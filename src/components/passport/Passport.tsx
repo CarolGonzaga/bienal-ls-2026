@@ -24,6 +24,21 @@ const TABS: { id: string; label: string; target: string; icon: LucideIcon }[] = 
 const COVER_MOTION_MS = 1450;
 const PAGE_FADE_MS = 300;
 
+const mobilePageLabel = (page: PageDef) => {
+  if (page.id === "identidade") return "Identificação";
+  if (page.id === "sumario") return "Sumário";
+  if (page.id.startsWith("bienal-")) return "Lista de compras";
+  if (page.id === "autoras-intro") return "Como funciona";
+  if (page.id.startsWith("autoras-index")) return "Autoras do passaporte";
+  if (page.id.includes("-perfil")) return "Perfil da autora";
+  if (page.id.includes("-livros")) return "Livros da autora";
+  if (page.id.includes("-programacao")) return "Onde encontrar a autora";
+  if (page.id.endsWith("-carimbo")) return "Resgatar carimbo";
+  if (page.id.startsWith("carimbos")) return "Meus carimbos";
+  if (page.id.startsWith("meus-livros")) return "Meus livros";
+  return "Página em branco";
+};
+
 export function Passport({ catalogVersion }: { catalogVersion: string }) {
   const { userBooks, stamps, pageId, setPageId, opened, setOpened, hydrated } = usePassport();
   const isMobile = useIsMobile();
@@ -179,14 +194,24 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
             >
               <ChevronLeft aria-hidden className="size-4" />
             </button>
-            <div className="min-w-0 text-center text-[var(--paper)]">
-              <p aria-live="polite" className="text-[0.64rem] font-bold uppercase tracking-[0.18em]">
-                Página {String(current + 1).padStart(2, "0")} de {pages.length}
-              </p>
-              <p className="mt-0.5 text-[0.52rem] uppercase tracking-[0.12em] opacity-65">
-                Deslize para mudar de página
-              </p>
-            </div>
+            <label className="passport-mobile-page-picker min-w-0 text-center text-[var(--paper)]">
+              <span className="sr-only">Ir diretamente para uma página do passaporte</span>
+              <select
+                value={current}
+                onChange={(event) => goToIndex(Number(event.target.value))}
+                aria-label="Ir para página do passaporte"
+                className="w-full appearance-none rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-center text-[0.58rem] font-bold uppercase tracking-[0.08em] text-white outline-none"
+              >
+                {pages.map((page, index) => (
+                  <option key={page.id} value={index} className="bg-[#6c1232] text-white">
+                    {String(index + 1).padStart(2, "0")} · {mobilePageLabel(page)}
+                  </option>
+                ))}
+              </select>
+              <span aria-live="polite" className="mt-0.5 block text-[0.48rem] uppercase tracking-[0.12em] opacity-65">
+                Página {current + 1} de {pages.length} · deslize para navegar
+              </span>
+            </label>
             <button
               onClick={next}
               disabled={current >= pages.length - 1}

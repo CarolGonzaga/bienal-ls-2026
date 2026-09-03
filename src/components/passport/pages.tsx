@@ -329,7 +329,7 @@ function BuyCard({ entry, book }: { entry: UserBook; book: Book }) {
             <Field label="Editora">{entry.publisher ?? book.publisher}</Field>
           )}
         </div>
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2">
+        <div className="buy-card-purchase-fields grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2">
           {isReaderAddedBook ? (
             <label className="min-w-0">
               <span className="label-caps block opacity-70">Estande</span>
@@ -819,7 +819,7 @@ function AuthorSchedulePage({
       <ul className={`author-schedule-list ${dense ? "mt-2" : "mt-[clamp(0.7rem,2vh,1.1rem)]"} divide-y divide-dotted divide-[oklch(0.72_0.06_30_/_0.6)] rounded-[10px] border border-dashed border-[var(--rose-antique)]`}>
         {entries.map((s) => (
           <li key={s.id} className={`author-schedule-card grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"}`}>
-            <div className="min-w-0">
+            <div className="author-schedule-main min-w-0">
               <div className="flex items-center gap-2">
                 <span className={`author-schedule-date font-body font-bold text-[var(--ink)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
                   <CalendarDays aria-hidden className="mr-1 inline size-4" /> {s.weekday}, {s.date}
@@ -830,7 +830,10 @@ function AuthorSchedulePage({
               </p>
               {s.related && (
                 <p className={`author-schedule-related flex items-center gap-1 text-[var(--ink-soft)] ${dense ? "text-[0.7rem]" : "text-[0.82rem]"}`}>
-                  <BookOpen aria-hidden className="size-4" /> Livro: {s.related}
+                  <BookOpen aria-hidden className="size-4 shrink-0" />
+                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                    Livro: {s.related}
+                  </span>
                 </p>
               )}
             </div>

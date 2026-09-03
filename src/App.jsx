@@ -430,8 +430,8 @@ export default function App() {
         </div>
       </header>
 
-      {activeTabMode === 'passport' && <div className="z-40 flex shrink-0 items-center justify-center bg-[#7b4051] px-3 py-1.5 md:hidden">
-        <button type="button" onClick={() => handleNavigate('map')} className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-black text-white shadow-sm transition active:scale-[0.98]" aria-label="Voltar para o mapa">
+      {activeTabMode === 'passport' && <div className="z-40 flex shrink-0 items-center justify-center bg-[#7b4051] px-3 py-1 md:hidden">
+        <button type="button" onClick={() => handleNavigate('map')} className="inline-flex min-h-8 items-center gap-1.5 px-1 py-1 text-xs font-black text-white/90 transition active:scale-[0.98] active:text-white" aria-label="Voltar para o mapa">
           <ArrowLeft className="h-3.5 w-3.5" /><span>Voltar para o mapa</span>
         </button>
       </div>}
