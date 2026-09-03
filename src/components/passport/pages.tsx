@@ -542,6 +542,7 @@ function AuthorsIndexPage({
       <ul className="authors-index-list grid gap-[clamp(0.3rem,0.7vh,0.48rem)]">
         {pageAuthors.map((a) => {
           const stamped = hasStamp(a.id);
+          const location = [a.city, a.state].filter(Boolean).join(" / ");
           return (
             <li
               key={a.id}
@@ -554,18 +555,20 @@ function AuthorsIndexPage({
                 className="aspect-square w-full self-center rounded-full object-cover"
               />
               <div className="authors-index-content relative min-h-[6.2rem] min-w-0">
-                <div className="flex h-full flex-col justify-center pr-[8.5rem]">
+                <div className={`authors-index-identity flex h-full flex-col justify-center pr-[8.5rem] ${location ? "" : "authors-index-identity--name-only"}`}>
                   <p className="authors-index-name script-name min-w-0 truncate text-4xl">{a.name}</p>
-                  <p className="text-[0.68rem] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
-                    {[a.city, a.state].filter(Boolean).join(" / ")}
-                  </p>
+                  {location && (
+                    <p className="authors-index-location truncate text-[0.68rem] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
+                      {location}
+                    </p>
+                  )}
                 </div>
                 <span
-                  className={`absolute right-0 top-0 shrink-0 rounded-full px-2 py-1 text-[0.52rem] font-bold uppercase tracking-[0.1em] ${stamped ? "bg-[var(--brand-pink-soft)] text-[var(--violet-deep)]" : "bg-[var(--brand-lilac-soft)] text-[var(--ink-soft)]"}`}
+                  className={`authors-index-status absolute right-0 top-0 shrink-0 rounded-full px-2 py-1 text-[0.52rem] font-bold uppercase tracking-[0.1em] ${stamped ? "bg-[var(--brand-pink-soft)] text-[var(--violet-deep)]" : "bg-[var(--brand-lilac-soft)] text-[var(--ink-soft)]"}`}
                 >
                   {stamped ? "Carimbo conquistado" : "Carimbo ainda não resgatado"}
                 </span>
-                <div className="absolute right-0 bottom-0">
+                <div className="authors-index-action absolute right-0 bottom-0">
                   <InkButton variant="ghost" onClick={() => goTo(`autora-${a.id}-perfil`)}>
                     Ver autora <ArrowRight aria-hidden className="size-4" />
                   </InkButton>

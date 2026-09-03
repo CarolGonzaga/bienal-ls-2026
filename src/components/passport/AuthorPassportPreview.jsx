@@ -51,12 +51,12 @@ const mapSchedule = (row, kind, exhibitors, fallbackId) => {
     weekday: date.weekday,
     date: date.date,
     time: timeLabel(row.start_time || row.startTime, row.end_time || row.endTime),
-    booth: standCode ? `Estande ${standCode}` : clean(row.location_text || row.locationName, 'Local a confirmar'),
-    publisher: exhibitor?.name || clean(row.publisher || row.location_text || row.locationName, 'Expositor a confirmar'),
+    booth: standCode ? `Estande ${standCode}` : (row.location_text || row.notes ? 'Sem local fixo' : clean(row.locationName, 'Local a confirmar')),
+    publisher: exhibitor?.name || clean(row.publisher || row.location_text || row.notes || row.locationName, 'Expositor a confirmar'),
     kind,
     related,
     sortKey: `${dateValue || ''}-${startValue}`,
-    dedupeKey: [kind, dateValue, startValue, normalize(row.exhibitor_id || standCode || row.location_text || row.locationName)].join('|'),
+    dedupeKey: [kind, dateValue, startValue, normalize(row.exhibitor_id || standCode || row.location_text || row.notes || row.locationName)].join('|'),
   }
 }
 

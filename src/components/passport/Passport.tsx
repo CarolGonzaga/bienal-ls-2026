@@ -24,20 +24,23 @@ const TABS: { id: string; label: string; target: string; icon: LucideIcon }[] = 
 const COVER_MOTION_MS = 1450;
 const PAGE_FADE_MS = 300;
 
-const mobilePageLabel = (page: PageDef) => {
-  if (page.id === "identidade") return "Identificação";
-  if (page.id === "sumario") return "Sumário";
-  if (page.id.startsWith("bienal-")) return "Lista de compras";
-  if (page.id === "autoras-intro") return "Como funciona";
-  if (page.id.startsWith("autoras-index")) return "Autoras do passaporte";
-  if (page.id.includes("-perfil")) return "Perfil da autora";
-  if (page.id.includes("-livros")) return "Livros da autora";
-  if (page.id.includes("-programacao")) return "Onde encontrar a autora";
-  if (page.id.endsWith("-carimbo")) return "Resgatar carimbo";
-  if (page.id.startsWith("carimbos")) return "Meus carimbos";
-  if (page.id.startsWith("meus-livros")) return "Meus livros";
-  return "Página em branco";
-};
+const MOBILE_NAV_ITEMS = [
+  { number: "01", label: "Identificação", match: (id: string) => id === "identidade" },
+  { number: "02", label: "Sumário", match: (id: string) => id === "sumario" },
+  { number: "03", label: "Lista de compras", match: (id: string) => id.startsWith("bienal-") },
+  { number: "04", label: "Como funciona", match: (id: string) => id === "autoras-intro" },
+  {
+    number: "05",
+    label: "Autoras",
+    match: (id: string) => id.startsWith("autoras-index") || id.startsWith("autora-"),
+  },
+  { number: "06", label: "Meus carimbos", match: (id: string) => id.startsWith("carimbos") },
+  {
+    number: "07",
+    label: "Meus livros comprados",
+    match: (id: string) => id.startsWith("meus-livros"),
+  },
+];
 
 export function Passport({ catalogVersion }: { catalogVersion: string }) {
   const { userBooks, stamps, pageId, setPageId, opened, setOpened, hydrated } = usePassport();
@@ -57,6 +60,18 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
     0,
     pages.findIndex((p) => p.id === pageId),
   );
+  const mobileNavigation = useMemo(
+    () =>
+      MOBILE_NAV_ITEMS.map((item) => ({
+        ...item,
+        target: pages.find((page) => item.match(page.id))?.id,
+      })).filter((item): item is (typeof item & { target: string }) => Boolean(item.target)),
+    [pages],
+  );
+  const mobileNavigationValue =
+    mobileNavigation.find((item) => item.match(pages[current]?.id || ""))?.target ||
+    mobileNavigation[0]?.target ||
+    "";
 
   const goToIndex = useCallback(
     (i: number) => {
@@ -197,14 +212,14 @@ export function Passport({ catalogVersion }: { catalogVersion: string }) {
             <label className="passport-mobile-page-picker min-w-0 text-center text-[var(--paper)]">
               <span className="sr-only">Ir diretamente para uma página do passaporte</span>
               <select
-                value={current}
-                onChange={(event) => goToIndex(Number(event.target.value))}
+                value={mobileNavigationValue}
+                onChange={(event) => goTo(event.target.value)}
                 aria-label="Ir para página do passaporte"
                 className="w-full appearance-none rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-center text-[0.58rem] font-bold uppercase tracking-[0.08em] text-white outline-none"
               >
-                {pages.map((page, index) => (
-                  <option key={page.id} value={index} className="bg-[#6c1232] text-white">
-                    {String(index + 1).padStart(2, "0")} · {mobilePageLabel(page)}
+                {mobileNavigation.map((item) => (
+                  <option key={item.number} value={item.target} className="bg-[#6c1232] text-white">
+                    {item.number} · {item.label}
                   </option>
                 ))}
               </select>

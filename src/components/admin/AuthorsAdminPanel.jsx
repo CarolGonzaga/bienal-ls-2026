@@ -52,7 +52,7 @@ export default function AuthorsAdminPanel({ authors, profiles, requests, books =
         : 'Informação aprovada e publicada.'
     return run(`content-${request.id}`, async () => {
       if (decision === 'approved') {
-        const validation = await supabase.rpc('validate_author_content_payload', {
+        const validation = await supabase.rpc('validate_author_content_payload_v2', {
           p_request_type: request.request_type,
           p_payload: request.payload,
         })

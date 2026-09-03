@@ -74,8 +74,10 @@ const scheduleFromProfile = (
     time: timeRange(row.start_time, row.end_time),
     booth: row.stand_code
       ? `Estande ${row.stand_code}`
-      : text(row.location_text, "Local a confirmar"),
-    publisher: exhibitor?.name || text(row.location_text, "Expositor a confirmar"),
+      : row.location_text || row.notes
+        ? "Sem local fixo"
+        : "Local a confirmar",
+    publisher: exhibitor?.name || text(row.location_text || row.notes, "Referência não informada"),
     kind,
     related: text(related),
   };

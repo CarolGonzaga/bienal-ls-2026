@@ -14,6 +14,7 @@ import {
 import { supabase } from "../../lib/supabase";
 import { LOCAL_AUTHOR_EXHIBITORS } from "../../data/localAuthorScenarios";
 import { optimizePassportPhoto } from "../../utils/optimizeImage";
+import { friendlySubmissionError } from "../../utils/friendlySubmissionError";
 
 const EVENT_START = "2026-09-04";
 const EVENT_END = "2026-09-13";
@@ -25,6 +26,7 @@ const newPresence = () => ({
   end_time: "",
   exhibitor_id: "",
   stand_code: "",
+  location_unspecified: false,
   notes: "",
   guaranteed: true,
 });
@@ -107,7 +109,12 @@ const validateContent = (requestType, item, index = 0) => {
     if (!item.start_time) return `Informe o horário inicial${suffix}.`;
     if (item.end_time && item.end_time < item.start_time)
       return "O horário final não pode ser anterior ao horário inicial.";
-    if (!hasLocation(item)) return `Selecione o estande${suffix}.`;
+    if (requestType === "presence" && item.location_unspecified) {
+      if (String(item.notes || "").trim().length < 10)
+        return "Conte, de forma breve, em qual região da Bienal as leitoras poderão encontrar você.";
+    } else if (!hasLocation(item)) {
+      return `Selecione o estande${suffix}.`;
+    }
   }
   if (requestType === "book") {
     if (!String(item.title || "").trim()) return `Informe o título${suffix}.`;
@@ -161,6 +168,7 @@ function ExistingContentModal({ existing, exhibitors, onClose, onEdit }) {
     exhibitors.find((item) => item.id === row.exhibitor_id)?.name ||
     row.stand_code ||
     row.location_text ||
+    row.notes ||
     "Local a confirmar";
   return (
     <div
@@ -393,7 +401,7 @@ export default function AuthorContentRequests({
       availability.error ||
       bookRows.error ||
       eventRows.error;
-    if (error) notice(`Não foi possível carregar todo o conteúdo já cadastrado: ${error.message}`);
+    if (error) notice(friendlySubmissionError(error, "Não conseguimos carregar todo o conteúdo cadastrado. Atualize a página e tente novamente."));
     setExhibitors(stands.data || []);
     setRequests(history.data || []);
     const linksByBook = new Map((authorBooks.data || []).map((item) => [item.book_id, item]));
@@ -448,6 +456,7 @@ export default function AuthorContentRequests({
         end_time: String(item.end_time || "").slice(0, 5),
         exhibitor_id: item.exhibitor_id || "",
         stand_code: item.stand_code || "",
+        location_unspecified: !item.exhibitor_id && !item.stand_code,
         notes: item.notes || "",
         guaranteed: item.guaranteed !== false,
       });
@@ -544,7 +553,7 @@ export default function AuthorContentRequests({
         );
       }
     } catch (error) {
-      notice(error instanceof Error ? error.message : "Não foi possível enviar a capa.");
+      notice(friendlySubmissionError(error, "Não conseguimos enviar a capa. Use uma imagem JPEG, PNG ou WebP e tente novamente."));
     } finally {
       setUploadingIndex(-1);
     }
@@ -619,7 +628,7 @@ export default function AuthorContentRequests({
     const results = await Promise.all(payloads.map((payload) => submitOne(activeKind, payload)));
     const error = results.find((result) => result?.error)?.error;
     setSaving(false);
-    if (error) return notice(error.message);
+    if (error) return notice(friendlySubmissionError(error));
     notice(
       localScenario
         ? "Simulação: informações enviadas para revisão local."
@@ -731,14 +740,39 @@ export default function AuthorContentRequests({
                 onChange={(value) => setPresence({ ...presence, end_time: value })}
               />
             </div>
-            <SelectStand exhibitors={exhibitors} item={presence} setItem={setPresence} required />
+            <label className="flex items-center gap-2 rounded-xl border border-[#edcddd] p-3 text-xs font-bold">
+              <input
+                type="checkbox"
+                checked={presence.location_unspecified}
+                onChange={(event) =>
+                  setPresence({
+                    ...presence,
+                    location_unspecified: event.target.checked,
+                    exhibitor_id: event.target.checked ? "" : presence.exhibitor_id,
+                    stand_code: event.target.checked ? "" : presence.stand_code,
+                  })
+                }
+              />
+              Não ficarei em um estande fixo
+            </label>
+            {!presence.location_unspecified && (
+              <SelectStand exhibitors={exhibitors} item={presence} setItem={setPresence} required />
+            )}
             <label className="text-xs font-bold">
-              Observação
+              {presence.location_unspecified ? "Onde as leitoras poderão encontrar você? *" : "Observação (opcional)"}
               <textarea
+                required={presence.location_unspecified}
+                minLength={presence.location_unspecified ? 10 : undefined}
                 value={presence.notes}
                 onChange={(event) => setPresence({ ...presence, notes: event.target.value })}
                 className="auth-input mt-1 h-20 w-full rounded-xl border p-3 text-sm"
+                placeholder={presence.location_unspecified ? "Ex.: Estarei circulando perto dos estandes A e B." : "Informação adicional para as leitoras"}
               />
+              {presence.location_unspecified && (
+                <span className="mt-1 block font-normal leading-4 opacity-65">
+                  Dê uma referência simples, como uma ala, entrada, palco ou estandes próximos.
+                </span>
+              )}
             </label>
             <label className="flex gap-2 text-xs font-bold">
               <input

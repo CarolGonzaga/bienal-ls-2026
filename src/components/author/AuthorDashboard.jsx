@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, Copy, Download, Eye, KeyRound, Printer, Qr
 import { supabase } from '../../lib/supabase'
 import { appPath } from '../../lib/paths'
 import { optimizePassportPhoto } from '../../utils/optimizeImage'
+import { friendlySubmissionError } from '../../utils/friendlySubmissionError'
 import AuthorContentRequests from './AuthorContentRequests'
 import { LOCAL_AUTHOR_EXHIBITORS, LOCAL_AUTHOR_SCENARIOS } from '../../data/localAuthorScenarios'
 import AuthorPassportPreview from '../passport/AuthorPassportPreview'
@@ -86,7 +87,7 @@ export default function AuthorDashboard() {
       if (error) throw error
       setProfile(current => ({ ...current, photo_path: path, photo_width: optimized.width, photo_height: optimized.height, photo_mime: optimized.mime, photo_size: optimized.size, photo_updated_at: new Date().toISOString() }))
       setNotice(`Foto otimizada: ${Math.round(optimized.size / 1024)} KB`)
-    } catch (error) { setNotice(error.message) }
+    } catch (error) { setNotice(friendlySubmissionError(error, 'Não conseguimos enviar essa foto. Escolha outra imagem e tente novamente.')) }
   }
 
   const chooseParticipation = async decision => {
@@ -110,7 +111,7 @@ export default function AuthorDashboard() {
       : supabase.from('passport_profiles').upsert({ ...payload, author_id: account.authorId, status: profile.status || 'draft', updated_at: new Date().toISOString() })
     const { data, error } = await operation
     setParticipationSaving(false)
-    if (error) return setNotice(error.message)
+    if (error) return setNotice(friendlySubmissionError(error))
     setProfile(current => ({ ...current, ...payload, change_request_id: published ? data?.id || current.change_request_id : current.change_request_id, status: published ? 'pending' : current.status }))
     setParticipationModalOpen(false)
     setNotice(published ? 'Sua alteração foi enviada para revisão.' : accepted ? 'Participação confirmada. Agora preencha seu perfil e envie-o para revisão.' : 'Tudo bem — você poderá cadastrar sua agenda sem participar do Passaporte.')
@@ -131,7 +132,7 @@ export default function AuthorDashboard() {
       ? (profile.change_request_id ? supabase.from('author_change_requests').update(request).eq('id', profile.change_request_id) : supabase.from('author_change_requests').insert(request).select('id').single())
       : supabase.from('passport_profiles').upsert({ ...payload, author_id: account.authorId, status: submit ? 'pending' : 'draft', submitted_at: submit ? new Date().toISOString() : null, updated_at: new Date().toISOString() })
     const { data, error } = await operation
-    setNotice(error ? error.message : submit ? 'Perfil enviado para aprovação administrativa.' : 'Rascunho salvo.')
+    setNotice(error ? friendlySubmissionError(error) : submit ? 'Perfil enviado para aprovação administrativa.' : 'Rascunho salvo.')
     if (!error) setProfile(current => ({ ...current, change_request_id: data?.id || current.change_request_id, status: submit ? 'pending' : 'draft', published_status: published ? 'published' : current.published_status }))
   }
 
@@ -141,7 +142,7 @@ export default function AuthorDashboard() {
     if (urgentType !== 'important_information' && !urgentDate) return setNotice('Informe a data afetada pela alteração.')
     if (localScenario) { setNotice('Simulação: alteração urgente registrada localmente.'); setUrgentText(''); setUrgentDate(''); return }
     const { error } = await supabase.from('author_change_requests').insert({ author_id: account.authorId, submitted_by: account.user.id, request_type: 'urgent', urgent_type: urgentType, affected_date: urgentDate || null, payload: { message: urgentText.trim() }, status: 'pending', submitted_at: new Date().toISOString() })
-    setNotice(error ? error.message : 'Alteração urgente enviada para aprovação.')
+    setNotice(error ? friendlySubmissionError(error) : 'Alteração urgente enviada para aprovação.')
     if (!error) { setUrgentText(''); setUrgentDate('') }
   }
 
