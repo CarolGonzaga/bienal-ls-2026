@@ -1204,11 +1204,11 @@
     display: flex !important;
     justify-self: center;
     max-width: 100%;
-    overflow: hidden;
     font-size: clamp(0.6rem, 2.55vw, 0.72rem) !important;
     line-height: 1.22;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .author-schedule-location-row {
@@ -1232,9 +1232,11 @@
     max-width: 100%;
     padding: 0.05rem 0.35rem !important;
     border: 0 !important;
-    font-size: clamp(1.15rem, 6vw, 1.55rem) !important;
-    line-height: 1.1;
-    white-space: nowrap;
+    font-size: clamp(0.88rem, 4.5vw, 1.12rem) !important;
+    line-height: 1.08;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .author-schedule-publisher {
@@ -1243,12 +1245,31 @@
     justify-content: center;
     max-width: 100%;
     margin-top: 0 !important;
-    overflow: hidden;
     font-size: clamp(0.6rem, 2.55vw, 0.72rem) !important;
-    line-height: 1.1;
+    line-height: 1.18;
     text-align: center;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    white-space: normal;
+  }
+
+  .author-schedule-publisher span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .author-schedule-card--long-booth .author-schedule-booth {
+    font-size: clamp(0.74rem, 3.7vw, 0.94rem) !important;
+  }
+
+  .author-schedule-card--long-publisher .author-schedule-publisher {
+    font-size: clamp(0.54rem, 2.2vw, 0.66rem) !important;
+  }
+
+  .author-schedule-card--flexible-location .author-schedule-publisher {
+    width: min(100%, 27rem);
+  }
+
+  .author-schedule-card--flexible-location .author-schedule-publisher svg {
+    flex: none;
   }
 
   .schedule-generic-update {
@@ -1628,14 +1649,14 @@
 
   .author-schedule-card {
     box-sizing: border-box;
-    min-height: 5.3rem;
-    height: 5.3rem;
-    flex: 0 0 5.3rem;
+    min-height: 6rem;
+    height: 6rem;
+    flex: 0 0 6rem;
     align-items: center;
     padding: 0.55rem 0.7rem;
     border: 1px dashed var(--rose-antique) !important;
     border-radius: 10px;
-    grid-template-columns: minmax(14.5rem, 1fr) minmax(max-content, 1fr) !important;
+    grid-template-columns: minmax(10.5rem, 1fr) minmax(11rem, 44%) !important;
     column-gap: 0.75rem !important;
   }
 
@@ -1645,9 +1666,18 @@
 
   .author-schedule-date,
   .author-schedule-kind,
-  .author-schedule-time,
-  .author-schedule-related {
+  .author-schedule-time {
     white-space: nowrap;
+  }
+
+  .author-schedule-related {
+    align-items: flex-start;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .author-schedule-related span {
+    overflow-wrap: anywhere;
   }
 
   .author-schedule-card .author-schedule-kind {
@@ -1664,29 +1694,69 @@
     justify-content: flex-start !important;
     gap: 0.15rem !important;
     min-width: 0;
-    white-space: nowrap;
   }
 
   .author-schedule-card .author-schedule-booth {
     display: block;
-    width: auto;
+    width: fit-content;
+    max-width: 100%;
     flex: none;
-    white-space: nowrap;
     padding: 0.18rem 0.5rem;
     font-size: 0.86rem;
-    line-height: 1.1;
+    line-height: 1.12;
+    text-align: right;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .author-schedule-card .author-schedule-publisher {
     min-width: 0;
     margin-top: 0.2rem;
     font-size: 0.72rem;
-    line-height: 1.05;
-    white-space: nowrap;
+    line-height: 1.15;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .author-schedule-card .author-schedule-publisher span {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .author-schedule-publisher svg {
     flex: none;
+  }
+
+  .author-schedule-card--long-booth .author-schedule-booth,
+  .author-schedule-card--long-publisher .author-schedule-publisher {
+    font-size: 0.68rem !important;
+  }
+
+  .author-schedule-card--flexible-location {
+    grid-template-columns: minmax(10.5rem, 1fr) minmax(13rem, 44%) !important;
+  }
+
+  .author-schedule-card--flexible-location .author-schedule-location {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .author-schedule-card--flexible-location .author-schedule-location-row {
+    display: none !important;
+  }
+
+  .author-schedule-card--flexible-location .author-schedule-publisher {
+    width: min(100%, 17rem);
+    max-width: 17rem;
+    margin: 0 !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem !important;
+    line-height: 1.3;
+    text-align: center;
   }
 
   .author-schedule-date,

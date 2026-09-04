@@ -827,8 +827,15 @@ function AuthorSchedulePage({
       </p>
 
       <ul className={`author-schedule-list ${dense ? "mt-2" : "mt-[clamp(0.7rem,2vh,1.1rem)]"} divide-y divide-dotted divide-[oklch(0.72_0.06_30_/_0.6)] rounded-[10px] border border-dashed border-[var(--rose-antique)]`}>
-        {entries.map((s) => (
-          <li key={s.id} className={`author-schedule-card grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"}`}>
+        {entries.map((s) => {
+          const flexibleLocation = s.booth.trim().toLocaleLowerCase("pt-BR") === "sem local fixo";
+          const longBooth = s.booth.length > 22;
+          const longPublisher = s.publisher.length > 48;
+          return (
+          <li
+            key={s.id}
+            className={`author-schedule-card grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] ${dense ? "p-2 sm:gap-2" : "p-3 sm:gap-4"} ${flexibleLocation ? "author-schedule-card--flexible-location" : ""} ${longBooth ? "author-schedule-card--long-booth" : ""} ${longPublisher ? "author-schedule-card--long-publisher" : ""}`}
+          >
             <div className="author-schedule-main min-w-0">
               <div className="flex items-center gap-2">
                 <span className={`author-schedule-date font-body font-bold text-[var(--ink)] ${dense ? "text-[0.78rem]" : "text-[0.95rem]"}`}>
@@ -841,13 +848,13 @@ function AuthorSchedulePage({
               {s.related && (
                 <p className={`author-schedule-related flex items-center gap-1 text-[var(--ink-soft)] ${dense ? "text-[0.7rem]" : "text-[0.82rem]"}`}>
                   <BookOpen aria-hidden className="size-4 shrink-0" />
-                  <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                  <span className="min-w-0">
                     Livro: {s.related}
                   </span>
                 </p>
               )}
             </div>
-            <div className="min-w-0 sm:text-right">
+            <div className="author-schedule-location min-w-0 sm:text-right">
               <div className="author-schedule-location-row flex items-center justify-end gap-2">
                 <span
                   className={`author-schedule-kind rounded-[4px] px-2 py-0.5 text-[0.58rem] font-bold uppercase tracking-[0.12em] ${
@@ -863,11 +870,13 @@ function AuthorSchedulePage({
                 </span>
               </div>
               <p title={s.publisher} className={`author-schedule-publisher mt-1 flex items-center gap-1 text-[var(--ink-soft)] sm:justify-end ${dense ? "text-[0.68rem]" : "text-[0.8rem]"}`}>
-                <Building2 aria-hidden className="size-4" /> {s.publisher}
+                <Building2 aria-hidden className="size-4" />
+                <span>{s.publisher}</span>
               </p>
             </div>
           </li>
-        ))}
+          );
+        })}
         {!entries.length && (
           <li className="p-6 text-center text-[0.82rem] text-[var(--ink-soft)]">
             A programação desta autora aparecerá aqui.
