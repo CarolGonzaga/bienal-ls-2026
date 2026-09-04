@@ -42,12 +42,13 @@ import { OfflinePreparationPanel } from './components/offline/OfflinePreparation
 import { useOfflineStore } from './stores/useOfflineStore'
 import { clearPersonalOfflineData } from './lib/offlineDb'
 import { usePassportStore } from './stores/usePassportStore'
+import { importWithRecovery } from './lib/dynamicImportRecovery'
 
-const SapphicPassport = lazy(() => import('./components/passport/SapphicPassport').then(module => ({ default: module.SapphicPassport })))
-const ExhibitorList = lazy(() => import('./components/exhibitors/ExhibitorList').then(module => ({ default: module.ExhibitorList })))
-const RoutePlanner = lazy(() => import('./components/route/RoutePlanner').then(module => ({ default: module.RoutePlanner })))
-const ScheduleView = lazy(() => import('./components/schedule/ScheduleView').then(module => ({ default: module.ScheduleView })))
-const BookShowcase = lazy(() => import('./components/books/BookShowcase').then(module => ({ default: module.BookShowcase })))
+const SapphicPassport = lazy(() => importWithRecovery(() => import('./components/passport/SapphicPassport')).then(module => ({ default: module.SapphicPassport })))
+const ExhibitorList = lazy(() => importWithRecovery(() => import('./components/exhibitors/ExhibitorList')).then(module => ({ default: module.ExhibitorList })))
+const RoutePlanner = lazy(() => importWithRecovery(() => import('./components/route/RoutePlanner')).then(module => ({ default: module.RoutePlanner })))
+const ScheduleView = lazy(() => importWithRecovery(() => import('./components/schedule/ScheduleView')).then(module => ({ default: module.ScheduleView })))
+const BookShowcase = lazy(() => importWithRecovery(() => import('./components/books/BookShowcase')).then(module => ({ default: module.BookShowcase })))
 const TabFallback = () => <div className="p-8 text-center text-sm font-bold">Carregando…</div>
 
 const TEMPORARILY_DISABLED_TABS = new Set([])
