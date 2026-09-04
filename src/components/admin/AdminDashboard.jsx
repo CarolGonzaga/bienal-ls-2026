@@ -376,6 +376,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [reviewing, setReviewing] = useState('')
+  const [bookSort, setBookSort] = useState('recent')
 
   const load = async () => {
     setLoading(true)
@@ -421,6 +422,20 @@ export default function AdminDashboard() {
     pending: data.contributions.filter(item => item.status === 'pending').length,
     approved: data.contributions.filter(item => item.status === 'approved').length
   }), [data.contributions])
+
+  const sortedBooks = useMemo(() => {
+    const books = [...data.books]
+    if (bookSort === 'alphabetical') {
+      return books.sort((a, b) =>
+        String(a.title || '').localeCompare(String(b.title || ''), 'pt-BR', { sensitivity: 'base' })
+        || String(a.author_name || '').localeCompare(String(b.author_name || ''), 'pt-BR', { sensitivity: 'base' })
+      )
+    }
+    return books.sort((a, b) =>
+      (Date.parse(b.created_at || b.updated_at || '') || 0)
+      - (Date.parse(a.created_at || a.updated_at || '') || 0)
+    )
+  }, [bookSort, data.books])
 
   const notify = text => { setMessage(text); window.setTimeout(() => setMessage(''), 4000) }
 
@@ -696,17 +711,31 @@ export default function AdminDashboard() {
           {/* BOOKS */}
           {activeTab === 'books' && (
             <>
-              <div className="mb-5 flex items-start justify-between gap-3">
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h2 className="text-2xl font-black">Livros</h2>
                   <p className="text-sm opacity-65">{data.books.length} livro(s) · Alterações diretas no banco.</p>
                 </div>
-                <button
-                  onClick={() => { setCreating(v => !v); setEditing(null) }}
-                  className="admin-primary flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-black text-white"
-                >
-                  <Plus className="h-4 w-4" />Novo livro
-                </button>
+                <div className="flex flex-wrap items-end gap-2 sm:justify-end">
+                  <label className="min-w-44 text-[10px] font-black uppercase tracking-wider opacity-70">
+                    Ordenar por
+                    <select
+                      value={bookSort}
+                      onChange={event => setBookSort(event.target.value)}
+                      className="admin-input mt-1 block min-h-10 w-full rounded-xl border px-3 text-xs font-bold normal-case tracking-normal"
+                      aria-label="Ordenar livros"
+                    >
+                      <option value="recent">Mais recentes</option>
+                      <option value="alphabetical">Ordem alfabética</option>
+                    </select>
+                  </label>
+                  <button
+                    onClick={() => { setCreating(v => !v); setEditing(null) }}
+                    className="admin-primary flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-black text-white"
+                  >
+                    <Plus className="h-4 w-4" />Novo livro
+                  </button>
+                </div>
               </div>
 
               {creating && (
@@ -722,7 +751,7 @@ export default function AdminDashboard() {
               )}
 
               <div className="grid gap-3">
-                {data.books.map(item => (
+                {sortedBooks.map(item => (
                   <article key={item.id} className="admin-card rounded-2xl border p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
